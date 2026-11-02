@@ -73,6 +73,8 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
         return { ...base, met: devMonths <= scenario.devMonths, actual: devMonths, target: scenario.devMonths }
       case 'scienceAtLeast':
         return { ...base, met: s.science >= (req.value ?? 0), actual: s.science, target: req.value ?? 0 }
+      case 'costAtMost':
+        return { ...base, met: costM <= (req.value ?? Infinity), actual: costM, target: req.value ?? 0 }
       default:
         return { ...base, met: launched && designed.met, actual: designed.actual, target: designed.target }
     }
@@ -83,8 +85,11 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
 
   // 1. Mission success (300)
   const success = launched ? (300 * metCount) / Math.max(1, mandatory.length) : 0
-  // 2. Science (250)
-  const science = launched ? 250 * Math.min(1, s.science / scenario.scienceTarget) : 0
+  // 2. Science (250) — or cargo delivered for resupply contracts
+  const cargo = scenario.scoring === 'cargo'
+  const cargoTarget = scenario.requirements.find((q) => q.kind === 'cargoAtLeast' && !q.optional)?.value ?? 1
+  const delivered = launched && lifeYears > 0 ? (s.design.cargoKg ?? 0) : 0
+  const science = !launched ? 0 : cargo ? 250 * Math.min(1, delivered / cargoTarget) : 250 * Math.min(1, s.science / scenario.scienceTarget)
   // 3. Resource efficiency (150): launcher margin, EOL power margin, budget use
   const launchMargin = r.mass.capacityKg > 0 ? 1 - r.mass.wetKg / r.mass.capacityKg : 0
   const effLaunch = plateau(launchMargin, 0, 0.15, 0.35, 0.9, 0.4)
@@ -120,7 +125,9 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
   const fmt1 = (x: number) => (Math.round(x * 10) / 10).toString()
   const lines: ScoreLine[] = [
     { key: 'success', label: 'Mission success', points: success * soloRescale, max: 300 * soloRescale, detail: `${metCount}/${mandatory.length} requirements met` },
-    { key: 'science', label: 'Science achieved', points: science * soloRescale, max: 250 * soloRescale, detail: `${fmt1(s.science)} of ${scenario.scienceTarget} points` },
+    cargo
+      ? { key: 'science', label: 'Cargo delivered', points: science * soloRescale, max: 250 * soloRescale, detail: `${Math.round(delivered)} of ${cargoTarget} kg` }
+      : { key: 'science', label: 'Science achieved', points: science * soloRescale, max: 250 * soloRescale, detail: `${fmt1(s.science)} of ${scenario.scienceTarget} points` },
     { key: 'efficiency', label: 'Resource efficiency', points: efficiency * soloRescale, max: 150 * soloRescale, detail: `launch margin ${Math.round(launchMargin * 100)}%, power margin ${Math.round(r.power.marginEol * 100)}%, budget used ${Math.round(used * 100)}%` },
     { key: 'decisions', label: 'Engineering decisions', points: decisions * soloRescale, max: 100 * soloRescale, detail: `${warns} design warnings, ${s.decisions.length} flight decisions` },
     { key: 'schedule', label: 'Schedule', points: schedule * soloRescale, max: 50 * soloRescale, detail: late <= 0 ? 'ready on time' : `${fmt1(late)} months late` },

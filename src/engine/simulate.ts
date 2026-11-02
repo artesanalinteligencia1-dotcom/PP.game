@@ -73,6 +73,8 @@ export interface MissionState {
   plannedOpsWeeks: number
   launchDelayMonths: number
   endReason: EndReason | null
+  /** Reusable launchers: did the first stage land? (null = expendable) */
+  boosterLanded: boolean | null
   // spacecraft health
   batteryWear: number
   batteryWearFactor: number
@@ -129,7 +131,7 @@ function log(s: MissionState, role: Role, severity: LogEntry['severity'], text: 
 }
 
 /** Create a mission: rolls the launch and pre-launch delay. Pure (returns a fresh state). */
-export function createMission(design: Design, scenario: Scenario, seed: number): MissionState {
+export function createMission(design: Design, scenario: Scenario, seed: number, opts: { difficulty?: Difficulty } = {}): MissionState {
   const report = evaluateDesign(design, scenario)
   const orbit = getOrbit(design.orbitId)
   const launcher = getLauncher(design.launcherId)
@@ -139,7 +141,7 @@ export function createMission(design: Design, scenario: Scenario, seed: number):
     rng: mixSeed(seed),
     design: structuredClone(design),
     scenarioId: scenario.id,
-    difficulty: scenario.difficulty,
+    difficulty: opts.difficulty ?? scenario.difficulty,
     report,
     phase: 'transfer',
     week: 0,
@@ -147,6 +149,7 @@ export function createMission(design: Design, scenario: Scenario, seed: number):
     plannedOpsWeeks: Math.round(designLife * WEEKS_PER_YEAR),
     launchDelayMonths: 0,
     endReason: null,
+    boosterLanded: null,
     batteryWear: 0,
     batteryWearFactor: 1,
     panelFactor: 1,
@@ -185,6 +188,17 @@ export function createMission(design: Design, scenario: Scenario, seed: number):
     return s
   }
   log(s, 'engineer', 'good', `Launch successful on the ${launcher.name}. Spacecraft separated and healthy.`)
+  if (launcher.landing) {
+    s.boosterLanded = rand(s) < launcher.landing.successP
+    log(
+      s,
+      'engineer',
+      s.boosterLanded ? 'good' : 'warn',
+      s.boosterLanded
+        ? 'The first-stage booster landed and can fly again.'
+        : 'The booster missed its landing and was lost at sea (the mission is fine; the next flight costs more).',
+    )
+  }
   if (s.transferWeeks > 0) log(s, 'astrophysicist', 'info', `Cruising to ${orbit.name}: ~${Math.round(s.transferWeeks / 4.345)} month(s) of transfer.`)
   else {
     s.phase = 'operations'
@@ -354,6 +368,7 @@ function triggerEvent(s: MissionState, id: EventId) {
     }
     case 'science_opportunity': {
       const scenarioOpp = scenarioOpportunity(s)
+      if (scenarioOpp.instrumentIds.length === 0) return
       const has = s.design.instruments.some((i) => scenarioOpp.instrumentIds.includes(i.id))
       if (!has) {
         s.missedOpportunities++

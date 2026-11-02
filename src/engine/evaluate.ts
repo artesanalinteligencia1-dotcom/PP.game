@@ -98,11 +98,20 @@ const ROLE_BY_CODE: Record<string, Role> = {
   LIFE_SHORT: 'lead',
   LAUNCHER_OVERSIZED: 'lead',
   LAUNCHER_NO_TARGET: 'lead',
+  LAUNCHER_SUBORBITAL: 'lead',
+  RIDESHARE_ALTITUDE: 'astrophysicist',
+  RIDESHARE_SCHEDULE: 'lead',
+  NO_PAYLOAD: 'astrobiologist',
+}
+
+export interface EvaluateOptions {
+  /** Launchers the player may buy (campaign); others are never suggested. */
+  availableLaunchers?: string[]
 }
 
 const clamp = (x: number, lo: number, hi: number) => (Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : lo)
 
-export function evaluateDesign(design: Design, scenario: Scenario): DesignReport {
+export function evaluateDesign(design: Design, scenario: Scenario, opts: EvaluateOptions = {}): DesignReport {
   const review: ReviewItem[] = []
   const add = (
     code: string,
@@ -129,6 +138,7 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
   const antenna = getAntenna(design.antennaId)
   const stations = [...new Set(design.stationIds)].map(getStation)
   const designLife = clamp(design.designLifeYears, 0.5, 15)
+  const cargoKg = clamp(design.cargoKg ?? 0, 0, 20000)
   const seen = new Set<string>()
   const payload = design.instruments
     .filter((i) => (seen.has(i.id) ? false : (seen.add(i.id), true)))
@@ -217,6 +227,7 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
   const items: MassItem[] = (
     [
     ...payload.map((p): MassItem => ({ label: p.inst.name, kg: p.inst.massKg, group: 'payload' })),
+    { label: 'Cargo', kg: cargoKg, group: 'payload' },
     { label: `Solar array (${area.toFixed(1)} m²)`, kg: area > 0 ? area * array.kgPerM2 + array.fixedMassKg : 0, group: 'bus' },
     { label: battery.name, kg: battery.massKg, group: 'bus' },
     { label: `${band.name} radio`, kg: band.massKg, group: 'bus' },
@@ -228,7 +239,7 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
     { label: comp.name, kg: comp.massKg, group: 'bus' },
     ] satisfies MassItem[]
   ).filter((i) => i.kg > 0)
-  const instrumentsKg = payload.reduce((s, p) => s + p.inst.massKg, 0)
+  const instrumentsKg = payload.reduce((s, p) => s + p.inst.massKg, 0) + cargoKg
   const subsystemsKg = items.filter((i) => i.group === 'bus').reduce((s, i) => s + i.kg, 0)
   const structureKg = STRUCTURE_FRACTION * (instrumentsKg + subsystemsKg)
   const marginKg = MASS_MARGIN * (instrumentsKg + subsystemsKg + structureKg)
@@ -245,17 +256,24 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
   if (!hasProp && orbit.insertionDv > 0) add('NO_PROPULSION_INSERTION', 'error', 'mass', { dv: orbit.insertionDv, orbit: orbit.name })
   if (!Number.isFinite(propellantKg)) add('DV_INFEASIBLE', 'error', 'mass', { dv: totalDv, isp: prop.ispS })
   if (!hasProp && orbit.disposalDv > 0) add('DEBRIS_NO_DISPOSAL', 'warn', 'life', { dv: orbit.disposalDv })
-  if (capacityKg <= 0) add('LAUNCHER_NO_TARGET', 'error', 'mass', { launcher: launcher.name, orbit: orbit.name })
+  if (launcher.suborbital) add('LAUNCHER_SUBORBITAL', 'error', 'mass', { launcher: launcher.name, apogee: launcher.suborbital.apogeeKm })
+  else if (capacityKg <= 0) add('LAUNCHER_NO_TARGET', 'error', 'mass', { launcher: launcher.name, orbit: orbit.name })
   else if (Number.isFinite(wetKg)) {
     if (wetKg > capacityKg) add('MASS_OVER_CAPACITY', 'error', 'mass', { wet: wetKg, capacity: capacityKg, launcher: launcher.name })
     else if (wetKg > 0.9 * capacityKg) add('MASS_MARGIN_LOW', 'warn', 'mass', { wet: wetKg, capacity: capacityKg })
     else {
+      const priceOf = (l: typeof launcher) => l.costM + (l.costPerKgM ?? 0) * wetKg
       const cheaper = launchers
-        .filter((l) => l.costM < launcher.costM && launchCapacityKg(l, orbit) * 0.9 >= wetKg)
-        .sort((a, b) => a.costM - b.costM)[0]
-      if (cheaper) add('LAUNCHER_OVERSIZED', 'warn', 'cost', { launcher: launcher.name, cheaper: cheaper.name, saving: launcher.costM - cheaper.costM })
+        .filter((l) => !opts.availableLaunchers || opts.availableLaunchers.includes(l.id))
+        .filter((l) => !l.rideshare || alt <= l.rideshare.maxAltitudeKm)
+        .filter((l) => priceOf(l) < priceOf(launcher) && launchCapacityKg(l, orbit) * 0.9 >= wetKg)
+        .sort((a, b) => priceOf(a) - priceOf(b))[0]
+      if (cheaper) add('LAUNCHER_OVERSIZED', 'warn', 'cost', { launcher: launcher.name, cheaper: cheaper.name, saving: priceOf(launcher) - priceOf(cheaper) })
     }
   }
+
+  if (launcher.rideshare && capacityKg > 0 && alt > launcher.rideshare.maxAltitudeKm)
+    add('RIDESHARE_ALTITUDE', 'error', 'mass', { max: launcher.rideshare.maxAltitudeKm, alt })
 
   // ---------- Pointing vs instruments, environment ----------
   const scienceItems = payload.map(({ inst, duty }) => {
@@ -276,7 +294,7 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
     return { id: inst.id, base: inst.science * relevance * dutyFactor * pointingFactor * lowSun * comp.scienceFactor }
   })
   if (orbit.lowSunAngle && payload.some((p) => OPTICAL_INSTRUMENTS.includes(p.inst.id))) add('LOW_SUN_OPTICAL', 'warn', 'science')
-  if (payload.length === 0) add('NO_PAYLOAD', 'error', 'science')
+  if (payload.length === 0 && cargoKg <= 0) add('NO_PAYLOAD', 'error', 'science')
   const coldEnv = orbit.body !== 'earth'
   if (coldEnv && !thermal.coldCapable) add('COLD_RISK', 'warn', 'life', { orbit: orbit.name })
 
@@ -307,8 +325,11 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
   const instrumentsM = payload.reduce((s, p) => s + p.inst.costM * TRL_COST_FACTOR[p.inst.trl], 0)
   const busM =
     area * array.costPerM2 + battery.costM + band.costM + antenna.costM + obc.costM + adcs.costM + prop.costM + thermal.costM + comp.costM
-  const integrationM = INTEGRATION_FIXED_M + INTEGRATION_M_PER_KG * (Number.isFinite(tankKg) ? dryKg + tankKg : dryKg)
-  const launchM = launcher.costM
+  // Cargo (with its racks and margin) is not spacecraft to integrate.
+  const cargoShareKg = cargoKg * (1 + STRUCTURE_FRACTION) * (1 + MASS_MARGIN)
+  const integrationM =
+    INTEGRATION_FIXED_M + INTEGRATION_M_PER_KG * Math.max(0, (Number.isFinite(tankKg) ? dryKg + tankKg : dryKg) - cargoShareKg)
+  const launchM = launcher.costM + (launcher.costPerKgM ?? 0) * (Number.isFinite(wetKg) ? wetKg : 0)
   const opsBase = OPS_BASE_M_PER_MONTH[orbit.body]
   const stationM = stations.reduce((s, st) => s + st.costPerMonthM, 0)
   const opsM = designLife * 12 * (opsBase + stationM) + transferMonths * opsBase
@@ -320,12 +341,15 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
 
   // ---------- Schedule ----------
   const trlMonths = Math.max(0, ...payload.map((p) => TRL_MONTHS[p.inst.trl]), TRL_MONTHS[obc.trl])
-  const devMonths =
+  const buildMonths =
     DEV_BASE_MONTHS +
     trlMonths +
     DEV_MONTHS_PER_EXTRA_INSTRUMENT * Math.max(0, payload.length - 1) +
-    (DEV_MONTHS_PER_100KG * dryKg) / 100 +
+    (DEV_MONTHS_PER_100KG * Math.max(0, dryKg - cargoShareKg)) / 100 +
     (lowThrust ? DEV_MONTHS_ELECTRIC : 0)
+  // A rideshare leaves on a fixed calendar: wait for the next flight.
+  const devMonths = launcher.rideshare ? Math.ceil(buildMonths / launcher.rideshare.everyMonths) * launcher.rideshare.everyMonths : buildMonths
+  if (devMonths - buildMonths > 0.05) add('RIDESHARE_SCHEDULE', 'warn', 'schedule', { wait: devMonths - buildMonths, every: launcher.rideshare?.everyMonths ?? 0 })
   if (devMonths > scenario.devMonths) add('LATE', 'warn', 'schedule', { months: devMonths, deadline: scenario.devMonths })
 
   // ---------- Science ----------
@@ -361,6 +385,14 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
         return { ...base, met: devMonths <= scenario.devMonths, actual: devMonths, target: scenario.devMonths }
       case 'scienceAtLeast':
         return { ...base, met: sciencePerYear >= (r.value ?? 0), actual: sciencePerYear, target: r.value ?? 0 }
+      case 'cargoAtLeast':
+        return { ...base, met: cargoKg >= (r.value ?? 0), actual: cargoKg, target: r.value ?? 0 }
+      case 'altitudeAtMost':
+        return { ...base, met: alt <= (r.value ?? Infinity), actual: alt, target: r.value ?? 0 }
+      case 'propulsionAny':
+        return { ...base, met: !!r.propulsionIds?.includes(prop.id), actual: prop.name, target: 'thrusters for rendezvous' }
+      case 'costAtMost':
+        return { ...base, met: totalM <= (r.value ?? Infinity), actual: totalM, target: r.value ?? 0 }
     }
   })
 

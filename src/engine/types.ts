@@ -24,13 +24,26 @@ export interface Instrument {
   description: string
 }
 
+export type LauncherKind = 'sounding' | 'expendable' | 'rideshare' | 'reusable'
+
 export interface Launcher {
   id: string
   name: string
+  kind: LauncherKind
   /** Payload capacity (kg) per launch target; 0 = not offered. */
   capacityKg: Record<LaunchTarget, number>
   costM: number
+  /** Extra price per kg of spacecraft (rideshare pricing). */
+  costPerKgM?: number
   reliability: number
+  /** Sounding rockets only reach space briefly (suborbital). */
+  suborbital?: { apogeeKm: number; payloadKg: number }
+  /** Reusable first stage: chance the booster lands successfully. */
+  landing?: { successP: number }
+  /** Rideshare: highest altitude offered (km) and months between flights. */
+  rideshare?: { maxAltitudeKm: number; everyMonths: number }
+  /** One-line, approximate real-world reference shown as an educational card. */
+  realWorld: string
 }
 
 export interface Orbit {
@@ -213,6 +226,8 @@ export interface Design {
   stationIds: string[]
   /** Planned design life in years (propellant and operations are sized for it). */
   designLifeYears: number
+  /** Cargo carried to a destination (resupply contracts), kg. */
+  cargoKg?: number
 }
 
 export interface Requirement {
@@ -226,8 +241,13 @@ export interface Requirement {
     | 'withinBudget'
     | 'onSchedule'
     | 'scienceAtLeast'
+    | 'cargoAtLeast'
+    | 'altitudeAtMost'
+    | 'propulsionAny'
+    | 'costAtMost'
   instrumentIds?: string[]
   orbitIds?: string[]
+  propulsionIds?: string[]
   value?: number
   optional?: boolean
   bonus?: number
@@ -249,7 +269,11 @@ export interface Scenario {
   baseDesign: Design
   /** Science points that earn the full science score over the required life. */
   scienceTarget: number
-  /** Scenario-specific science opportunity event. */
+  /** 'cargo' contracts score delivered cargo instead of science. */
+  scoring?: 'science' | 'cargo'
+  /** Who pays for this contract (campaign). */
+  client?: 'agency' | 'commercial' | 'foundation'
+  /** Scenario-specific science opportunity event (empty instrument list = no opportunity). */
   opportunity: { title: string; text: string; instrumentIds: string[]; bonusScience: number }
 }
 

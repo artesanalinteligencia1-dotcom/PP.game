@@ -37,9 +37,33 @@ export const instruments: Instrument[] = [
 export const OPTICAL_INSTRUMENTS = ['pan_camera', 'multispectral', 'hires_camera', 'hyperspectral']
 
 export const launchers: Launcher[] = [
-  { id: 'light', name: 'Light (L-1)', capacityKg: { leo: 300, sso: 200, gto: 0, tli: 0 }, costM: 7, reliability: 0.9 },
-  { id: 'medium', name: 'Medium (M-2)', capacityKg: { leo: 3000, sso: 2000, gto: 1000, tli: 400 }, costM: 45, reliability: 0.94 },
-  { id: 'heavy', name: 'Heavy (H-3)', capacityKg: { leo: 15000, sso: 10000, gto: 6000, tli: 3500 }, costM: 130, reliability: 0.96 },
+  {
+    id: 'paulet', name: 'Paulet-1 (sounding rocket)', kind: 'sounding', capacityKg: { leo: 0, sso: 0, gto: 0, tli: 0 }, costM: 1.5, reliability: 0.8,
+    suborbital: { apogeeKm: 110, payloadKg: 8 },
+    realWorld: 'Built by Pedro Goicochea from Pedro Paulet’s notebooks (fiction). Paulet claimed in a 1927 letter to have tested a liquid-propellant engine in Paris in the 1890s — not independently verified. The first verified liquid-fuel rocket flight was Robert Goddard’s, in 1926.',
+  },
+  {
+    id: 'light', name: 'Light (L-1)', kind: 'expendable', capacityKg: { leo: 300, sso: 200, gto: 0, tli: 0 }, costM: 7, reliability: 0.9,
+    realWorld: 'Small dedicated launchers (a few hundred kg to low orbit) appeared in the late 2010s for small satellites.',
+  },
+  {
+    id: 'rideshare', name: 'Rideshare (shared ride to SSO)', kind: 'rideshare', capacityKg: { leo: 0, sso: 150, gto: 0, tli: 0 }, costM: 0.5, costPerKgM: 0.015, reliability: 0.95,
+    rideshare: { maxAltitudeKm: 620, everyMonths: 6 },
+    realWorld: 'Dedicated rideshare flights carry dozens of small satellites at once to sun-synchronous orbit: cheap per kg, but you go when and where the rocket goes.',
+  },
+  {
+    id: 'medium', name: 'Medium (M-2)', kind: 'expendable', capacityKg: { leo: 3000, sso: 2000, gto: 1000, tli: 400 }, costM: 45, reliability: 0.94,
+    realWorld: 'Classic medium launchers, thrown away after each flight, flew most satellites of the last decades.',
+  },
+  {
+    id: 'reusable_medium', name: 'R-2 Reusable Medium', kind: 'reusable', capacityKg: { leo: 2100, sso: 1400, gto: 700, tli: 280 }, costM: 27, reliability: 0.95,
+    landing: { successP: 0.9 },
+    realWorld: 'In December 2015 an orbital rocket’s first stage (Falcon 9) landed back for the first time; boosters have been re-flown since 2017. Landing needs propellant, so a reusable rocket lifts less than the same rocket thrown away — but each flight costs much less.',
+  },
+  {
+    id: 'heavy', name: 'Heavy (H-3)', kind: 'expendable', capacityKg: { leo: 15000, sso: 10000, gto: 6000, tli: 3500 }, costM: 130, reliability: 0.96,
+    realWorld: 'Heavy expendable launchers send big satellites to geostationary orbit and probes to the Moon and planets.',
+  },
 ]
 
 export const orbits: Orbit[] = [
