@@ -51,3 +51,17 @@ Then run: `python3 scripts/audio/prepare_launch_audio.py --countdown countdown.m
 ## 7. Approve credits for the per-stage music loops (decision)
 - **What:** two 150 s loops for "design" and "flight" (ElevenLabs estimate: 7 500 credits for both). Until then the game uses music A softly.
 - **Done when:** approved and generated, or replaced by local AI music.
+
+## 8. Launch-pad art upgrade (LOCAL, no ElevenLabs credits needed)
+- **What:** replace the flat shapes of the launch scene with illustrated layers in the intro's style (docs/video-style.md):
+  sky gradient by altitude, Andes range with the Misti volcano, launch pad + tower, clouds for the cloud-layer crossing, ocean + drone ship for
+  the booster landing, Earth limb from orbit. Optional: rocket sprites per launcher (Paulet-1 brass/copper, L-1, M-2, R-2 with legs/grid fins, H-3 with
+  boosters). Export as SVG or WebP layers (≤ 300 KB each) into `src/assets/launch/` and swap them into `src/ui/launch/LaunchSequence.tsx`
+  and `src/ui/hub/SoundingSequence.tsx` (keep the timeline, captions and telemetry as they are).
+- **Why local:** you can use the image tools on your PC at no credit cost; the cloud keeps the mechanics.
+- **Done when:** the scene reads as "illustrated" at 1280×720 and on a phone, with no change to the timing or the tests.
+
+## 9. Opening a cloud session that can download from ElevenLabs
+- In claude.ai/code: environment menu (session title bar) → Edit → Network access → add `elevenlabsusercontent.com` under Allowed domains
+  (keep "allow package managers" ticked). Then start a **new** session in that environment on this repo (branch `cloud/fase-1`).
+- Or do it from the local chat: your PC is not subject to the cloud network policy.

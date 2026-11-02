@@ -475,3 +475,37 @@ Tres niveles: Cadete / Investigador / Director de Programa. Tres cuerpos: verlo 
 
 ### 19.7 Entregable final pedido por el usuario
 Al terminar el proyecto: un **texto detallado tipo storytelling** de todos los pasos seguidos, explicando términos y procesos (qué se hizo, por qué y cómo). Registrar los hitos en PROGRESS.md para poder escribirlo.
+
+---
+
+## 20. ADDENDUM v6 — Paulet-1, cohetes, campaña del Acto 1 y Marte (aprobado por el usuario el 2026-11-02; PREVALECE si hay conflicto)
+
+### 20.1 Paulet-1 (cohete inicial)
+- El primer cohete del jugador es **Paulet-1**, un cohete sonda de propelente líquido que el protagonista construyó a partir de los cuadernos de Paulet (ficción; los hechos históricos siguen §16.4).
+- **No puede hacer lo que hacen los demás:** llega al espacio (~110 km) unos segundos y cae; no alcanza órbita (necesitaría ~7,8 km/s laterales; logra ~1,5 km/s vertical). Esa limitación es parte del aprendizaje y de la historia (Prólogo "First Light").
+
+### 20.2 Progresión de cohetes (tecnología actual primero)
+| Momento | Cohete | Idea |
+|---|---|---|
+| Prólogo | Paulet-1 (sonda) | solo suborbital |
+| Acto 1 (tras First Light) | L-1, M-2, H-3 desechables | servicios comerciales |
+| Acto 1 (tecnología) | Viaje compartido (rideshare) | barato por kg; SSO ≤ 620 km; sale cada 6 meses |
+| Acto 1 (tecnología) | **R-2 reutilizable** | ~40 % más barato, ~30 % menos carga, el propulsor aterriza (o se pierde) |
+| Acto 2 | R-3 pesado reutilizable | propulsores laterales que aterrizan |
+| Acto 3 | Superpesado totalmente reutilizable + recarga orbital | Luna y Marte |
+| Acto 4 | Etapa nuclear-térmica | especulativo, etiquetado |
+- Nombres jugables genéricos (§14); cada cohete tiene una tarjeta "In the real world" con la referencia real aproximada (p. ej. primer aterrizaje de una primera etapa orbital en 2015).
+
+### 20.3 Campaña del Acto 1 (porción vertical)
+- Perfil: nombre del jugador, título Dr./Ing., nivel Cadete/Investigador/Director (afecta eventos y fallos).
+- Contratos: First Light (prólogo) → Earth Watch → Andean Eye (fundación), Station Resupply (comercial, carga por kg), Storm Tracker (agencia, GEO). Acto 2: Lunar Pathfinder (requiere prestigio y 3 contratos del Acto 1).
+- Inversores: Agencia, Socio comercial, Fundación; la confianza multiplica el pago (×0,8–×1,2).
+- Dos monedas: Fondos (compran tecnología, nunca más presupuesto de contrato) y Prestigio (desbloquea contratos y tecnología).
+- Guardado local + compartir misión por link (diseño + semilla).
+- Pantalla de inicio: Carrera, Misión libre, Ver intro, Aprender (lecciones 1–3 + Paulet), Legado: Paulet, Sandbox.
+
+### 20.4 Marte (aprobado; Actos 3–4)
+- **"Stranded"** (homenaje a *The Martian*, sin nombres, personajes ni escenas de la obra): suministros + relé de comunicaciones; ventanas de lanzamiento (~26 meses), viaje de 7–9 meses, retardo de radio, entrada-descenso-aterrizaje.
+- **"Breathing Mars"**: producir oxígeno del CO₂ (referencia real: MOXIE en Perseverance, 2021–2023).
+- **Terraformación** como gran desafío por etapas: lo actual (hielo, oxígeno) → futuro cercano (hábitats) → terraformación especulativa (siglos), explicando que con la tecnología actual no es posible.
+- Requiere en el motor: ventanas interplanetarias y subsistema de aterrizaje (escudo térmico, paracaídas, retrocohetes).

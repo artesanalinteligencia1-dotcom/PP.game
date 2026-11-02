@@ -61,3 +61,16 @@
 - Music: silence during the countdown so the voice is heard; B starts at liftoff / B from countdown / cinematic timing.
 - Design/flight loops generated (4 500 credits, below the 7 500 estimate) and wired to load automatically.
 - Not downloadable in this session: ElevenLabs now serves all outputs from elevenlabsusercontent.com, blocked by the session's network policy even after the user's change (probably only new sessions pick it up). A workaround through an ElevenLabs composition node was refused by the permission system as a policy bypass; not retried.
+
+## Phase 3 — Paulet-1, rockets, Act 1 campaign (2026-11-02, user-approved)
+- Starting rocket = Paulet-1 sounding rocket (suborbital only) built from Paulet's notebooks / start with L-1 / user's idea: the limitation is part of the story and the learning ("reaching space ≠ orbit").
+- First Light as its own mini-flow (choose a ≤ 8 kg experiment, seeded flight, honest history card) / reuse the orbital designer / clearer and much shorter for a prologue.
+- Rockets keep generic names with "In the real world" cards (Falcon 9 landing 2015, rideshare flights…) / real brand names / HANDOFF §14 + trademarks.
+- Rideshare priced per kg with fixed altitude (≤ 620 km) and 6-month slots / free choice / teaches the real trade-off of shared rides.
+- Reusable R-2: −40 % price, −30 % capacity, 90 % landing roll shown in a "Booster recovery" inset; lost booster −$8 M / no downside / honest trade-off.
+- Campaign economy: funds only buy technology (never larger contract budgets); prestige gates contracts/tech; investor trust multiplies payments / free spending / keeps trade-offs alive (no snowball).
+- New contracts: Andean Eye (foundation), Station Resupply (commercial, cargo-scored, R-2 wins the cost bonus), Storm Tracker (GEO, radiation teaches rad-hard OBC); Sandbox scenario.
+- Mars (Stranded, Breathing Mars, Terraforming) visible as locked previews with honest notes; implementation later (needs interplanetary windows + EDL).
+- Home hub + lessons 1–3 + Paulet facts; intro test video bundled (720p, 2.9 MB) with English captions as the "Watch intro" placeholder.
+- Share links: design + seed in the URL hash, validated on load.
+- Launch-pad art upgrade delegated to the local chat (LOCAL_TODO §8); cloud kept the mechanics (rockets per launcher, booster landing, rideshare neighbours).

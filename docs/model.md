@@ -182,3 +182,31 @@ computer and only "ok" with a hardened one). Bots: *prudent* picks the safest op
 
 Rank: launch failure or < 50 % of requirements → **Fail**; some requirement missed → **Partial**; all met → **Success**;
 all met and ≥ 800 → **Outstanding**. Post-mission analysis ranks the causes by approximate point impact and shows the top 3.
+
+---
+
+# Phase 3 — launchers, First Light and the campaign
+
+## 15. Launchers (game values)
+| Launcher | Capacity LEO / SSO / GTO / TLI (kg) | Price | Reliability | Notes |
+|---|---|---|---|---|
+| Paulet-1 (sounding) | suborbital only: ~110 km, 8 kg | $1.5 M | 80 % | cannot reach orbit (blocking error `LAUNCHER_SUBORBITAL`) |
+| L-1 Light | 300 / 200 / – / – | $7 M | 90 % | |
+| Rideshare | – / 150 / – / – | $0.5 M + $0.015 M per kg | 95 % | SSO ≤ 620 km only; flies every 6 months → dev time rounded up to the next slot |
+| M-2 Medium | 3 000 / 2 000 / 1 000 / 400 | $45 M | 94 % | |
+| R-2 Reusable Medium | 2 100 / 1 400 / 700 / 280 (−30 %) | $27 M (−40 %) | 95 % | booster landing roll 90 %; lost booster = −$8 M in the campaign |
+| H-3 Heavy | 15 000 / 10 000 / 6 000 / 3 500 | $130 M | 96 % | |
+
+## 16. First Light (sounding flight)
+Vertical shot without drag: apogee `h = v²/2g` ⇒ burnout speed `v = √(2gh)` (≈ 1.47 km/s for 110 km). Apogee = 110 km + 3 km per kg below the
+8 kg limit ± 3 km; 20 % failure (apogee 8–38 km); time above 100 km = `2·√(2(h − 100 km)/g)`; parachute recovery 90 %.
+Science = Σ instrument science × 0.3 × (1 if above 100 km else 0.2) × (1 if recovered else 0.6).
+
+## 17. Campaign economy
+- Start: $20 M funds, 0 prestige, trust 50 with each investor.
+- Payment = contract payment × rank factor (Fail 0, Partial 0.4, Success/Outstanding 0.7 + 0.3·score/1000) × trust multiplier (0.8 + trust/250);
+  repeats pay 25 %. Prestige: Partial 10, Success 30, Outstanding 50, +20 first success, +30 first booster landing.
+- Trust: client +10 on success / −12 on failure; other investors ±2–3.
+- First Light reaching space: +$10 M, +25 prestige, unlocks commercial launchers; every Paulet-1 flight costs $1.5 M.
+- Technology: rideshare ($3 M, 40 prestige), R-2 ($35 M, 120 prestige, after Earth Watch); later acts shown but locked.
+- Cargo contracts score "cargo delivered / required" instead of science; cargo is excluded from integration cost and development time.

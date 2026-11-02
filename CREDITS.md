@@ -10,5 +10,8 @@
 - Sound effects (when present in `src/assets/audio/sfx/`): generated with ElevenLabs Sound Effects for this project.
 - Licence/terms of the owner's ElevenLabs plan to be confirmed before any commercial use (see LOCAL_TODO.md).
 
+## Video
+- "Watch intro" test video (illustrations, narration, music): generated with ElevenLabs for this project; assembled with `scripts/video/build_intro_test.py`.
+
 ## Data
 - All component, launcher and mission values are simplified, fictional game values (see `docs/model.md`).

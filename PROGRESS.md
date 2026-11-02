@@ -1,7 +1,7 @@
 # PROGRESS
 
-**Current phase:** Phase 3 started — visual identity, launch pad, audio (branch `cloud/fase-1`, 2026-11-02).
-**Next:** rest of Phase 3 — campaign ("career"), player name, 3 difficulty levels, save/share by link, hub with Watch Intro, in-app lessons 1–3.
+**Current phase:** Phase 3 Act 1 vertical slice — DONE (branch `cloud/fase-1`, 2026-11-02).
+**Next:** Phase 3.5 (Act 2: Moon, Lagrange, 3-body lesson) — or Act 1 polish after local tasks (audio download, launch-pad art).
 
 ## Done
 - Phase 0 (local): scaffold, CI.
@@ -23,6 +23,15 @@
   - Typography: Space Grotesk + Inter in game and video script; `docs/video-style.md`; `CREDITS.md`; HANDOFF §19.
   - Tests: 46 passing (+ spacecraft visual mapping and launch timeline).
 
+- Phase 3 (part 2 — Act 1 vertical slice):
+  - Home hub (career, free mission, watch intro, learn, Paulet legacy, sandbox), profile (name, Dr./Eng., 3 levels), local save.
+  - Prologue "First Light": Paulet-1 sounding rocket, suborbital flight animation, honest history card.
+  - Career screen: contracts by act (Mars previews), investors with trust, funds/prestige, technology tree with real-world cards.
+  - New launchers (Paulet-1, rideshare, R-2 reusable) with locks in the designer; booster-landing inset; rideshare neighbours.
+  - New contracts: Andean Eye, Station Resupply (cargo), Storm Tracker (GEO); Sandbox.
+  - Lessons: Newton's cannon (orbit), budgets, rocket equation (sliders), Pedro Paulet facts. Intro video (test) with captions.
+  - Share link (design + seed). Tests: 66 passing. Browser: full career loop with no console errors; progress survives reload.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
@@ -30,6 +39,7 @@
 4. Media tests with ElevenLabs (music A/B, 30 s intro) → Phase 2 (seeded simulation, events, bots, score, report).
 5. User feedback (launch pad basic, typography, videos per format) → HANDOFF §19 → visual identity, spacecraft everywhere, new launch pad, per-stage audio.
 6. Movie-style voiced countdown with ignition phase and varying farewell line; design/flight music loops generated; evaluation of rockets (reusables), Mars projects and the rest of Phase 3.
+7. Paulet-1 as the starting rocket (the user's idea), rockets progression up to reusables, Act 1 career with investors, hub, lessons, share links; Mars planned for Acts 3–4.
 
 ## How to run
 ```
