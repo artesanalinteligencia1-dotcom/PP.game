@@ -38,6 +38,9 @@
   "one / ignition / liftoff" into one segment. `prepare_launch_audio.py`: farewell split uses 0.3 s pauses (0.6 s found none).
   Tests 66 passing; build passes once `intro.mp4` is present (see Open risks). Not listened to by a human yet.
 
+- Cloud session (2026-11-02): `src/assets/video/intro.mp4` (720p, 30 s, 2.9 MB — the original encode) committed now that
+  `.gitignore` allows `src/assets/video/*.mp4`; clean-checkout `npm ci && npm run build` verified.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
@@ -62,10 +65,8 @@ Vercel project being linked from the cloud session (see README for the URL once 
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
 - Recharts bundle ~570 kB (warning only).
 - ElevenLabs licence for public/commercial use not verified (LOCAL_TODO).
-- **`src/assets/video/intro.mp4` is missing from the repo** (it was blocked by the `*.mp4` rule in `.gitignore`), so a clean
-  checkout fails `npm run build` (and CI / Vercel). `.gitignore` now allows `src/assets/video/*.mp4`; the cloud session must
-  re-add and commit the file (regenerate with `scripts/video/build_intro_test.py` if the container no longer has it).
 - Vercel deploy postponed by the user.
 
 ## Next exact step
-Phase 3 (rest): campaign map (contracts, investors, Funds + Prestige), player name, 3 difficulty levels, save/share link, hub with Watch Intro.
+Phase 3.5 — Act 2: Lunar Pathfinder in the career, Lagrange observatory, lesson 4 (three-body problem / chaos) with deterministic
+RK4 and precomputed routes. In parallel (local): launch-pad art (LOCAL_TODO §8) and a human listen of the generated audio.
