@@ -1,9 +1,11 @@
+import { useMusic } from '../audio/audio'
 import { scenarios } from '../engine/catalog'
 import { useGame } from '../store/game'
 import { Disclaimer, Pill } from './components'
 
 export function ScenarioSelect() {
   const start = useGame((s) => s.startScenario)
+  useMusic('home')
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
       <header className="text-center">

@@ -4,8 +4,9 @@ import { FlightScreen } from './FlightScreen'
 import { LaunchScreen } from './LaunchScreen'
 import { ResultsScreen } from './ResultsScreen'
 import { ScenarioSelect } from './ScenarioSelect'
+import { SoundToggle } from './SoundToggle'
 
-export function App() {
+function CurrentScreen() {
   const design = useGame((s) => s.design)
   const screen = useGame((s) => s.screen)
   const mission = useGame((s) => s.mission)
@@ -14,4 +15,13 @@ export function App() {
   if (screen === 'flight' && mission) return <FlightScreen />
   if (screen === 'results' && mission) return <ResultsScreen />
   return <DesignScreen design={design} />
+}
+
+export function App() {
+  return (
+    <>
+      <CurrentScreen />
+      <SoundToggle />
+    </>
+  )
 }

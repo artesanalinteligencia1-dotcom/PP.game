@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react'
+import { audio, useMusic } from '../audio/audio'
+import { JourneyView } from './JourneyView'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { getObc, getScenario } from '../engine/catalog'
 import { SIM_WEEKS_PER_YEAR, type Personality } from '../engine/simulate'
@@ -48,6 +50,11 @@ export function FlightScreen() {
   const scenario = getScenario(mission.scenarioId)
   const r = mission.report
   const acc = useRef(0)
+  useMusic('flight')
+  const pendingKey = mission.pending ? `${mission.pending.eventId}-${mission.pending.week}` : ''
+  useEffect(() => {
+    if (pendingKey) audio.play('alert')
+  }, [pendingKey])
 
   useEffect(() => {
     if (!playing) return
@@ -145,6 +152,9 @@ export function FlightScreen() {
 
         {/* Center: chart + log */}
         <section className="min-w-0 space-y-4">
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-2">
+            <JourneyView mission={mission} playing={playing} />
+          </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
             <div className="mb-1 flex justify-between text-xs text-slate-400">
               <span>Science points (violet) · battery health % (blue) · power vs need % (amber)</span>
