@@ -1,7 +1,7 @@
 # PROGRESS
 
-**Current phase:** Phase 3 Act 1 vertical slice — DONE (branch `cloud/fase-1`, 2026-11-02).
-**Next:** Phase 3.5 (Act 2: Moon, Lagrange, 3-body lesson) — or Act 1 polish after local tasks (audio download, launch-pad art).
+**Current phase:** Phase 3.5 Act 2 (Moon, Lagrange, three-body) — DONE (branch `cloud/fase-1`, 2026-11-02).
+**Next:** Phase 3.6 / Act 3 planning (Mars: launch windows + entry-descent-landing), or polish after local tasks (launch-pad art).
 
 ## Done
 - Phase 0 (local): scaffold, CI.
@@ -41,6 +41,18 @@
 - Cloud session (2026-11-02): `src/assets/video/intro.mp4` (720p, 30 s, 2.9 MB — the original encode) committed now that
   `.gitignore` allows `src/assets/video/*.mp4`; clean-checkout `npm ci && npm run build` verified.
 
+- Audio pass (cloud): voiced countdown verified in Chromium (count_10…1 at 1 s steps, ignition at 10 s, liftoff + music B at 11.5 s,
+  farewell, staging/fairing/deploy/orbit SFX, design/flight loops, alert SFX; no 404s). Fixed overlaps: "T-minus ten" fitted to 1 s,
+  farewell after the liftoff call, clock T−0 = ignition.
+- Phase 3.5 (Act 2):
+  - Engine `threebody.ts`: CR3BP Earth–Moon, RK4 (deterministic arithmetic), Jacobi, L1/L2/L3, L2 Lyapunov orbit, butterfly experiment.
+  - Routes (direct / flyby / low-energy) for lunar orbit and L2, correction reserve slider, chaos-dependent corrections in flight,
+    halo drift events; new orbit "Earth–Moon L2 halo"; instruments IR telescope + low-frequency radio antennas.
+  - Scenario + contract **Lagrange Observatory** (Act 2, after Lunar Pathfinder); **R-3 Reusable Heavy** tech.
+  - UI: route cards + reserve slider + real L2 orbit view (Orbit tab), L2 journey view, **lesson 4 "Three bodies & chaos"**.
+  - Tests: 77 passing (Lagrange points, Jacobi, periodicity, determinism snapshot 1e-12, butterfly, Lagrange designs/outcomes).
+  - Browser: lesson 4 + full Lagrange mission (low-energy route, drift decisions) → 901/1 000, no console errors.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
@@ -49,6 +61,7 @@
 5. User feedback (launch pad basic, typography, videos per format) → HANDOFF §19 → visual identity, spacecraft everywhere, new launch pad, per-stage audio.
 6. Movie-style voiced countdown with ignition phase and varying farewell line; design/flight music loops generated; evaluation of rockets (reusables), Mars projects and the rest of Phase 3.
 7. Paulet-1 as the starting rocket (the user's idea), rockets progression up to reusables, Act 1 career with investors, hub, lessons, share links; Mars planned for Acts 3–4.
+8. Audio landed from the local session; voiced-countdown pass; Act 2: real three-body physics, routes, chaos lesson, Lagrange Observatory.
 
 ## How to run
 ```
@@ -68,5 +81,5 @@ Vercel project being linked from the cloud session (see README for the URL once 
 - Vercel deploy postponed by the user.
 
 ## Next exact step
-Phase 3.5 — Act 2: Lunar Pathfinder in the career, Lagrange observatory, lesson 4 (three-body problem / chaos) with deterministic
-RK4 and precomputed routes. In parallel (local): launch-pad art (LOCAL_TODO §8) and a human listen of the generated audio.
+Decide with the user: Act 3 (Mars "Stranded": launch windows, interplanetary transfer, entry-descent-landing subsystem) or polish/
+balance with playtests. In parallel (local): launch-pad art (LOCAL_TODO §8) and a human listen of the generated audio.

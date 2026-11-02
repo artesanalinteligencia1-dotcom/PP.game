@@ -77,3 +77,11 @@
 - Launch scenery as inline SVG React components (`src/ui/launch/LaunchScenery.tsx`) / exported SVG or WebP files in `src/assets/launch/` (LOCAL_TODO §8) / vector stays sharp at any size, ~10 KB of code instead of image files, layers can parallax and recolour with altitude, no image-generation credits.
 - Sky darkening and the cloud-layer crossing follow the camera scroll, not the HUD altitude / tie them to km / the HUD altitude passes 100 km about 1.7 s after liftoff, which turned the sky black while the Andes were still on screen; telemetry is unchanged.
 - Misti drawn left of the pad inside the central 800×480 crop / at the far left / phones show only the middle of the scene (`slice`), and the volcano is the scene's landmark.
+
+## Phase 3.5 — Act 2 (2026-11-02)
+- Real CR3BP physics (RK4, + − × ÷ √ only) for the L2 orbit picture, the journey view and lesson 4; the mission simulation uses route statistics derived from it / integrate every mission in CR3BP / weekly sim stays fast and readable; chaos still decides outcomes through seeded correction needs and drift events.
+- Planar Lyapunov orbit as the "halo" / full 3-D halo / planar is enough to show the loop and the instability; labelled honestly.
+- Route schematics are drawn, not integrated (real low-energy transfers need the Sun: 4-body) / fake "exact" curves / honesty.
+- Unused correction reserve is kept for station-keeping; default reserve 2× expected + 10 m/s / reserve lost at arrival / found in calibration: otherwise most halo missions ran out of propellant.
+- Lagrange Observatory: the low-energy route is what lets the telescope fit the Medium rocket (370/400 kg); the direct route needs R-3 or busts the budget with H-3 — designed trade-off time ↔ propellant ↔ money.
+- Launch audio pass: "T-minus ten" sped up to fit 1 s (atempo 1.3, pitch kept); farewell moved after the 2.5 s liftoff call; pre-liftoff clock counts to ignition.

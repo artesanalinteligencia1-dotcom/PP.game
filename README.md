@@ -15,7 +15,8 @@ Inspired by the engineering spirit of Pedro Paulet and by chaos in orbital mecha
 | 1 | Engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder | ✅ |
 | 2 | Launch animation, seeded mission simulation, events with team decisions (or bots), score 0–1 000, post-mission analysis | ✅ |
 | 3 (part 1) | Your spacecraft drawn from your design (design, launch pad, flight), new launch sequence with telemetry, music per stage, typography | ✅ |
-| 3 (part 2) | Career: Paulet-1 prologue, Act 1 contracts, investors, funds & prestige, reusable rockets, hub, lessons, share links | ✅ (branch `cloud/fase-1`) |
+| 3 (part 2) | Career: Paulet-1 prologue, Act 1 contracts, investors, funds & prestige, reusable rockets, hub, lessons, share links | ✅ |
+| 3.5 | Act 2: real Earth–Moon three-body physics, transfer routes, chaos lesson, Lagrange Observatory, reusable heavy | ✅ (branch `cloud/fase-1`) |
 | 3+ | Campaign with investors, player name, difficulty levels, save/share, hub + intro video, lessons, 3-body module, Paulet legacy, polish | planned |
 
 Live demo: _pending deploy_.

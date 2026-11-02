@@ -210,3 +210,34 @@ Science = Σ instrument science × 0.3 × (1 if above 100 km else 0.2) × (1 if 
 - First Light reaching space: +$10 M, +25 prestige, unlocks commercial launchers; every Paulet-1 flight costs $1.5 M.
 - Technology: rideshare ($3 M, 40 prestige), R-2 ($35 M, 120 prestige, after Earth Watch); later acts shown but locked.
 - Cargo contracts score "cargo delivered / required" instead of science; cargo is excluded from integration cost and development time.
+
+---
+
+# Phase 3.5 — Act 2: the three-body problem
+
+## 18. Circular restricted three-body problem (Earth–Moon)
+- Planar CR3BP in the rotating frame, normalised units: μ = 0.012150586 (Moon mass fraction), 1 LU = 384 400 km,
+  1 TU = 4.3425 days. Earth at (−μ, 0), Moon at (1 − μ, 0).
+- Equations: ẍ = 2ẏ + x − (1−μ)(x+μ)/r₁³ − μ(x−1+μ)/r₂³, ÿ = −2ẋ + y − (1−μ)y/r₁³ − μy/r₂³.
+- **Determinism (HANDOFF §16.3):** fixed-step classical RK4; inside the integrator only + − × ÷ √ (no sin/cos/pow/hypot),
+  which IEEE-754 rounds identically in every browser. Snapshot test: 1 000 steps of h = 0.001 from the L2 orbit must reproduce
+  the stored state within **1e-12** (tests/threebody.test.ts). Checks: Jacobi constant drift < 1e-9 over one period;
+  L1 = 0.836915, L2 = 1.155682, L3 = −1.005063.
+- **L2 orbit:** planar Lyapunov orbit (planar cousin of a halo) found by differential correction: x₀ = 1.18568, ẏ₀ = −0.19242,
+  period 3.444 TU ≈ 15 days; returns within ~100 km after one period, then drifts (unstable).
+- **Butterfly lesson:** same start, speed changed by 0.0001 %–0.1 %; a 0.01 % (~2 cm/s) change grows past 1 000 km in ~16 days.
+
+## 19. Routes, corrections and drift (game layer)
+| Destination | Route | Arrival Δv | Transfer | Expected corrections |
+|---|---|---|---|---|
+| Low lunar orbit | direct | 850 m/s | 0.2 months | 10 m/s |
+| Low lunar orbit | low-energy | 650 m/s | 3.5 months | 25 m/s |
+| Earth–Moon L2 halo | direct | 450 m/s | 0.25 months | 15 m/s |
+| Earth–Moon L2 halo | lunar flyby | 300 m/s | 0.75 months | 20 m/s |
+| Earth–Moon L2 halo | ballistic low-energy | 120 m/s | 4 months | 35 m/s |
+- Correction reserve (design slider) defaults to 2 × expected + 10 m/s and is added to the Δv budget (propellant).
+- In flight the real need is drawn from the seed: expected × (0.5 … 2). Leftover reserve funds station-keeping; a deficit asks the
+  Astrophysicist to borrow station-keeping propellant or accept a wider orbit (−25 % science).
+- Halo station-keeping 25 m/s/yr; "orbit drifting" events (1.5/yr × difficulty): correct now (1.5 m/s) or wait (70 %: 6 m/s later).
+- Halo orbit: no eclipses, deep-space antennas (480 min/day each), link factor 0.009, radiation 10 krad/yr, no-propulsion life 0.1 yr.
+- R-3 Reusable Heavy: 10 500 / 7 000 / 4 200 / 2 450 kg, $80 M, 96 %, landing 88 % (Act 2 tech: $60 M, 250 prestige, after Lunar Pathfinder).
