@@ -9,10 +9,17 @@ export const fmt = (n: number | string | undefined, digits = 0): string => {
 }
 
 export const ROLE_LABEL: Record<Role, string> = {
-  lead: 'Mission Lead',
-  science: 'Science Lead',
+  lead: 'Mission Director',
   engineer: 'Spacecraft Engineer',
-  ops: 'Comms & Ops',
+  astrophysicist: 'Astrophysicist',
+  astrobiologist: 'Astrobiologist',
+}
+
+export const ROLE_BLURB: Record<Role, string> = {
+  lead: 'Principal Investigator: contract, investors, budget, launcher, ground stations, schedule, final sign-off.',
+  engineer: 'Builds the spacecraft: power, propulsion, structure, thermal, computer, radio and antenna.',
+  astrophysicist: 'Orbits and trajectories, space weather, telescopes, radar and particle instruments.',
+  astrobiologist: 'Water, life and habitability; Earth-system and planetary science; spectrometers and imagers.',
 }
 
 export const RESOURCE_LABEL: Record<ResourceKey, string> = {
@@ -236,4 +243,119 @@ export const GLOSSARY: Record<string, string> = {
   'Link budget': 'How much data per second a radio link can carry; depends on band, antenna and distance.',
   'Payload capacity': 'Maximum mass a launcher can deliver to a given orbit.',
   'Isp (specific impulse)': 'Fuel efficiency of an engine, in seconds. Higher Isp = more Δv per kg of propellant.',
+}
+
+// ---------------------------------------------------------------------------
+// Post-mission analysis (Phase 2)
+// ---------------------------------------------------------------------------
+type CP = Record<string, number | string>
+export interface CauseMessage {
+  title: string
+  why: string
+  change?: string
+}
+export const CAUSE_TEXT: Record<string, (p: CP) => CauseMessage> = {
+  CAUSE_LAUNCH_FAILURE: (p) => ({
+    title: 'The rocket failed',
+    why: `Your launcher succeeds about ${p.reliability}% of the time. This time it did not. Bad luck — but a real risk you chose.`,
+    change: 'Fly again with a new seed, or pay for a more reliable launcher.',
+  }),
+  CAUSE_END_BATTERY: (p) => ({
+    title: 'Battery wore out early',
+    why: `The battery died after ${p.life} years (needed ${p.required}). Deep discharges in thousands of eclipses age it fast.`,
+    change: 'Use a bigger battery so each eclipse drains less of it.',
+  }),
+  CAUSE_END_POWER: (p) => ({
+    title: 'Not enough power at the end',
+    why: `Solar arrays degraded until they could not run the spacecraft (after ${p.life} years).`,
+    change: 'Add array area margin for end of life.',
+  }),
+  CAUSE_END_RADIATION: (p) => ({
+    title: 'Radiation killed the computer',
+    why: `The computer exceeded its radiation tolerance after ${p.life} years.`,
+    change: 'Use a radiation-hardened computer or a gentler orbit.',
+  }),
+  CAUSE_END_ORBIT: (p) => ({
+    title: 'Could not keep the orbit',
+    why: `Without enough propellant or thrusters, the orbit decayed after ${p.life} years.`,
+    change: 'Carry propulsion and size propellant for the whole mission.',
+  }),
+  CAUSE_END_FUNDING: (p) => ({
+    title: 'The money ran out',
+    why: `Investors stopped paying for operations after ${p.life} years. Society’s rules apply in space too.`,
+    change: 'Keep a larger budget reserve or cheaper operations (fewer stations).',
+  }),
+  CAUSE_END_COLLISION: () => ({
+    title: 'Lost to space debris',
+    why: 'You accepted a collision risk and lost the bet.',
+    change: 'Carry propellant for avoidance manoeuvres and use it.',
+  }),
+  CAUSE_END_ECLIPSE: () => ({
+    title: 'Frozen in a lunar eclipse',
+    why: 'The battery could not carry the spacecraft through hours of Earth’s shadow.',
+    change: 'Size the battery for the long eclipse, or power down before it.',
+  }),
+  CAUSE_DATA_LOST: (p) => ({
+    title: 'Data was lost',
+    why: `${p.lostPct}% of everything your instruments produced never reached the ground.`,
+    change: 'More ground stations, a faster radio, lower duty cycles or compression.',
+  }),
+  CAUSE_BOTTLENECK: (p) => ({
+    title: 'Downlink bottleneck',
+    why: `Instruments produced ${p.gen} GB/day but only ${p.down} GB/day could be downloaded.`,
+    change: 'Add a high-latitude station or a higher band.',
+  }),
+  CAUSE_SAFE_MODE: (p) => ({
+    title: 'Too much time in safe mode',
+    why: `${p.weeks} weeks without science after flares, anomalies or eclipses.`,
+    change: 'Radiation-hardened electronics and battery margin reduce downtime.',
+  }),
+  CAUSE_MISSED_OPPORTUNITY: (p) => ({
+    title: 'Missed a science opportunity',
+    why: `"${p.title}" happened ${p.count} time(s) and no instrument on board could observe it.`,
+    change: 'Fly an instrument that fits the scenario’s surprises.',
+  }),
+  CAUSE_SEIZED_OPPORTUNITY: (p) => ({ title: 'Seized a science opportunity', why: `Retargeting earned +${p.points} science points.` }),
+  CAUSE_POOR_DECISIONS: (p) => ({
+    title: 'Risky calls in flight',
+    why: `${p.count} decision(s) took more risk than the situation justified.`,
+    change: 'Read what each role is worried about before choosing.',
+  }),
+  CAUSE_GOOD_DECISIONS: (p) => ({ title: 'Sound decisions under pressure', why: `${p.count} in-flight decisions matched the situation.` }),
+  CAUSE_OVER_BUDGET: (p) => ({
+    title: 'Over budget',
+    why: `Final cost $${p.cost} M vs budget $${p.budget} M.`,
+    change: 'Cheaper launcher, fewer stations or more mature instruments.',
+  }),
+  CAUSE_LATE: (p) => ({
+    title: 'Launched late',
+    why: `${p.months} months behind schedule${Number(p.delay) > 0 ? ` (including a ${p.delay}-month launcher delay)` : ''}.`,
+    change: 'Higher-TRL instruments and a lighter spacecraft develop faster.',
+  }),
+  CAUSE_COMPLETED: (p) => ({ title: 'Mission completed', why: `The spacecraft operated for ${p.life} years as planned.` }),
+  CAUSE_STRONG_DOWNLINK: (p) => ({ title: 'Plenty of downlink', why: `${p.down} GB/day of capacity kept data flowing even during outages.` }),
+  CAUSE_LOW_SCIENCE: (p) => ({
+    title: 'Science fell short',
+    why: `${p.science} science points against a target of ${p.target}.`,
+    change: 'More relevant instruments (stars in Payload), higher duty cycles if downlink allows.',
+  }),
+}
+
+export const END_REASON_LABEL: Record<string, string> = {
+  completed: 'Mission complete',
+  launch_failure: 'Launch failure',
+  battery: 'Battery worn out',
+  power: 'Power failure',
+  radiation: 'Radiation failure',
+  orbit: 'Orbit lost',
+  funding: 'Funding cut',
+  collision: 'Debris collision',
+  eclipse: 'Frozen in eclipse',
+}
+
+/** Default protagonist (fictional). The player will be able to rename them in Phase 3. */
+export const PROTAGONIST = {
+  name: 'Pedro Goicochea',
+  title: 'Dr.',
+  bio: 'Physicist from Arequipa, Peru. Inspired as a kid by the story of Pedro Paulet, now Mission Director (Principal Investigator) of a small space institute.',
 }

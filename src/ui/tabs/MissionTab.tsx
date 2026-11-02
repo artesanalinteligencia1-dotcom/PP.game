@@ -1,8 +1,8 @@
 import type { DesignReport, Role, Scenario } from '../../engine/types'
-import { REQUIREMENT_LABEL, ROLE_LABEL, fmt, message } from '../../i18n/en'
+import { PROTAGONIST, REQUIREMENT_LABEL, ROLE_BLURB, ROLE_LABEL, fmt, message } from '../../i18n/en'
 import { Pill, SEV_BORDER, SEV_TEXT, Section } from '../components'
 
-const ROLE_ICON: Record<Role, string> = { lead: '★', science: '◎', engineer: '⚙', ops: '📡' }
+export const ROLE_ICON: Record<Role, string> = { lead: '★', engineer: '⚙', astrophysicist: '✦', astrobiologist: '❋' }
 
 export function RequirementsList({ report }: { report: DesignReport }) {
   return (
@@ -39,10 +39,16 @@ export function RequirementsList({ report }: { report: DesignReport }) {
 }
 
 export function MissionTab({ scenario, report }: { scenario: Scenario; report: DesignReport }) {
-  const roles: Role[] = ['lead', 'science', 'engineer', 'ops']
+  const roles: Role[] = ['lead', 'engineer', 'astrophysicist', 'astrobiologist']
   return (
     <div>
       <Section title="Briefing">
+        <p className="mb-2 text-xs text-slate-400">
+          <span className="font-semibold text-slate-200">
+            {PROTAGONIST.title} {PROTAGONIST.name}
+          </span>{' '}
+          — {PROTAGONIST.bio} <span className="italic">(Fictional character.)</span>
+        </p>
         <p className="text-slate-200">{scenario.objective}</p>
         <div className="mt-3 flex flex-wrap gap-2 text-xs">
           <Pill tone="sky">Budget ${scenario.budgetM} M</Pill>
@@ -66,7 +72,7 @@ export function MissionTab({ scenario, report }: { scenario: Scenario; report: D
             const sev = item?.severity ?? 'ok'
             return (
               <div key={role} className={`rounded-lg border p-3 ${SEV_BORDER[sev]}`}>
-                <div className="text-xs font-semibold text-slate-300">
+                <div className="text-xs font-semibold text-slate-300" title={ROLE_BLURB[role]}>
                   {ROLE_ICON[role]} {ROLE_LABEL[role]}
                 </div>
                 <p className={`mt-1 text-sm ${SEV_TEXT[sev]}`}>{msg ? `“${msg.title}.”` : '“All good on my side.”'}</p>

@@ -2,11 +2,13 @@ import type { DesignReport } from '../../engine/types'
 import { RESOURCE_LABEL, ROLE_LABEL, message } from '../../i18n/en'
 import { Pill, SEV_BORDER, SEV_TEXT, Section } from '../components'
 import { RequirementsList } from './MissionTab'
+import { useGame } from '../../store/game'
 
 const ICON = { ok: '●', warn: '▲', error: '■' } as const
 
 export function ReviewTab({ report }: { report: DesignReport }) {
-  const errors = report.review.filter((r) => r.severity === 'error')
+  const errors = report.review.filter((r) => r.blocking)
+  const goToLaunchPad = useGame((s) => s.goToLaunchPad)
   return (
     <div>
       <Section
@@ -47,14 +49,17 @@ export function ReviewTab({ report }: { report: DesignReport }) {
       <div className="rounded-lg border border-slate-700 bg-slate-900/60 p-4">
         <button
           type="button"
-          disabled
+          disabled={errors.length > 0}
+          onClick={goToLaunchPad}
           className={`w-full rounded-lg px-4 py-3 font-semibold ${
-            errors.length ? 'cursor-not-allowed bg-slate-800 text-slate-500' : 'cursor-not-allowed bg-emerald-600/40 text-emerald-100'
+            errors.length ? 'cursor-not-allowed bg-slate-800 text-slate-500' : 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-400'
           }`}
         >
-          {errors.length ? `Fix ${errors.length} blocking issue${errors.length > 1 ? 's' : ''} to launch` : 'Design ready for launch ✔'}
+          {errors.length ? `Fix ${errors.length} blocking issue${errors.length > 1 ? 's' : ''} to launch` : 'Go to the launch pad 🚀'}
         </button>
-        <p className="mt-2 text-center text-xs text-slate-500">Launch, mission simulation and scoring arrive in the next build (Phase 2).</p>
+        <p className="mt-2 text-center text-xs text-slate-500">
+          {errors.length ? 'Red items would make the mission impossible.' : 'Amber items are allowed — but the mission will feel them.'}
+        </p>
       </div>
     </div>
   )
