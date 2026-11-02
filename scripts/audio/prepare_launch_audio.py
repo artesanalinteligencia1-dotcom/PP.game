@@ -45,6 +45,15 @@ def cut(src, a, b, dst, radio=False):
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}", "-to", f"{b:.3f}", "-i", src, "-af", af, "-b:a", "96k", dst], check=True)
 
 
+def fit_to_one_second(path: str, max_s: float = 0.95):
+    """Countdown lines are played once per second: speed up (pitch kept) any line longer than ~1 s."""
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path], capture_output=True, text=True).stdout)
+    if dur > max_s:
+        tmp = path + ".tmp.mp3"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", path, "-af", f"atempo={min(2.0, dur / max_s):.3f}", "-b:a", "96k", tmp], check=True)
+        os.replace(tmp, path)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--countdown")
@@ -60,7 +69,9 @@ def main():
             raise SystemExit(f"expected ≥ 12 spoken segments in the countdown, found {len(segs)}; adjust --noise/min_silence")
         names = [f"count_{n}" for n in range(10, 0, -1)] + ["ignition"]
         for name, (s, e) in zip(names, segs[:11]):
-            cut(a.countdown, s, e, os.path.join(VOICE, f"{name}.mp3"), radio=True)
+            dst = os.path.join(VOICE, f"{name}.mp3")
+            cut(a.countdown, s, e, dst, radio=True)
+            fit_to_one_second(dst)
         cut(a.countdown, segs[11][0], segs[-1][1], os.path.join(VOICE, "liftoff.mp3"), radio=True)
     if a.farewells:
         segs = speech_segments(a.farewells, min_silence=0.3)

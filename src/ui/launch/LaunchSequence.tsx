@@ -13,7 +13,7 @@ export function makeTimeline(count: number) {
     count,
     ignition,
     liftoff,
-    farewell: liftoff + 1.8,
+    farewell: liftoff + 2.7, // after the 2.5 s "Liftoff! We have liftoff!" line
     maxQ: liftoff + 1.6,
     boosterSep: liftoff + 2.4,
     meco: liftoff + 3.6,
@@ -236,7 +236,8 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const altKm = flying ? parking * p ** 1.3 : 0
   const velKms = flying ? vOrbit * p ** 1.8 : 0
   const dvSpent = flying ? velKms + 1.5 * clamp(p * 1.4) : 0
-  const met = flying ? (t - T.liftoff) * MET_FACTOR : (t - T.liftoff) * 1
+  // Before liftoff the clock follows the voiced countdown (T−0 = ignition); after liftoff it shows compressed mission time.
+  const met = flying ? (t - T.liftoff) * MET_FACTOR : t - T.ignition
   const space = clamp(altKm / 120)
   const skyTop = hex(mix([29, 78, 216], [2, 6, 23], space))
   const skyBottom = hex(mix([251, 146, 60], [2, 6, 23], clamp(space * 1.3)))
@@ -347,7 +348,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
       {/* HUD */}
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-slate-950/70 px-3 py-2 font-mono text-[11px] leading-5 text-slate-200 backdrop-blur">
         <div className="font-display text-xs font-semibold text-sky-300">{launcher.name}</div>
-        <div>{running ? fmtMet(met) : fmtMet(-T.liftoff)}</div>
+        <div>{running ? fmtMet(met) : fmtMet(-T.ignition)}</div>
         <div>ALT {altKm.toFixed(0)} km</div>
         <div>VEL {velKms.toFixed(2)} km/s</div>
         <div>Δv {dvSpent.toFixed(2)} km/s</div>
