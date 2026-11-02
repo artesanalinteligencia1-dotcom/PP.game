@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getScenario, type Design } from '../src/engine'
 import { spacecraftVisual } from '../src/ui/spacecraft/visual'
-import { failureTime, T } from '../src/ui/launch/LaunchSequence'
+import { FAREWELLS, failureTime, farewellIndex, makeTimeline } from '../src/ui/launch/LaunchSequence'
 
 const base = getScenario('earth_watch').baseDesign
 
@@ -30,7 +30,9 @@ describe('spacecraft drawing follows the design (visible on pad and in flight)',
 })
 
 describe('launch sequence timeline', () => {
-  it('phases happen in physical order', () => {
+  it.each([3, 10])('phases happen in physical order (countdown %i s)', (count) => {
+    const T = makeTimeline(count)
+    expect(T.ignition).toBeLessThan(T.liftoff)
     expect(T.liftoff).toBeLessThan(T.maxQ)
     expect(T.maxQ).toBeLessThan(T.meco)
     expect(T.meco).toBeLessThan(T.fairing)
@@ -38,9 +40,14 @@ describe('launch sequence timeline', () => {
     expect(T.seco).toBeLessThan(T.deploy)
   })
   it('a failed launch fails at a deterministic, seed-dependent moment after liftoff', () => {
-    expect(failureTime(5)).toEqual(failureTime(5))
-    const times = new Set([0, 1, 2].map((s) => failureTime(s).at))
+    const T = makeTimeline(10)
+    expect(failureTime(5, T)).toEqual(failureTime(5, T))
+    const times = new Set([0, 1, 2].map((s) => failureTime(s, T).at))
     expect(times.size).toBe(3)
-    for (const s of [0, 1, 2]) expect(failureTime(s).at).toBeGreaterThan(T.liftoff)
+    for (const s of [0, 1, 2]) expect(failureTime(s, T).at).toBeGreaterThan(T.liftoff)
+  })
+  it('the farewell line is chosen deterministically from the seed', () => {
+    expect(farewellIndex(123456)).toBe(farewellIndex(123456))
+    expect(new Set([0, 1, 2, 3, 4].map((s) => FAREWELLS[farewellIndex(s)])).size).toBe(5)
   })
 })

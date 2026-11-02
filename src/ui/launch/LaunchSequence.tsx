@@ -1,12 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getLauncher, getOrbit } from '../../engine/catalog'
 import type { Design } from '../../engine/types'
-import { audio, type Sfx } from '../../audio/audio'
+import { audio, hasVoice, type Sfx } from '../../audio/audio'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
 
-/** Timeline in seconds after pressing Launch. */
-export const T = { liftoff: 3, maxQ: 4.6, boosterSep: 5.4, meco: 6.6, fairing: 8.2, seco: 10.6, deploy: 11.6, end: 13.2 }
+/** Timeline in seconds after pressing Launch. `count` = seconds of countdown before ignition (10 with the voice, 3 without). */
+export function makeTimeline(count: number) {
+  const ignition = count
+  const liftoff = count + 1.5
+  return {
+    count,
+    ignition,
+    liftoff,
+    farewell: liftoff + 1.8,
+    maxQ: liftoff + 1.6,
+    boosterSep: liftoff + 2.4,
+    meco: liftoff + 3.6,
+    fairing: liftoff + 5.2,
+    seco: liftoff + 7.6,
+    deploy: liftoff + 8.6,
+    end: liftoff + 10.2,
+  }
+}
+export type Timeline = ReturnType<typeof makeTimeline>
+
+/** Farewell lines from mission control (English); one is chosen per mission from the seed. */
+export const FAREWELLS = [
+  'Good luck, traveler.',
+  'Godspeed, explorer.',
+  'Fly safe, and bring us back some science.',
+  'The sky is not the limit anymore.',
+  'Good luck out there. We are with you.',
+]
+export const farewellIndex = (seed: number) => (seed >>> 0) % FAREWELLS.length
 const MET_FACTOR = 60 // 1 s of animation ≈ 1 min of real ascent
 const MU = 398600.4418
 const RE = 6371
@@ -30,21 +57,21 @@ function mix(a: number[], b: number[], k: number) {
 }
 const hex = (c: number[]) => `rgb(${c[0]},${c[1]},${c[2]})`
 
-export function failureTime(seed: number): { at: number; text: string } {
+export function failureTime(seed: number, T: Timeline): { at: number; text: string } {
   const k = seed % 3
-  if (k === 0) return { at: 4.9, text: 'Engine anomaly on the first stage. The flight termination system was triggered.' }
+  if (k === 0) return { at: T.liftoff + 1.9, text: 'Engine anomaly on the first stage. The flight termination system was triggered.' }
   if (k === 1) return { at: T.meco, text: 'Stage separation failed: the stages collided.' }
-  return { at: 9.3, text: 'The upper-stage engine shut down early. The spacecraft never reached orbital speed.' }
+  return { at: T.liftoff + 6.3, text: 'The upper-stage engine shut down early. The spacecraft never reached orbital speed.' }
 }
 
-function Rocket({ launcherId, t, failAt, v }: { launcherId: string; t: number; failAt: number | null; v: ReturnType<typeof spacecraftVisual> }) {
+function Rocket({ launcherId, t, failAt, v, T }: { launcherId: string; t: number; failAt: number | null; v: ReturnType<typeof spacecraftVisual>; T: Timeline }) {
   const H = launcherId === 'light' ? 150 : launcherId === 'medium' ? 200 : 230
   const w = launcherId === 'light' ? 16 : launcherId === 'medium' ? 22 : 24
   const h1 = H * 0.55
   const h2 = H * 0.25
   const hf = H * 0.2
   const heavy = launcherId === 'heavy'
-  const burning1 = t >= T.liftoff - 0.3 && t < T.meco
+  const burning1 = t >= T.ignition && t < T.meco
   const burning2 = t >= T.meco + 0.3 && t < T.seco
   const sep1 = t >= T.meco
   const boostersGone = heavy && t >= T.boosterSep
@@ -120,7 +147,10 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
   const start = useRef<number | null>(null)
   const fired = useRef<Set<string>>(new Set())
   const done = useRef(false)
-  const fail = useMemo(() => (failed ? failureTime(seed) : null), [failed, seed])
+  const voice = hasVoice('count_10') && hasVoice('ignition')
+  const T = useMemo(() => makeTimeline(voice ? 10 : 3), [voice])
+  const fail = useMemo(() => (failed ? failureTime(seed, T) : null), [failed, seed, T])
+  const farewell = FAREWELLS[farewellIndex(seed)]
 
   const parking = orbit.body === 'earth' && orbit.launchTarget !== 'gto' ? Math.min(orbit.defaultAltitudeKm, design.altitudeKm) : 200
   const vOrbit = Math.sqrt(MU / (RE + parking))
@@ -140,7 +170,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [running, skipTo, fail])
+  }, [running, skipTo, fail, T])
 
   // Sound cues and completion.
   useEffect(() => {
@@ -151,8 +181,23 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
         if (!skipTo) audio.play(sfx)
       }
     }
-    cue('count', 0, 'countdown')
-    cue('liftoff', T.liftoff, 'liftoff')
+    const say = (key: string, at: number, line: string) => {
+      if (t >= at && !fired.current.has(key) && (!fail || at <= fail.at)) {
+        fired.current.add(key)
+        if (!skipTo) audio.say(line)
+      }
+    }
+    if (voice) {
+      for (let k = 0; k < T.count; k++) say(`c${k}`, k, `count_${T.count - k}`)
+      say('ign', T.ignition, 'ignition')
+      say('lift', T.liftoff, 'liftoff')
+      say('bye', T.farewell, `farewell_${farewellIndex(seed) + 1}`)
+    } else cue('count', Math.max(0, T.count - 3), 'countdown')
+    cue('liftoff', T.ignition, 'liftoff')
+    if (t >= T.liftoff && !fired.current.has('music') && (!fail || T.liftoff <= fail.at)) {
+      fired.current.add('music')
+      audio.setStage('launch')
+    }
     if (design.launcherId === 'heavy') cue('boost', T.boosterSep, 'staging')
     cue('meco', T.meco, 'staging')
     cue('fairing', T.fairing, 'fairing')
@@ -167,7 +212,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
       if (!fail && !skipTo) audio.play('orbit')
       onDone(fail ? 'failure' : 'success')
     }
-  }, [t, running, fail, onDone, skipTo, design.launcherId])
+  }, [t, running, fail, onDone, skipTo, design.launcherId, T, voice, seed])
 
   const p = clamp((t - T.liftoff) / (T.seco - T.liftoff))
   const flying = t >= T.liftoff
@@ -190,7 +235,9 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
 
   const caption = (() => {
     if (exploded) return fail!.text
-    if (t < T.liftoff) return 'Final countdown. All systems go.'
+    if (t < Math.min(4, T.ignition)) return T.count > 3 ? 'Launch director: all stations report GO for launch.' : 'Final countdown. All systems go.'
+    if (t < T.ignition) return 'Final countdown.'
+    if (t < T.liftoff) return 'Ignition! The engines build up to full thrust while clamps hold the rocket down.'
     if (t < T.maxQ) return 'Liftoff! Thrust must be greater than the rocket’s weight.'
     if (t < (design.launcherId === 'heavy' ? T.boosterSep : T.meco))
       return 'Max-Q: maximum aerodynamic pressure. The engines throttle down so the air does not crush the rocket.'
@@ -238,16 +285,16 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
           <rect x="0" y="430" width="800" height="60" fill="#0f172a" />
           <rect x="350" y="420" width="100" height="12" fill="#334155" />
           <rect x="432" y={430 - (launcher.id === 'light' ? 160 : launcher.id === 'medium' ? 210 : 240)} width="7" height={launcher.id === 'light' ? 160 : launcher.id === 'medium' ? 210 : 240} fill="#475569" />
-          {flying && t < T.liftoff + 2.5 && (
-            <g opacity={clamp(1 - (t - T.liftoff) / 2.5)}>
-              <circle cx="370" cy="428" r={20 + (t - T.liftoff) * 25} fill="#cbd5e1" opacity={0.35} />
-              <circle cx="430" cy="428" r={18 + (t - T.liftoff) * 22} fill="#e2e8f0" opacity={0.3} />
+          {t >= T.ignition && t < T.liftoff + 2.5 && (
+            <g opacity={t < T.liftoff ? 1 : clamp(1 - (t - T.liftoff) / 2.5)}>
+              <circle cx="370" cy="428" r={20 + (t - T.ignition) * 22} fill="#cbd5e1" opacity={0.35} />
+              <circle cx="430" cy="428" r={18 + (t - T.ignition) * 20} fill="#e2e8f0" opacity={0.3} />
             </g>
           )}
         </g>
         {/* rocket */}
         <g transform={`translate(400 ${rocketY})`}>
-          <Rocket launcherId={launcher.id} t={t} failAt={fail?.at ?? null} v={v} />
+          <Rocket launcherId={launcher.id} t={t} failAt={fail?.at ?? null} v={v} T={T} />
         </g>
         {exploded && (
           <g transform={`translate(400 ${rocketY - H * 0.6})`}>
@@ -262,21 +309,32 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo }
           </g>
         )}
         {/* countdown digit */}
-        {running && t < T.liftoff && (
+        {running && t < T.ignition && (
           <text x="400" y="200" textAnchor="middle" fontSize="110" fontWeight="800" fill="#fff" style={{ fontFamily: 'var(--font-display)' }}>
-            {Math.max(1, Math.ceil(T.liftoff - t))}
+            {Math.max(1, Math.ceil(T.ignition - t))}
+          </text>
+        )}
+        {running && t >= T.ignition && t < T.liftoff && (
+          <text x="400" y="190" textAnchor="middle" fontSize="64" fontWeight="800" fill="#fbbf24" letterSpacing="6" style={{ fontFamily: 'var(--font-display)' }}>
+            IGNITION
           </text>
         )}
       </svg>
       {/* HUD */}
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-slate-950/70 px-3 py-2 font-mono text-[11px] leading-5 text-slate-200 backdrop-blur">
         <div className="font-display text-xs font-semibold text-sky-300">{launcher.name}</div>
-        <div>{running ? fmtMet(met) : 'T−00:03'}</div>
+        <div>{running ? fmtMet(met) : fmtMet(-T.liftoff)}</div>
         <div>ALT {altKm.toFixed(0)} km</div>
         <div>VEL {velKms.toFixed(2)} km/s</div>
         <div>Δv {dvSpent.toFixed(2)} km/s</div>
         <div className="text-slate-400">{stage}</div>
       </div>
+      {running && !exploded && t >= T.farewell && t < T.farewell + 3.2 && (
+        <div className="absolute inset-x-0 top-20 text-center" aria-live="polite">
+          <span className="rounded-lg bg-slate-950/70 px-4 py-2 font-display text-xl font-semibold text-amber-200 shadow-lg">“{farewell}”</span>
+          <div className="mt-1 text-xs text-slate-300">— Mission Control</div>
+        </div>
+      )}
       {running && (
         <div className="absolute inset-x-3 bottom-3 rounded-lg bg-slate-950/75 px-3 py-2 text-sm text-slate-100 backdrop-blur" aria-live="polite">
           {caption}

@@ -27,7 +27,8 @@ export function LaunchScreen() {
   const orbit = getOrbit(design.orbitId)
   const [phase, setPhase] = useState<Phase>('ready')
   const [skip, setSkip] = useState(false)
-  useMusic(phase === 'ready' ? 'design' : phase === 'failure' ? 'none' : 'launch')
+  // Silence during the countdown so mission control is heard; music B starts at liftoff (LaunchSequence).
+  useMusic(phase === 'ready' ? 'design' : phase === 'success' ? 'launch' : 'none')
 
   const failed = mission?.endReason === 'launch_failure'
   const go = () => {

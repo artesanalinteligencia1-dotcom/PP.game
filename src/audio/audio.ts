@@ -8,19 +8,22 @@ export type Sfx = 'countdown' | 'liftoff' | 'staging' | 'fairing' | 'deploy' | '
 // Bundled audio files (hashed by Vite). Missing files are simply absent → no 404s.
 const MUSIC_FILES = import.meta.glob('../assets/audio/music/*.mp3', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
 const SFX_FILES = import.meta.glob('../assets/audio/sfx/*.mp3', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
+const VOICE_FILES = import.meta.glob('../assets/audio/voice/*.mp3', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
 const music = (name: string) => MUSIC_FILES[`../assets/audio/music/${name}.mp3`]
+/** True when a voice line (e.g. 'count_10', 'ignition', 'farewell_1') is bundled. */
+export const hasVoice = (name: string) => Boolean(VOICE_FILES[`../assets/audio/voice/${name}.mp3`])
 /** Sound effects present in the bundle (see LOCAL_TODO if some are missing). */
 export const AVAILABLE_SFX = Object.keys(SFX_FILES).map((k) => k.split('/').pop()!.replace('.mp3', ''))
 
 /**
  * Stage → music. See HANDOFF §19.4: A (Andean-electronic) = home; B (cinematic) = launch.
- * Design and flight reuse A softly until dedicated loops are produced.
+ * Design and flight use their own loops when bundled (design-focus.mp3, flight-ambient.mp3), otherwise A softly.
  */
 export const MUSIC: Record<Exclude<MusicStage, 'none'>, { src: string; volume: number } | null> = {
   home: { src: music('home-andean-electronic'), volume: 0.55 },
-  design: { src: music('home-andean-electronic'), volume: 0.22 },
+  design: music('design-focus') ? { src: music('design-focus'), volume: 0.4 } : { src: music('home-andean-electronic'), volume: 0.22 },
   launch: { src: music('launch-cinematic'), volume: 0.6 },
-  flight: { src: music('home-andean-electronic'), volume: 0.16 },
+  flight: music('flight-ambient') ? { src: music('flight-ambient'), volume: 0.4 } : { src: music('home-andean-electronic'), volume: 0.16 },
   results: null,
 }
 
@@ -148,6 +151,16 @@ class AudioEngine {
         }
       }
     }, (CROSSFADE * 1000) / steps)
+  }
+
+  /** Speak a bundled voice line (mission control). Missing lines are skipped silently. */
+  say(name: string) {
+    if (this.muted || !this.unlocked || typeof window === 'undefined') return
+    const src = VOICE_FILES[`../assets/audio/voice/${name}.mp3`]
+    if (!src) return
+    const a = new Audio(src)
+    a.volume = 0.95
+    a.play().catch(() => undefined)
   }
 
   play(name: Sfx) {
