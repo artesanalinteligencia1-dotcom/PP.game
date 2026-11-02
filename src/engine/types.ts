@@ -6,8 +6,12 @@ export type PointingLevel = 'coarse' | 'fine' | 'precise'
 export type CentralBody = 'earth' | 'moon' | 'sun'
 export type LaunchTarget = 'leo' | 'sso' | 'gto' | 'tli'
 
+export type Discipline = 'astrophysicist' | 'astrobiologist'
+
 export interface Instrument {
   id: string
+  /** Which scientist on the team owns this instrument. */
+  discipline: Discipline
   name: string
   massKg: number
   powerW: number
@@ -243,10 +247,15 @@ export interface Scenario {
   relevance: Record<string, number>
   requirements: Requirement[]
   baseDesign: Design
+  /** Science points that earn the full science score over the required life. */
+  scienceTarget: number
+  /** Scenario-specific science opportunity event. */
+  opportunity: { title: string; text: string; instrumentIds: string[]; bonusScience: number }
 }
 
 export type Severity = 'ok' | 'warn' | 'error'
-export type Role = 'lead' | 'science' | 'engineer' | 'ops'
+/** Team roles: Mission Director (PI, incl. finance & operations), Spacecraft Engineer, Astrophysicist, Astrobiologist. */
+export type Role = 'lead' | 'engineer' | 'astrophysicist' | 'astrobiologist'
 export type ResourceKey = 'mass' | 'power' | 'data' | 'cost' | 'schedule' | 'life' | 'science' | 'risk'
 
 export interface ReviewItem {

@@ -64,6 +64,8 @@ const POINTING_RANK: Record<PointingLevel, number> = { coarse: 0, fine: 1, preci
 export const OPS_BASE_M_PER_MONTH = { earth: 0.25, moon: 0.4, sun: 0.5 } as const
 /** Coast/transfer time for chemical propulsion (months), before science starts. */
 const CHEMICAL_TRANSFER_MONTHS: Record<string, number> = { meo: 0.2, geo: 0.3, lunar_polar: 0.2, helio: 8 }
+/** Δv reserved for debris-avoidance manoeuvres in Earth orbits with drag (m/s). */
+export const COLLISION_AVOIDANCE_DV = 5
 /** Integration, test and management: fixed + per kg of dry mass. */
 export const INTEGRATION_FIXED_M = 6
 export const INTEGRATION_M_PER_KG = 0.06
@@ -76,20 +78,40 @@ export const DEV_MONTHS_ELECTRIC = 2
 const ROLE_BY_RESOURCE: Record<ResourceKey, Role> = {
   mass: 'engineer',
   power: 'engineer',
-  data: 'ops',
-  cost: 'ops',
+  data: 'lead',
+  cost: 'lead',
   schedule: 'lead',
-  life: 'lead',
-  science: 'science',
+  life: 'engineer',
+  science: 'astrobiologist',
   risk: 'lead',
+}
+
+/** Who on the team raises each alert (overrides the per-resource default). */
+const ROLE_BY_CODE: Record<string, Role> = {
+  ANTENNA_INCOMPATIBLE: 'engineer',
+  DISH_NEEDS_POINTING: 'engineer',
+  MAGNETORQUERS_NO_FIELD: 'engineer',
+  NO_PROPULSION_INSERTION: 'astrophysicist',
+  DV_INFEASIBLE: 'astrophysicist',
+  LOW_SUN_OPTICAL: 'astrophysicist',
+  DEBRIS_NO_DISPOSAL: 'lead',
+  LIFE_SHORT: 'lead',
+  LAUNCHER_OVERSIZED: 'lead',
+  LAUNCHER_NO_TARGET: 'lead',
 }
 
 const clamp = (x: number, lo: number, hi: number) => (Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : lo)
 
 export function evaluateDesign(design: Design, scenario: Scenario): DesignReport {
   const review: ReviewItem[] = []
-  const add = (code: string, severity: Severity, resource: ResourceKey, params: ReviewItem['params'] = {}, blocking = severity === 'error') =>
-    review.push({ code, severity, resource, role: ROLE_BY_RESOURCE[resource], blocking, params })
+  const add = (
+    code: string,
+    severity: Severity,
+    resource: ResourceKey,
+    params: ReviewItem['params'] = {},
+    blocking = severity === 'error',
+    role: Role = ROLE_BY_CODE[code] ?? ROLE_BY_RESOURCE[resource],
+  ) => review.push({ code, severity, resource, role, blocking, params })
 
   // ---------- Resolve and sanitise inputs ----------
   const orbit = getOrbit(design.orbitId)
@@ -215,7 +237,7 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
   const maintDv = maintenanceDvPerYear(orbit, alt)
   const hasProp = prop.ispS > 0
   const insertionDv = orbit.insertionDv * (lowThrust ? lowThrust.dvPenalty : 1)
-  const totalDv = hasProp ? insertionDv + maintDv * designLife + orbit.disposalDv : 0
+  const totalDv = hasProp ? insertionDv + maintDv * designLife + orbit.disposalDv + (orbit.drag ? COLLISION_AVOIDANCE_DV : 0) : 0
   const { propellantKg, tankKg } = propellantForDv(dryKg, totalDv, prop.ispS)
   const wetKg = dryKg + tankKg + propellantKg
   const capacityKg = launchCapacityKg(launcher, orbit)
@@ -242,10 +264,10 @@ export function evaluateDesign(design: Design, scenario: Scenario): DesignReport
     if (pointingRank < need) {
       if (inst.pointing === 'precise') {
         pointingFactor = 0
-        add('POINTING_INSUFFICIENT', 'error', 'science', { instrument: inst.name, need: inst.pointing, have: adcs.name })
+        add('POINTING_INSUFFICIENT', 'error', 'science', { instrument: inst.name, need: inst.pointing, have: adcs.name }, true, inst.discipline)
       } else {
         pointingFactor = 0.5
-        add('POINTING_DEGRADED', 'warn', 'science', { instrument: inst.name, need: inst.pointing, have: adcs.name })
+        add('POINTING_DEGRADED', 'warn', 'science', { instrument: inst.name, need: inst.pointing, have: adcs.name }, false, inst.discipline)
       }
     }
     const lowSun = orbit.lowSunAngle && OPTICAL_INSTRUMENTS.includes(inst.id) ? 0.5 : 1

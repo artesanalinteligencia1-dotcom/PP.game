@@ -38,6 +38,13 @@ export const scenarios: Scenario[] = [
       { id: 'ew_bonus_life', kind: 'lifeYears', value: 4, optional: true, bonus: 15 },
       { id: 'ew_bonus_time', kind: 'onSchedule', optional: true, bonus: 15 },
     ],
+    scienceTarget: 160,
+    opportunity: {
+      title: 'Fire season over the Amazon',
+      text: 'Smoke plumes are rising over the southern Amazon. Retargeting now could map burn scars and vegetation stress — but it will flood the downlink for a week.',
+      instrumentIds: ['thermal_ir', 'multispectral', 'hyperspectral', 'sar'],
+      bonusScience: 15,
+    },
     baseDesign: {
       scenarioId: 'earth_watch',
       instruments: [],
@@ -95,6 +102,13 @@ export const scenarios: Scenario[] = [
       { id: 'lp_bonus_life', kind: 'lifeYears', value: 2, optional: true, bonus: 15 },
       { id: 'lp_bonus_time', kind: 'onSchedule', optional: true, bonus: 15 },
     ],
+    scienceTarget: 150,
+    opportunity: {
+      title: 'Fresh impact near the south pole',
+      text: 'A small meteorite just hit the Moon near a shadowed crater, exposing fresh material. Pointing everything at it this week could reveal buried ice.',
+      instrumentIds: ['ir_spectrometer', 'neutron_spectrometer', 'laser_altimeter', 'thermal_ir'],
+      bonusScience: 15,
+    },
     baseDesign: {
       scenarioId: 'lunar_pathfinder',
       instruments: [],
