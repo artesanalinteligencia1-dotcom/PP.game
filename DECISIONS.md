@@ -43,3 +43,13 @@
 - Spent ≈ 3 325 credits: 2 × 30 s instrumental music (450 each), 6 illustrations (2 per scene, ≈ 275 each), 2 narration takes (387 each). Fewer variations than the tool default to save credits.
 - Pipeline option C (stills + ffmpeg camera moves + narration + ducked music + word-by-word ASS subtitles + .srt): `scripts/video/build_intro_test.py`. Generated media are not committed (size + licence still to confirm).
 - Narrator voice: "Marcus K – Calm Documentary Narrator" (library voice) / others / suited to science/education content.
+
+## Phase 3 start — visuals, audio, typography (2026-11-02, user-approved "procede")
+- One procedural spacecraft drawing (`src/ui/spacecraft/`) built from the design and reused in design sidebar, launch pad (inside fairing → deploy) and flight journey view / separate art per screen / user rule: changes to the spacecraft must be visible on the pad and in the journey.
+- Launch sequence driven by a JS timeline (requestAnimationFrame) instead of CSS keyframes / CSS only / sync of captions, telemetry and sound cues; launcher-specific rockets; deterministic failure moment from the seed.
+- Telemetry is illustrative (altitude ∝ p^1.3, velocity ∝ p^1.8 to the circular speed of the parking orbit, +1.5 km/s gravity/drag losses) / full ascent physics / readable and honest about losses (~9.3 km/s to LEO).
+- Music per stage: A home, B launch, A softly for design/flight until dedicated loops are approved (7 500 credits estimated) / generate now / spending above what was approved.
+- Audio bundled with Vite (`src/assets/audio`, glob) so missing SFX never cause 404s / `public/` paths / clean console while SFX are pending.
+- SFX generated (≈ 113 credits, 1 take each because the cloud cannot audition audio) but not downloadable: network policy blocks elevenlabsusercontent.com (LOCAL_TODO §5).
+- Fonts: Space Grotesk + Inter (OFL) self-hosted via @fontsource; static TTF instances for libass subtitles / Google Fonts CDN / offline-safe, same identity in game and videos.
+- HANDOFF §19 written as approved, plus 19.4 per-stage music table, 19.6 spacecraft-visibility rule and 19.7 final storytelling deliverable (from the user's same message).

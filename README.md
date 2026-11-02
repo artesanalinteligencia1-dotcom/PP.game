@@ -13,7 +13,8 @@ Inspired by the engineering spirit of Pedro Paulet and by chaos in orbital mecha
 |---|---|---|
 | 0 | Scaffold, CI | ✅ |
 | 1 | Engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder | ✅ |
-| 2 | Launch animation, seeded mission simulation, events with team decisions (or bots), score 0–1 000, post-mission analysis | ✅ (branch `cloud/fase-1`) |
+| 2 | Launch animation, seeded mission simulation, events with team decisions (or bots), score 0–1 000, post-mission analysis | ✅ |
+| 3 (part 1) | Your spacecraft drawn from your design (design, launch pad, flight), new launch sequence with telemetry, music per stage, typography | ✅ (branch `cloud/fase-1`) |
 | 3+ | Campaign with investors, player name, difficulty levels, save/share, hub + intro video, lessons, 3-body module, Paulet legacy, polish | planned |
 
 Live demo: _pending deploy_.
@@ -46,6 +47,9 @@ npm test
 ## Known limitations
 - Two-body circular orbits, daily-average data and power; no real link-budget or thermal analysis.
 - Weekly simulation with simplified event models; balance is first-pass.
+
+## Credits
+Fonts, music and sound credits: [`CREDITS.md`](CREDITS.md).
 
 ## License
 MIT — see [LICENSE](LICENSE).

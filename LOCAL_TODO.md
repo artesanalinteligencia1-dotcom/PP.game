@@ -21,3 +21,25 @@
 ## 4. NASA API key (later, user decision)
 - **What:** create a free key at api.nasa.gov and store it as a GitHub secret (never in the repo) for the daily data snapshot.
 - **Why cloud can't:** needs your account.
+
+## 5. Download the 10 sound effects (or allow the domain for the cloud)
+- **What:** in ElevenLabs open the flow "PP.game — media tests" (id `0LCbZREUNFxbn2azaj88`), download the nodes "SFX …" and save them as
+  `src/assets/audio/sfx/{countdown,liftoff,staging,fairing,deploy,orbit,explosion,alert,success,failure}.mp3`
+  (normalise: `ffmpeg -i in.mp3 -af loudnorm=I=-18:TP=-1.5 -b:a 96k out.mp3`). The game picks them up automatically.
+- **Why cloud can't:** the cloud environment's network policy blocks `elevenlabsusercontent.com`. Alternative: add that domain under
+  Network access → Allowed domains in the cloud environment settings, then the cloud can do it.
+- **Done when:** sounds play on the launch pad, in flight alerts and on the report.
+
+## 6. Animated intro + video format tests (LOCAL, uses your PC)
+- **What:** turn the 30 s intro test into an animated version and compare formats/styles as in HANDOFF §19.5
+  (16:9 / 9:16 / 1:1; stills+camera vs 2.5D layers vs AI-animated clips vs game capture). Keep `docs/video-style.md`
+  (palette, Inter/Space Grotesk, subtitle style) and end on the game's home screen.
+- **Assets:** ElevenLabs flow "PP.game — media tests": scene illustrations S1–S3 (chosen: S1 left/1st, S2 2nd, S3 2nd), narration
+  (voice "Marcus K – Calm Documentary Narrator"), music A (home) and B (launch). Script: `scripts/video/build_intro_test.py`
+  (fonts in `scripts/video/fonts/`). Text and timings are inside the script.
+- **Why cloud can't:** heavier animation tools and local AI on your PC; you asked to do it locally.
+- **Done when:** one approved animated intro (16:9) + a short comparison of formats; chosen files listed in CREDITS.md.
+
+## 7. Approve credits for the per-stage music loops (decision)
+- **What:** two 150 s loops for "design" and "flight" (ElevenLabs estimate: 7 500 credits for both). Until then the game uses music A softly.
+- **Done when:** approved and generated, or replaced by local AI music.

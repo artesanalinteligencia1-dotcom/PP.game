@@ -433,3 +433,44 @@ Al arrancar, cada sesión lee `docs/HANDOFF.md`, `PROGRESS.md` y `LOCAL_TODO.md`
 
 ### 18.6 Criterio de cierre de cada sesión
 Terminar con: (a) todo commiteado y pusheado, (b) `PROGRESS.md` y `LOCAL_TODO.md` actualizados, (c) un resumen de máximo 8 líneas con el link de deploy, lo hecho y lo pendiente para la siguiente sesión.
+
+---
+
+## 19. ADDENDUM v5 — Narrativa, roles, música y formatos de video (aprobado por el usuario el 2026-11-02; PREVALECE si hay conflicto)
+
+### 19.1 Narrativa
+- Tesis: un científico que quiere hacer ciencia y vive con las reglas de la economía y la sociedad (inversores, presupuesto, regulación).
+- Protagonista: **Dr. Pedro Goicochea**, físico ficticio de Arequipa inspirado por la historia de Pedro Paulet; Director de Misión (PI). El jugador podrá poner su nombre (el juego lo llama "Dr./Ing. <nombre>").
+- Paulet solo en la capa histórica real (reglas de §16.4).
+- Campaña con contratos e inversores; dos monedas (Fondos y Prestigio); tecnología especulativa solo en los actos finales y etiquetada.
+
+### 19.2 Roles (reemplaza §8)
+Director/a de Misión (incluye finanzas y operaciones) · Ingeniero/a de Nave · Astrofísico/a · Astrobiólogo/a; cada instrumento pertenece a uno de los dos científicos. Solo: 1–4 roles, el resto bots (prudente / equilibrado / audaz); consejeros siempre disponibles.
+
+### 19.3 Dificultad
+Tres niveles: Cadete / Investigador / Director de Programa. Tres cuerpos: verlo (Cadete) → elegir rutas precalculadas (Investigador) → diseñarlo (Director).
+
+### 19.4 Música y audio — la música va acorde a la etapa del juego
+| Etapa | Música | Estado |
+|---|---|---|
+| Pantalla de inicio / hub | **A** (andina-electrónica) | ✅ en el juego |
+| Briefing y diseño | loop tranquilo para concentrarse (charango + pads) | provisional: A suave; pista propia pendiente de aprobación de créditos |
+| Lanzamiento | **B** (cinematográfica: crece hasta el clímax) | ✅ en el juego |
+| Vuelo / control de misión | loop ambiental espacial con tensión sutil | provisional: A muy suave; pista propia pendiente |
+| Eventos / decisiones | efecto corto de alerta (no cambia la música) | generado, falta descargar |
+| Reporte | "sting" de éxito o de fracaso (sin música de fondo) | generado, falta descargar |
+- Versiones finales largas y en loop (crossfade); audio apagado hasta el primer clic; botón de silencio; voces en inglés con subtítulos.
+- Confirmar la licencia de ElevenLabs antes de una publicación comercial (LOCAL_TODO).
+
+### 19.5 Videos: probar distintos formatos sin alejarse del juego
+- Comparar el mismo guion de 20–30 s en formatos **16:9** (intro dentro del juego y demo del jurado), **9:16** (redes) y **1:1**; y en estilos: (a) ilustración + movimientos de cámara (prueba actual), (b) animación 2.5D por capas/parallax, (c) clips animados con IA a partir de las ilustraciones, (d) captura real del juego + ilustración (demo).
+- Regla de coherencia: misma paleta, tipografía e iconos que el juego (`docs/video-style.md`); cada video termina en la pantalla de inicio real del juego; nada que el juego no tenga.
+- La **intro animada la hace el chat LOCAL** con recursos de la PC; la nube deja guiones, assets de referencia y scripts reproducibles (`scripts/video/`).
+
+### 19.6 Diseño visual del juego
+- **La nave que diseña el jugador se ve igual en todo el juego:** en el diseño (vista previa), en el launch pad (dentro de la cofia, se revela al separarse y despliega paneles) y durante el viaje (orbita con sus paneles, antena, instrumentos y propulsión).
+- Launch pad mejorado: cohete según lanzador (Light / Medium / Heavy con boosters), telemetría (T+, altitud, velocidad, Δv), fases reales explicadas (Max-Q, separación de etapa, cofia, inserción orbital), música B y efectos.
+- Tipografía compartida juego/videos: Space Grotesk (títulos) + Inter (texto), licencia OFL, empaquetadas en el proyecto.
+
+### 19.7 Entregable final pedido por el usuario
+Al terminar el proyecto: un **texto detallado tipo storytelling** de todos los pasos seguidos, explicando términos y procesos (qué se hizo, por qué y cómo). Registrar los hitos en PROGRESS.md para poder escribirlo.
