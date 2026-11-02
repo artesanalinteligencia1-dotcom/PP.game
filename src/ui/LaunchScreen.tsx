@@ -49,7 +49,7 @@ export function LaunchScreen() {
       </div>
       <h1 className="mt-3 text-2xl font-semibold">Launch pad — {scenario.name}</h1>
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <LaunchSequence design={design} running={phase !== 'ready'} failed={failed} seed={seed} onDone={onDone} skipTo={skip} />
+        <LaunchSequence design={design} running={phase !== 'ready'} failed={failed} seed={seed} onDone={onDone} skipTo={skip} boosterLanded={mission?.boosterLanded ?? null} />
         <aside className="space-y-4">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm">
             <h2 className="text-sm font-semibold">Payload in the fairing</h2>

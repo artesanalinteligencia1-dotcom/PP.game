@@ -210,6 +210,21 @@ export const MESSAGES: Record<string, (p: P) => Message> = {
     why: `Building this spacecraft takes ~${n(p, 'months')} months but launch is planned in ${n(p, 'deadline')}. Immature instruments (low TRL) and heavy designs take longer.`,
     levers: ['Use higher-TRL instruments', 'Fewer instruments', 'Lighter design'],
   }),
+  LAUNCHER_SUBORBITAL: (p) => ({
+    title: `${p.launcher} cannot reach orbit`,
+    why: `It is a sounding rocket: it climbs to ~${n(p, 'apogee')} km for a few minutes and falls back. Staying in orbit needs ~7.8 km/s of sideways speed; Paulet-1 reaches about 1.5 km/s straight up.`,
+    levers: ['Choose an orbital launcher (unlocked after First Light in the campaign)'],
+  }),
+  RIDESHARE_ALTITUDE: (p) => ({
+    title: 'The rideshare does not go that high',
+    why: `Shared flights drop everyone at the same place (up to ~${n(p, 'max')} km). You asked for ${n(p, 'alt')} km.`,
+    levers: [`Lower the altitude to ${n(p, 'max')} km or less`, 'Or buy a dedicated launcher'],
+  }),
+  RIDESHARE_SCHEDULE: (p) => ({
+    title: 'Waiting for the next shared flight',
+    why: `Rideshares fly every ${n(p, 'every')} months; your satellite waits ~${n(p, 'wait', 1)} months on the ground after it is ready.`,
+    levers: ['Accept the wait (it is cheap)', 'Or pay for a dedicated launcher to fly as soon as you are ready'],
+  }),
   MASS_OK: () => ({ title: 'Mass fits the launcher', why: 'Fully fuelled mass is within launcher capacity with a healthy margin.' }),
   POWER_OK: () => ({ title: 'Power balance positive', why: 'Arrays cover all loads, including battery recharge, through end of life.' }),
   DATA_OK: () => ({ title: 'Downlink keeps up', why: 'Everything your instruments produce can be downloaded each day.' }),
@@ -232,6 +247,10 @@ export const REQUIREMENT_LABEL: Record<string, string> = {
   withinBudget: 'Within budget',
   onSchedule: 'Ready by deadline',
   scienceAtLeast: 'Science ≥',
+  cargoAtLeast: 'Cargo ≥ (kg)',
+  altitudeAtMost: 'Altitude ≤ (km)',
+  propulsionAny: 'Thrusters for rendezvous',
+  costAtMost: 'Total cost ≤ ($ M)',
 }
 
 export const GLOSSARY: Record<string, string> = {
@@ -333,6 +352,12 @@ export const CAUSE_TEXT: Record<string, (p: CP) => CauseMessage> = {
     change: 'Higher-TRL instruments and a lighter spacecraft develop faster.',
   }),
   CAUSE_COMPLETED: (p) => ({ title: 'Mission completed', why: `The spacecraft operated for ${p.life} years as planned.` }),
+  CAUSE_BOOSTER_LANDED: () => ({ title: 'The booster came home', why: 'Your reusable first stage landed and can fly again — cheaper launches and prestige.' }),
+  CAUSE_BOOSTER_LOST: () => ({
+    title: 'Booster lost at sea',
+    why: 'The reusable first stage missed its landing. The mission was fine, but replacing the booster costs money.',
+    change: 'Landings get more reliable with experience; it is still worth it on average.',
+  }),
   CAUSE_STRONG_DOWNLINK: (p) => ({ title: 'Plenty of downlink', why: `${p.down} GB/day of capacity kept data flowing even during outages.` }),
   CAUSE_LOW_SCIENCE: (p) => ({
     title: 'Science fell short',

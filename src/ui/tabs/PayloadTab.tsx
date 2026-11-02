@@ -10,9 +10,24 @@ const POINTING_LABEL = { coarse: 'any ADCS', fine: 'needs wheels', precise: 'nee
 export function PayloadTab({ design, scenario }: { design: Design; scenario: Scenario }) {
   const toggle = useGame((s) => s.toggleInstrument)
   const setDuty = useGame((s) => s.setDuty)
+  const update = useGame((s) => s.update)
+  const cargoReq = scenario.requirements.find((r) => r.kind === 'cargoAtLeast' && !r.optional)
   const sorted = [...instruments].sort((a, b) => (scenario.relevance[b.id] ?? 0.2) - (scenario.relevance[a.id] ?? 0.2))
   return (
     <div>
+      {cargoReq && (
+        <Section title="Cargo" hint="Food, water, experiments and spare parts for the station crew. You are paid per kilogram delivered — but every kilogram must be launched.">
+          <Slider
+            label="Cargo mass"
+            value={design.cargoKg ?? 0}
+            min={0}
+            max={2500}
+            step={50}
+            onChange={(v) => update({ cargoKg: v })}
+            format={(v) => `${fmt(v)} kg (required ≥ ${fmt(cargoReq.value)})`}
+          />
+        </Section>
+      )}
       <Section
         title="Instruments"
         hint="Pick what your mission carries. Each instrument adds mass, power, data and cost. Stars = how useful it is for this scenario. Duty cycle = share of the day it is switched on."

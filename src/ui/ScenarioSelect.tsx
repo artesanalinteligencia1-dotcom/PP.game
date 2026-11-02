@@ -5,9 +5,13 @@ import { Disclaimer, Pill } from './components'
 
 export function ScenarioSelect() {
   const start = useGame((s) => s.startScenario)
+  const go = useGame((s) => s.go)
   useMusic('home')
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
+      <button type="button" onClick={() => go('home')} className="text-sm text-slate-400 hover:text-slate-100">
+        ← Home
+      </button>
       <header className="text-center">
         <p className="text-xs uppercase tracking-[0.3em] text-sky-400">Space Mission Design</p>
         <h1 className="mt-2 text-4xl font-bold sm:text-5xl">PP.game</h1>
@@ -17,7 +21,7 @@ export function ScenarioSelect() {
         </p>
       </header>
       <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Choose a mission</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Free mission — choose any scenario (no career progress)</h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           {scenarios.map((s) => (
             <button
@@ -28,7 +32,7 @@ export function ScenarioSelect() {
             >
               <div className="flex items-center justify-between">
                 <span className="text-xl font-semibold">{s.name}</span>
-                <Pill tone={s.difficulty === 'beginner' ? 'emerald' : 'rose'}>{s.difficulty}</Pill>
+                <Pill tone={s.difficulty === 'beginner' ? 'emerald' : s.difficulty === 'sandbox' ? 'sky' : s.difficulty === 'engineer' ? 'amber' : 'rose'}>{s.difficulty}</Pill>
               </div>
               <p className="mt-1 text-sm text-sky-300">{s.tagline}</p>
               <p className="mt-3 text-sm text-slate-400">{s.objective}</p>

@@ -28,6 +28,7 @@ export function DesignScreen({ design }: { design: Design }) {
   const setTab = useGame((s) => s.setTab)
   const exit = useGame((s) => s.exit)
   const resetDesign = useGame((s) => s.resetDesign)
+  const mode = useGame((s) => s.mode)
   const scenario = getScenario(design.scenarioId)
   const designKey = JSON.stringify(design)
   const report = useMemo(() => evaluateDesign(design, scenario), [design, scenario])
@@ -39,9 +40,10 @@ export function DesignScreen({ design }: { design: Design }) {
       <header className="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2">
           <button type="button" onClick={exit} className="text-sm text-slate-400 hover:text-slate-100">
-            ← Missions
+            ← {mode === 'campaign' ? 'Career' : 'Missions'}
           </button>
           <h1 className="text-lg font-semibold">
+            {mode === 'campaign' && <span className="mr-2 rounded bg-orange-500/20 px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase text-orange-300">contract</span>}
             {scenario.name} <span className="text-sm font-normal text-slate-400">· {scenario.tagline}</span>
           </h1>
           <button type="button" onClick={resetDesign} className="ml-auto text-xs text-slate-400 hover:text-slate-100">

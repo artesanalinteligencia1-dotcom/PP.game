@@ -1,4 +1,4 @@
-import { getOrbit, launchCapacityKg, launchers, maintenanceDvPerYear, orbits } from '../../engine'
+import { getLauncher, getOrbit, launchCapacityKg, launchers, maintenanceDvPerYear, orbits } from '../../engine'
 import type { Design, DesignReport } from '../../engine/types'
 import { fmt } from '../../i18n/en'
 import { useGame } from '../../store/game'
@@ -7,6 +7,7 @@ import { Grid, OptionCard, Pill, Section, Slider } from '../components'
 
 export function OrbitTab({ design, report }: { design: Design; report: DesignReport }) {
   const update = useGame((s) => s.update)
+  const launcherAllowed = useGame((s) => s.launcherAllowed)
   const setOrbit = useGame((s) => s.setOrbit)
   const orbit = getOrbit(design.orbitId)
   const [lo, hi] = orbit.altitudeKm
@@ -76,18 +77,40 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
           {launchers.map((l) => {
             const cap = launchCapacityKg(l, orbit)
             const fits = cap >= report.mass.wetKg
+            const allowed = launcherAllowed(l.id)
+            const priceM = l.costM + (l.costPerKgM ?? 0) * (Number.isFinite(report.mass.wetKg) ? report.mass.wetKg : 0)
             return (
               <OptionCard
                 key={l.id}
                 selected={design.launcherId === l.id}
-                onClick={() => update({ launcherId: l.id })}
+                disabled={!allowed}
+                onClick={() => update({ launcherId: l.id, ...(l.rideshare && design.altitudeKm > l.rideshare.maxAltitudeKm ? { altitudeKm: l.rideshare.maxAltitudeKm } : {}) })}
                 title={l.name}
-                stats={[cap > 0 ? `${fmt(cap)} kg to this orbit` : 'cannot reach this orbit', `$${l.costM} M`, `${fmt(l.reliability * 100)}% reliable`]}
-                badge={cap > 0 ? <Pill tone={fits ? 'emerald' : 'rose'}>{fits ? 'fits' : 'too heavy'}</Pill> : <Pill tone="rose">no</Pill>}
-              />
+                stats={[
+                  l.suborbital ? `suborbital: ~${l.suborbital.apogeeKm} km, ${l.suborbital.payloadKg} kg` : cap > 0 ? `${fmt(cap)} kg to this orbit` : 'cannot reach this orbit',
+                  `$${fmt(priceM, 1)} M${l.costPerKgM ? ' (per kg)' : ''}`,
+                  `${fmt(l.reliability * 100)}% reliable`,
+                  l.kind === 'reusable' ? 'booster lands' : undefined,
+                ]}
+                badge={
+                  !allowed ? (
+                    <Pill tone="slate">locked</Pill>
+                  ) : cap > 0 ? (
+                    <Pill tone={fits ? 'emerald' : 'rose'}>{fits ? 'fits' : 'too heavy'}</Pill>
+                  ) : (
+                    <Pill tone="rose">no</Pill>
+                  )
+                }
+              >
+                {!allowed ? 'Unlock it in your career’s technology tree.' : null}
+              </OptionCard>
             )
           })}
         </Grid>
+        <p className="mt-3 rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-xs text-slate-300">
+          <span className="font-semibold text-sky-300">In the real world: </span>
+          {getLauncher(design.launcherId).realWorld}
+        </p>
       </Section>
     </div>
   )

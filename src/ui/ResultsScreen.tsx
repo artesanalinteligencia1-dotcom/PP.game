@@ -7,6 +7,7 @@ import { analyseMission } from '../engine/report'
 import { scoreMission, type Rank } from '../engine/score'
 import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt } from '../i18n/en'
 import { useGame } from '../store/game'
+import { shareUrl } from '../store/share'
 import { Disclaimer, Pill } from './components'
 
 const RANK_STYLE: Record<Rank, string> = {
@@ -37,6 +38,9 @@ export function ResultsScreen() {
   const mission = useGame((s) => s.mission)!
   const backToDesign = useGame((s) => s.backToDesign)
   const flyAgain = useGame((s) => s.flyAgain)
+  const mode = useGame((s) => s.mode)
+  const collectReward = useGame((s) => s.collectReward)
+  const [copied, setCopied] = useState(false)
   const scenario = getScenario(mission.scenarioId)
   const score = useMemo(() => scoreMission(mission, scenario), [mission, scenario])
   const analysis = useMemo(() => analyseMission(mission, score, scenario), [mission, score, scenario])
@@ -151,6 +155,24 @@ export function ResultsScreen() {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            {mode === 'campaign' && (
+              <button type="button" onClick={collectReward} className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500">
+                💰 Report to investors &amp; return to career
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                const url = shareUrl(mission.design, mission.seed)
+                navigator.clipboard?.writeText(url).then(
+                  () => setCopied(true),
+                  () => window.prompt('Copy this link:', url),
+                )
+              }}
+              className="rounded-lg border border-slate-600 px-4 py-2 hover:border-slate-300"
+            >
+              🔗 {copied ? 'Link copied!' : 'Share this mission'}
+            </button>
             <button type="button" onClick={backToDesign} className="rounded-lg bg-sky-600 px-4 py-2 font-semibold text-white hover:bg-sky-500">
               ✎ Redesign
             </button>
