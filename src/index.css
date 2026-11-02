@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
 :root {
   color-scheme: dark;
 }
@@ -23,51 +33,9 @@ body {
   .delta-flash { animation: none; }
 }
 
-/* ---------- Launch animation (Phase 2) ---------- */
-.launch-stage {
-  background: linear-gradient(#020617 0%, #1e1b4b 65%, #4c1d95 100%);
-}
-.launch-stage .stars {
-  background-image: radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 70% 20%, #fff 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 40% 70%, #cbd5e1 50%, transparent 51%),
-    radial-gradient(1px 1px at 85% 55%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 10% 80%, #e2e8f0 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 55% 10%, #fff 50%, transparent 51%);
-  opacity: 0.7;
-}
-.launch-stage .flame { opacity: 0; transform-origin: 200px 356px; }
-.launch-stage.countdown .flame { opacity: 0.6; animation: flicker 0.12s infinite alternate; }
-.launch-stage.ascent .flame { opacity: 1; animation: flicker 0.08s infinite alternate; }
-.launch-stage.ascent .rocket { animation: rise 4.2s cubic-bezier(0.55, 0, 0.9, 0.6) forwards; }
-.launch-stage.ascent .booster { animation: stage-sep 4.2s linear forwards; }
-.launch-stage.success .rocket { transform: translateY(-560px); }
-.launch-stage.ascent.failing .rocket { animation: rise-fail 2.6s cubic-bezier(0.55, 0, 0.9, 0.6) forwards; }
-.launch-stage.ascent.failing .booster { animation: none; }
-.launch-stage.ascent.failing .boom,
-.launch-stage.failure .boom { animation: boom 1.4s 2.4s ease-out forwards; }
-.launch-stage.failure .rocket { opacity: 0; }
-.launch-stage.failure .boom { animation-delay: 0s; }
-.countdown { animation: pop 1s ease-out; }
-
-@keyframes flicker { from { transform: scaleY(0.85); } to { transform: scaleY(1.15); } }
-@keyframes rise { 0% { transform: translateY(0); } 100% { transform: translateY(-560px); } }
-@keyframes rise-fail {
-  0% { transform: translateY(0); opacity: 1; }
-  92% { transform: translateY(-150px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(-160px); opacity: 0; }
-}
-@keyframes stage-sep {
-  0%, 55% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(260px) rotate(8deg); opacity: 0; }
-}
-@keyframes boom {
-  0% { opacity: 0; transform: scale(0.2); transform-origin: 200px 120px; }
-  25% { opacity: 1; transform: scale(1.4); transform-origin: 200px 120px; }
-  100% { opacity: 0.25; transform: scale(2.2); transform-origin: 200px 120px; }
-}
-@keyframes pop { from { transform: scale(1.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* ---------- Journey view ---------- */
+@keyframes orbit-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .launch-stage .rocket, .launch-stage .booster, .launch-stage .flame, .countdown { animation: none !important; }
+  [style*="orbit-spin"] { animation: none !important; }
 }

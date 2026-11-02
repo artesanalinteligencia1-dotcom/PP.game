@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Build the 30 s "Watch Intro" test video (16:9) from generated assets.
 
+Typography and colours follow docs/video-style.md (same fonts as the game, bundled in scripts/video/fonts).
+
 Pipeline (option C of HANDOFF §17.3): still illustrations + slow camera moves (ffmpeg zoompan) +
 narration + music bed with ducking + word-by-word burned subtitles (ASS) + an .srt for accessibility.
 
@@ -78,10 +80,10 @@ PlayResY: {H}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Sub,DejaVu Sans,64,&H00FFFFFF,&H00FFFFFF,&H00101010,&H64000000,1,0,0,0,100,100,0,0,1,4,2,2,80,80,90,1
-Style: Title,DejaVu Sans,120,&H00FFFFFF,&H00FFFFFF,&H00101010,&H00000000,1,0,0,0,100,100,4,0,1,0,0,5,80,80,0,1
-Style: Tag,DejaVu Sans,44,&H00F5B90B,&H00FFFFFF,&H00101010,&H00000000,1,0,0,0,100,100,2,0,1,0,0,5,80,80,0,1
-Style: Note,DejaVu Sans,30,&H00B8A394,&H00FFFFFF,&H00101010,&H00000000,0,0,0,0,100,100,0,0,1,0,0,2,120,120,60,1
+Style: Sub,Inter,64,&H00FFFFFF,&H00FFFFFF,&H00101010,&H64000000,1,0,0,0,100,100,0,0,1,4,2,2,80,80,90,1
+Style: Title,Space Grotesk,120,&H00FFFFFF,&H00FFFFFF,&H00101010,&H00000000,1,0,0,0,100,100,4,0,1,0,0,5,80,80,0,1
+Style: Tag,Inter,44,&H00F8BD38,&H00FFFFFF,&H00101010,&H00000000,1,0,0,0,100,100,2,0,1,0,0,5,80,80,0,1
+Style: Note,Inter,30,&H00B8A394,&H00FFFFFF,&H00101010,&H00000000,0,0,0,0,100,100,0,0,1,0,0,2,120,120,60,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -98,7 +100,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             cur = []
     if cur:
         chunks.append(cur)
-    orange = r"{\c&H0B9EF5&}"
+    orange = r"{\c&H1673F9&}"  # game accent #f97316 (docs/video-style.md)
     white = r"{\c&HFFFFFF&}"
     for chunk in chunks:
         for i, (a, b, _) in enumerate(chunk):
@@ -159,7 +161,8 @@ def main():
         offset += lengths[i - 1] - XF
         filters.append(f"[{prev}][v{i}]xfade=transition=fade:duration={XF}:offset={offset:.3f}[x{i}]")
         prev = f"x{i}"
-    filters.append(f"[{prev}]trim=duration={TOTAL},ass={ass}[vout]")
+    fonts = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
+    filters.append(f"[{prev}]trim=duration={TOTAL},ass={ass}:fontsdir={fonts}[vout]")
     # Audio: narration delayed, music ducked under it.
     na, mu = n + 1, n + 2
     inputs += ["-i", os.path.join(src, "narration.mp3"), "-i", os.path.join(src, "music.mp3")]
