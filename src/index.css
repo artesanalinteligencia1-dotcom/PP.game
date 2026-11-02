@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+@keyframes delta-flash {
+  0% { opacity: 0; transform: translateY(4px); }
+  15% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+.delta-flash {
+  animation: delta-flash 2.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delta-flash { animation: none; }
+}
