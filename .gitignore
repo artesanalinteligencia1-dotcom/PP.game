@@ -147,3 +147,16 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# --- PP.game additions ---
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+refs/
+credentials/
+*.mp4
+*.mov
+*.vercel
+.vercel/
