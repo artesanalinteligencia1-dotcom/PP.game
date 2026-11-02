@@ -102,6 +102,17 @@ export const CONTRACTS: ContractDef[] = [
     requires: { prestige: 150, act1Completed: 3 },
   },
   {
+    id: 'lagrange_observatory',
+    act: 2,
+    title: 'Lagrange Observatory',
+    kind: 'orbital',
+    scenarioId: 'lagrange_observatory',
+    client: 'agency',
+    paymentM: 150,
+    blurb: 'A telescope on a halo orbit around Earth–Moon L2 — where the three-body problem and chaos rule.',
+    requires: { contracts: ['lunar_pathfinder'] },
+  },
+  {
     id: 'mars_stranded',
     act: 3,
     title: 'Stranded',
@@ -151,7 +162,7 @@ export interface TechDef {
 export const TECH: TechDef[] = [
   { id: 'rideshare', name: 'Rideshare contract', launcherId: 'rideshare', costM: 3, prestige: 40, act: 1, available: true, description: 'Book seats on shared flights to sun-synchronous orbit. Cheap per kg; fixed dates and altitude.' },
   { id: 'reusable_medium', name: 'Reusable boosters (R-2)', launcherId: 'reusable_medium', costM: 35, prestige: 120, requires: ['earth_watch'], act: 1, available: true, description: 'First stages that land and fly again: ~40% cheaper launches, ~30% less payload.' },
-  { id: 'reusable_heavy', name: 'Reusable heavy (R-3)', costM: 80, prestige: 300, act: 2, available: false, description: 'Side boosters that land together. Coming in Act 2.' },
+  { id: 'reusable_heavy', name: 'Reusable heavy (R-3)', launcherId: 'reusable_heavy', costM: 60, prestige: 250, requires: ['lunar_pathfinder'], act: 2, available: true, description: 'Three cores that land: heavy-lift capacity at a medium price. Opens fast routes to the Moon and L2.' },
   { id: 'super_heavy', name: 'Fully reusable super-heavy + orbital refuelling', costM: 200, prestige: 600, act: 3, available: false, description: 'In development in the real world. Coming in Act 3 (Moon and Mars).' },
   { id: 'nuclear_stage', name: 'Nuclear-thermal upper stage', costM: 400, prestige: 1000, act: 4, available: false, description: 'Speculative: researched for decades, not operational. Act 4.' },
 ]

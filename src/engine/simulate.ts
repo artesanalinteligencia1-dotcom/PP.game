@@ -4,6 +4,7 @@ import { BATTERY_CALENDAR_LIFE_YEARS, batteryCycleLife } from './budget'
 import { getInstrument, getLauncher, getObc, getOrbit, getStation } from './catalog/components'
 import { COLLISION_AVOIDANCE_DV, evaluateDesign } from './evaluate'
 import { getScenario } from './catalog/scenarios'
+import { getRoute } from './catalog/routes'
 import { MINUTES_PER_YEAR, maintenanceDvPerYear, noPropulsionOrbitLifeYears, stationContactMinutes } from './orbit'
 import { mixSeed, rngNext } from './rng'
 import type { Design, DesignReport, Difficulty, Role, Scenario } from './types'
@@ -75,6 +76,11 @@ export interface MissionState {
   endReason: EndReason | null
   /** Reusable launchers: did the first stage land? (null = expendable) */
   boosterLanded: boolean | null
+  /** Three-body routes: correction Δv actually needed (drawn at launch; chaos makes it uncertain) and the reserve carried. */
+  tcmNeed: number | null
+  tcmReserve: number
+  /** Multiplier on science (e.g. after accepting a looser, less stable orbit). */
+  scienceFactor: number
   // spacecraft health
   batteryWear: number
   batteryWearFactor: number
@@ -117,6 +123,7 @@ export const EVENT_RATES = {
   budget_cut: 0.2,
   science_opportunity: 0.8,
   lunar_eclipse: 2.0,
+  chaotic_drift: 1.5,
 }
 type EventId = keyof typeof EVENT_RATES
 
@@ -150,6 +157,9 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
     launchDelayMonths: 0,
     endReason: null,
     boosterLanded: null,
+    tcmNeed: null,
+    tcmReserve: report.schedule.tcmReserveDv,
+    scienceFactor: 1,
     batteryWear: 0,
     batteryWearFactor: 1,
     panelFactor: 1,
@@ -199,12 +209,43 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
         : 'The booster missed its landing and was lost at sea (the mission is fine; the next flight costs more).',
     )
   }
-  if (s.transferWeeks > 0) log(s, 'astrophysicist', 'info', `Cruising to ${orbit.name}: ~${Math.round(s.transferWeeks / 4.345)} month(s) of transfer.`)
-  else {
-    s.phase = 'operations'
-    log(s, 'astrophysicist', 'info', `Arrived in ${orbit.name}. Science operations begin.`)
+  const route = getRoute(orbit.id, design.routeId)
+  if (route && report.mass.ispS > 0) {
+    // Chaos: the correction actually needed is only known in flight (0.5×–2× the expected value).
+    s.tcmNeed = Math.round(route.tcmDv * (0.5 + 1.5 * rand(s)) * 10) / 10
+    log(s, 'astrophysicist', 'info', `Route: ${route.name}. Correction reserve on board: ${Math.round(s.tcmReserve)} m/s.`)
   }
+  if (s.transferWeeks > 0) log(s, 'astrophysicist', 'info', `Cruising to ${orbit.name}: ~${Math.round(s.transferWeeks / 4.345)} month(s) of transfer.`)
+  else arrive(s)
   return s
+}
+
+/** Arrival: report how much trajectory correction chaos really demanded. */
+function arrive(s: MissionState) {
+  const orbit = getOrbit(s.design.orbitId)
+  s.phase = 'operations'
+  log(s, 'astrophysicist', 'good', `Arrived in ${orbit.name}. Science operations begin.`)
+  if (s.tcmNeed === null) return
+  if (s.tcmNeed <= s.tcmReserve) {
+    const left = Math.round((s.tcmReserve - s.tcmNeed) * 10) / 10
+    s.dvRemaining += left // what is left of the correction reserve is kept for station-keeping
+    log(s, 'astrophysicist', 'good', `Course corrections used ${s.tcmNeed} of the ${Math.round(s.tcmReserve)} m/s reserve; ${left} m/s kept for station-keeping.`)
+    return
+  }
+  const deficit = Math.round((s.tcmNeed - s.tcmReserve) * 10) / 10
+  const enough = s.dvRemaining - deficit > 0.25 * (s.dvRemaining + 1)
+  s.pending = {
+    eventId: 'chaos_correction',
+    week: s.week,
+    role: 'astrophysicist',
+    title: 'The trajectory drifted more than planned',
+    text: `Tiny errors grew on the way (that is chaos): arriving needs ${s.tcmNeed} m/s of corrections, but the reserve was ${Math.round(s.tcmReserve)} m/s. Missing: ${deficit} m/s.`,
+    options: [
+      { id: 'borrow', label: `Use ${deficit} m/s of station-keeping propellant`, hint: enough ? 'The mission may end a little earlier.' : 'Most of the station-keeping budget: the mission will be short.', quality: enough ? 'good' : 'poor', safe: true },
+      { id: 'loose', label: 'Accept a wider, less stable orbit', hint: 'Keeps propellant; science drops by 25%.', quality: 'ok', bold: true },
+    ],
+    meta: { deficit },
+  }
 }
 
 function activeStations(s: MissionState): string[] {
@@ -241,6 +282,8 @@ function eventAllowed(s: MissionState, id: EventId): boolean {
       return orbit.drag
     case 'lunar_eclipse':
       return orbit.longEclipseH !== undefined
+    case 'chaotic_drift':
+      return orbit.id === 'em_l2_halo' && s.phase === 'operations' && s.dvRemaining > 0
     case 'station_outage':
       return activeStations(s).length > 0
     default:
@@ -390,6 +433,20 @@ function triggerEvent(s: MissionState, id: EventId) {
       }
       return
     }
+    case 'chaotic_drift': {
+      s.pending = {
+        eventId: id,
+        week: s.week,
+        role: 'astrophysicist',
+        title: 'Orbit drifting away from L2',
+        text: 'Tracking shows the spacecraft slowly sliding off its halo orbit. In a chaotic orbit small deviations grow exponentially — correcting now is cheap, later it is not.',
+        options: [
+          { id: 'correct_now', label: 'Correct now (1.5 m/s)', hint: 'A small burn while the error is small.', quality: 'good', safe: true },
+          { id: 'wait', label: 'Wait and see', hint: 'Saves propellant if the drift reverses… but it usually grows.', quality: 'poor', bold: true },
+        ],
+      }
+      return
+    }
     case 'lunar_eclipse': {
       const dod = r.power.longEclipseDod ?? 0
       if (dod <= 0.8) {
@@ -426,7 +483,7 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
   const obc = getObc(s.design.obcId)
   s.pending = null
   const who = byBot ? 'Bot' : 'You'
-  switch (p.eventId as EventId) {
+  switch (p.eventId as EventId | 'chaos_correction') {
     case 'solar_flare':
       if (opt.id === 'safe') {
         s.safeModeUntil = s.week + 2
@@ -493,6 +550,26 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
         log(s, p.role, 'good', `${who} retargeted: +${bonus} science points.`)
       } else log(s, p.role, 'info', `${who} stayed on the plan.`)
       return
+    case 'chaos_correction': {
+      const deficit = Number(meta.deficit ?? 0)
+      if (opt.id === 'borrow') {
+        s.dvRemaining -= deficit
+        log(s, p.role, 'info', `${who} used ${deficit} m/s of station-keeping propellant to reach the planned orbit.`)
+      } else {
+        s.scienceFactor *= 0.75
+        log(s, p.role, 'warn', `${who} accepted a wider orbit: −25% science, propellant kept.`)
+      }
+      return
+    }
+    case 'chaotic_drift':
+      if (opt.id === 'correct_now') {
+        s.dvRemaining -= 1.5
+        log(s, p.role, 'good', `${who}: correction burn done while the error was small (1.5 m/s).`)
+      } else if (rand(s) < 0.7) {
+        s.dvRemaining -= 6
+        log(s, p.role, 'bad', `${who} waited: the drift grew exponentially and the correction cost 6 m/s.`)
+      } else log(s, p.role, 'info', `${who} waited and the drift happened to reverse. Lucky this time.`)
+      return
     case 'lunar_eclipse': {
       const dod = s.report.power.longEclipseDod ?? 0
       if (opt.id === 'precharge') {
@@ -542,10 +619,7 @@ export function advanceWeek(s: MissionState) {
   if (s.reserveM < -0.01) return end(s, 'funding', 'lead', 'The money ran out: investors stopped funding operations.')
 
   if (s.phase === 'transfer') {
-    if (s.week >= s.transferWeeks) {
-      s.phase = 'operations'
-      log(s, 'astrophysicist', 'good', `Arrived in ${orbit.name}. Science operations begin.`)
-    }
+    if (s.week >= s.transferWeeks) arrive(s)
     record(s, powerRatio)
     return
   }
@@ -591,7 +665,7 @@ export function advanceWeek(s: MissionState) {
   const rawPerYear = designFactor > 0 ? r.science.perYear / designFactor : 0
   const deliveredFraction = genWeek > 0 ? Math.min(1, delivered / genWeek) : 0
   const dutyScience = Math.sqrt(s.dutyFactor)
-  s.science += (rawPerYear / WEEKS_PER_YEAR) * deliveredFraction * dutyScience * Math.min(1, powerRatio)
+  s.science += (rawPerYear / WEEKS_PER_YEAR) * deliveredFraction * dutyScience * Math.min(1, powerRatio) * s.scienceFactor
 
   // Events, then end-of-plan check.
   maybeEvent(s)

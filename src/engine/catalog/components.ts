@@ -30,6 +30,8 @@ export const instruments: Instrument[] = [
   { id: 'neutron_spectrometer', discipline: 'astrobiologist', name: 'Neutron Spectrometer', massKg: 15, powerW: 12, dataRateMbps: 0.1, costM: 10, science: 60, trl: 8, pointing: 'coarse', defaultDuty: 1, description: 'Detects hydrogen (a hint of water ice) from orbit by counting neutrons.' },
   { id: 'thermal_ir', discipline: 'astrobiologist', name: 'Thermal Infrared Camera', massKg: 35, powerW: 50, dataRateMbps: 40, costM: 14, science: 50, trl: 8, pointing: 'fine', defaultDuty: 0.1, description: 'Sees heat: fires, drought stress, cold traps.' },
   { id: 'mw_radiometer', discipline: 'astrophysicist', name: 'Microwave Radiometer', massKg: 70, powerW: 110, dataRateMbps: 2, costM: 25, science: 70, trl: 7, pointing: 'coarse', defaultDuty: 0.5, description: 'Measures soil moisture, rain and ice through clouds.' },
+  { id: 'ir_telescope', discipline: 'astrophysicist', name: 'Infrared Space Telescope', massKg: 150, powerW: 120, dataRateMbps: 5, costM: 60, science: 95, trl: 7, pointing: 'precise', defaultDuty: 0.3, description: 'A cooled infrared telescope: sees young galaxies and dusty star nurseries. Needs a cold, stable, eclipse-free spot.' },
+  { id: 'radio_array', discipline: 'astrophysicist', name: 'Low-Frequency Radio Antennas', massKg: 40, powerW: 30, dataRateMbps: 2, costM: 20, science: 75, trl: 7, pointing: 'coarse', defaultDuty: 0.5, description: 'Listens to the faint radio hiss of the early Universe — only possible where the Moon blocks Earth’s radio noise.' },
   { id: 'weather_imager', discipline: 'astrophysicist', name: 'Wide-Field Weather Imager', massKg: 90, powerW: 150, dataRateMbps: 60, costM: 40, science: 75, trl: 8, pointing: 'fine', defaultDuty: 0.3, description: 'Watches whole cloud systems evolve. Best from high orbits.' },
 ]
 
@@ -59,6 +61,11 @@ export const launchers: Launcher[] = [
     id: 'reusable_medium', name: 'R-2 Reusable Medium', kind: 'reusable', capacityKg: { leo: 2100, sso: 1400, gto: 700, tli: 280 }, costM: 27, reliability: 0.95,
     landing: { successP: 0.9 },
     realWorld: 'In December 2015 an orbital rocket’s first stage (Falcon 9) landed back for the first time; boosters have been re-flown since 2017. Landing needs propellant, so a reusable rocket lifts less than the same rocket thrown away — but each flight costs much less.',
+  },
+  {
+    id: 'reusable_heavy', name: 'R-3 Reusable Heavy', kind: 'reusable', capacityKg: { leo: 10500, sso: 7000, gto: 4200, tli: 2450 }, costM: 80, reliability: 0.96,
+    landing: { successP: 0.88 },
+    realWorld: 'In 2018 the two side boosters of a heavy rocket (Falcon Heavy) landed side by side after launch. Recovering three cores makes heavy launches much cheaper.',
   },
   {
     id: 'heavy', name: 'Heavy (H-3)', kind: 'expendable', capacityKg: { leo: 15000, sso: 10000, gto: 6000, tli: 3500 }, costM: 130, reliability: 0.96,
@@ -102,6 +109,12 @@ export const orbits: Orbit[] = [
     launchTarget: 'tli', capacityFactor: 1, insertionDv: 850, disposalDv: 0, radiationKradYr: 10, panelDegradation: 0.03,
     linkFactor: 0.01, contact: 'deep', stationKeepingDv: 150, drag: false, sunDistanceAu: 1, longEclipseH: 2.5,
     description: 'Passes over both lunar poles every ~2 h. Needs a braking burn to be captured, regular corrections (lumpy gravity), and deep-space antennas on Earth.',
+  },
+  {
+    id: 'em_l2_halo', name: 'Earth–Moon L2 halo orbit', body: 'moon', altitudeKm: [64500, 64500], defaultAltitudeKm: 64500,
+    launchTarget: 'tli', capacityFactor: 1, insertionDv: 450, disposalDv: 0, radiationKradYr: 10, panelDegradation: 0.03,
+    linkFactor: 0.009, contact: 'deep', stationKeepingDv: 25, drag: false, sunDistanceAu: 1, eclipseOverride: 0, periodMinOverride: 21600,
+    description: 'A loop around the L2 point, ~64 500 km beyond the Moon, where Earth’s and the Moon’s pull balance the spacecraft’s motion. Almost no eclipses and a radio-quiet view — but the orbit is unstable (chaos): it needs regular small corrections.',
   },
   {
     id: 'helio', name: 'Heliocentric (Mars flyby)', body: 'sun', altitudeKm: [0, 0], defaultAltitudeKm: 0,

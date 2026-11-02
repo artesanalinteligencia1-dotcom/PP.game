@@ -75,6 +75,10 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
         return { ...base, met: s.science >= (req.value ?? 0), actual: s.science, target: req.value ?? 0 }
       case 'costAtMost':
         return { ...base, met: costM <= (req.value ?? Infinity), actual: costM, target: req.value ?? 0 }
+      case 'arrivalByMonth': {
+        const arrival = devMonths + r.schedule.transferMonths
+        return { ...base, met: launched && arrival <= (req.value ?? Infinity), actual: arrival, target: req.value ?? 0 }
+      }
       default:
         return { ...base, met: launched && designed.met, actual: designed.actual, target: designed.target }
     }

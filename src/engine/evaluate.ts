@@ -33,6 +33,7 @@ import {
   getThermal,
   launchers,
 } from './catalog/components'
+import { defaultTcmReserve, getRoute } from './catalog/routes'
 import { TRL_COST_FACTOR, TRL_MONTHS, launchCapacityKg, successProbability } from './launch'
 import {
   MINUTES_PER_DAY,
@@ -99,6 +100,7 @@ const ROLE_BY_CODE: Record<string, Role> = {
   LAUNCHER_OVERSIZED: 'lead',
   LAUNCHER_NO_TARGET: 'lead',
   LAUNCHER_SUBORBITAL: 'lead',
+  TCM_RESERVE_LOW: 'astrophysicist',
   RIDESHARE_ALTITUDE: 'astrophysicist',
   RIDESHARE_SCHEDULE: 'lead',
   NO_PAYLOAD: 'astrobiologist',
@@ -152,10 +154,14 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   const contactMin = contactMinutesPerDay(orbit, alt, stations)
 
   const lowThrust = prop.lowThrust
+  // Three-body destinations: the chosen route sets arrival Δv, travel time and expected corrections.
+  const route = getRoute(orbit.id, design.routeId)
+  const baseInsertionDv = route ? route.insertionDv : orbit.insertionDv
+  const tcmReserveDv = route ? clamp(design.tcmReserveDv ?? defaultTcmReserve(route), 0, 500) : 0
   const transferMonths =
-    orbit.insertionDv > 0 && lowThrust
-      ? (orbit.insertionDv * lowThrust.dvPenalty) / lowThrust.dvPerMonth
-      : (CHEMICAL_TRANSFER_MONTHS[orbit.id] ?? 0)
+    baseInsertionDv > 0 && lowThrust
+      ? Math.max(route?.transferMonths ?? 0, (baseInsertionDv * lowThrust.dvPenalty) / lowThrust.dvPerMonth)
+      : (route?.transferMonths ?? CHEMICAL_TRANSFER_MONTHS[orbit.id] ?? 0)
   const transferYears = transferMonths / 12
 
   // ---------- Pointing ----------
@@ -247,13 +253,17 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
 
   const maintDv = maintenanceDvPerYear(orbit, alt)
   const hasProp = prop.ispS > 0
-  const insertionDv = orbit.insertionDv * (lowThrust ? lowThrust.dvPenalty : 1)
-  const totalDv = hasProp ? insertionDv + maintDv * designLife + orbit.disposalDv + (orbit.drag ? COLLISION_AVOIDANCE_DV : 0) : 0
+  const insertionDv = baseInsertionDv * (lowThrust ? lowThrust.dvPenalty : 1)
+  const totalDv = hasProp
+    ? insertionDv + maintDv * designLife + orbit.disposalDv + (orbit.drag ? COLLISION_AVOIDANCE_DV : 0) + tcmReserveDv
+    : 0
   const { propellantKg, tankKg } = propellantForDv(dryKg, totalDv, prop.ispS)
   const wetKg = dryKg + tankKg + propellantKg
   const capacityKg = launchCapacityKg(launcher, orbit)
 
-  if (!hasProp && orbit.insertionDv > 0) add('NO_PROPULSION_INSERTION', 'error', 'mass', { dv: orbit.insertionDv, orbit: orbit.name })
+  if (!hasProp && baseInsertionDv > 0) add('NO_PROPULSION_INSERTION', 'error', 'mass', { dv: baseInsertionDv, orbit: orbit.name })
+  if (route && hasProp && tcmReserveDv < route.tcmDv)
+    add('TCM_RESERVE_LOW', 'warn', 'mass', { reserve: tcmReserveDv, need: route.tcmDv, route: route.name })
   if (!Number.isFinite(propellantKg)) add('DV_INFEASIBLE', 'error', 'mass', { dv: totalDv, isp: prop.ispS })
   if (!hasProp && orbit.disposalDv > 0) add('DEBRIS_NO_DISPOSAL', 'warn', 'life', { dv: orbit.disposalDv })
   if (launcher.suborbital) add('LAUNCHER_SUBORBITAL', 'error', 'mass', { launcher: launcher.name, apogee: launcher.suborbital.apogeeKm })
@@ -393,6 +403,10 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
         return { ...base, met: !!r.propulsionIds?.includes(prop.id), actual: prop.name, target: 'thrusters for rendezvous' }
       case 'costAtMost':
         return { ...base, met: totalM <= (r.value ?? Infinity), actual: totalM, target: r.value ?? 0 }
+      case 'dvAtMost':
+        return { ...base, met: hasProp && totalDv <= (r.value ?? Infinity), actual: totalDv, target: r.value ?? 0 }
+      case 'arrivalByMonth':
+        return { ...base, met: devMonths + transferMonths <= (r.value ?? Infinity), actual: devMonths + transferMonths, target: r.value ?? 0 }
     }
   })
 
@@ -455,7 +469,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
       contactMinDay: contactMin,
     },
     cost: { instrumentsM, busM, integrationM, launchM, opsM, contingencyM, totalM, budgetM: scenario.budgetM },
-    schedule: { devMonths, deadlineMonths: scenario.devMonths, transferMonths },
+    schedule: { devMonths, deadlineMonths: scenario.devMonths, transferMonths, routeId: route?.id ?? null, tcmReserveDv },
     life: { lifeYears, requiredYears: scenario.requiredLifeYears, limits, limitingFactor },
     science: { perYear: sciencePerYear, total: sciencePerYear * lifeYears, byInstrument },
     risk: { successProbability: successP, launchReliability: launcher.reliability },

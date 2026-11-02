@@ -11,6 +11,7 @@ export const MINUTES_PER_YEAR = 365.25 * MINUTES_PER_DAY
 
 /** Kepler's third law: T = 2π·sqrt(a³/μ). Returns minutes. Heliocentric orbits return one day (no eclipse cycling). */
 export function orbitalPeriodMin(orbit: Orbit, altitudeKm: number): number {
+  if (orbit.periodMinOverride) return orbit.periodMinOverride
   if (orbit.body === 'sun') return MINUTES_PER_DAY
   const b = BODY[orbit.body]
   const a = b.radiusKm + altitudeKm
@@ -37,6 +38,7 @@ const CONTACT: Record<string, { passes: number; minutes: number; refAltKm?: numb
   geo: { passes: 1, minutes: MINUTES_PER_DAY },
   lunar_polar: { passes: 1, minutes: 290 },
   helio: { passes: 1, minutes: 480 },
+  em_l2_halo: { passes: 1, minutes: 480 },
 }
 
 /**
@@ -82,6 +84,7 @@ export function maintenanceDvPerYear(orbit: Orbit, altitudeKm: number): number {
 export function noPropulsionOrbitLifeYears(orbit: Orbit, altitudeKm: number): number {
   if (orbit.drag) return dragLifetimeYears(altitudeKm)
   if (orbit.id === 'lunar_polar') return 0.3 // lumpy lunar gravity pulls low orbits into the surface
+  if (orbit.id === 'em_l2_halo') return 0.1 // unstable (chaotic): drifts away within weeks
   if (orbit.id === 'geo') return 0.5 // drifts out of its assigned slot
   return Infinity
 }

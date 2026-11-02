@@ -80,6 +80,8 @@ export interface Orbit {
   lowSunAngle?: boolean
   /** Distance from the Sun in AU for solar flux (1 for Earth/Moon). */
   sunDistanceAu: number
+  /** Orbits not described by a simple altitude (e.g. a halo orbit): period in minutes. */
+  periodMinOverride?: number
   description: string
 }
 
@@ -228,6 +230,10 @@ export interface Design {
   designLifeYears: number
   /** Cargo carried to a destination (resupply contracts), kg. */
   cargoKg?: number
+  /** Transfer route for three-body destinations (see catalog/routes.ts). */
+  routeId?: string
+  /** Trajectory-correction Δv reserve (m/s); defaults to twice the route's expected need. */
+  tcmReserveDv?: number
 }
 
 export interface Requirement {
@@ -245,6 +251,8 @@ export interface Requirement {
     | 'altitudeAtMost'
     | 'propulsionAny'
     | 'costAtMost'
+    | 'dvAtMost'
+    | 'arrivalByMonth'
   instrumentIds?: string[]
   orbitIds?: string[]
   propulsionIds?: string[]
@@ -362,6 +370,9 @@ export interface ScheduleBreakdown {
   devMonths: number
   deadlineMonths: number
   transferMonths: number
+  /** Chosen transfer route (three-body destinations) and the trajectory-correction reserve carried. */
+  routeId: string | null
+  tcmReserveDv: number
 }
 
 export interface LifeBreakdown {
