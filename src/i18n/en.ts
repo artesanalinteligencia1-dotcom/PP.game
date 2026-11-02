@@ -225,6 +225,11 @@ export const MESSAGES: Record<string, (p: P) => Message> = {
     why: `Rideshares fly every ${n(p, 'every')} months; your satellite waits ~${n(p, 'wait', 1)} months on the ground after it is ready.`,
     levers: ['Accept the wait (it is cheap)', 'Or pay for a dedicated launcher to fly as soon as you are ready'],
   }),
+  TCM_RESERVE_LOW: (p) => ({
+    title: 'Small correction reserve for a chaotic route',
+    why: `On the ${p.route} small navigation errors grow quickly (chaos). Expected corrections are ~${n(p, 'need')} m/s but you carry ${n(p, 'reserve')} m/s.`,
+    levers: ['Raise the correction reserve (Orbit & Launch)', 'Pick a faster, less sensitive route'],
+  }),
   MASS_OK: () => ({ title: 'Mass fits the launcher', why: 'Fully fuelled mass is within launcher capacity with a healthy margin.' }),
   POWER_OK: () => ({ title: 'Power balance positive', why: 'Arrays cover all loads, including battery recharge, through end of life.' }),
   DATA_OK: () => ({ title: 'Downlink keeps up', why: 'Everything your instruments produce can be downloaded each day.' }),
@@ -251,6 +256,8 @@ export const REQUIREMENT_LABEL: Record<string, string> = {
   altitudeAtMost: 'Altitude ≤ (km)',
   propulsionAny: 'Thrusters for rendezvous',
   costAtMost: 'Total cost ≤ ($ M)',
+  dvAtMost: 'Total Δv ≤ (m/s)',
+  arrivalByMonth: 'Operating by month',
 }
 
 export const GLOSSARY: Record<string, string> = {
