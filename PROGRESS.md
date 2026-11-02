@@ -1,37 +1,36 @@
 # PROGRESS
 
-**Current phase:** Phase 1 (engine + solo design) — DONE on branch `cloud/fase-1` (cloud session, 2026-11-02).
-**Next:** Phase 2 (launch + `simulateMission` + seeded events + score + post-mission report).
+**Current phase:** Phase 2 (launch + simulation + score + report) — DONE on branch `cloud/fase-1` (cloud session, 2026-11-02).
+**Next:** Phase 3 — campaign ("career"), player name, 3 difficulty levels, team roles/bots polish, save/share by link, hub, in-app lessons 1–3.
 
 ## Done
-- Phase 0 (local, `a995015`): scaffold Vite 8 + React 19 + TS + Tailwind 4 + Zustand + Recharts + Vitest, CI, handoff docs.
-- Phase 1 (cloud, branch `cloud/fase-1`):
-  - `src/engine/`: types, catalog (13 instruments, 3 launchers, 7 orbits, all subsystems, 8 ground stations),
-    `orbit.ts`, `launch.ts`, `budget.ts`, `evaluate.ts` (`evaluateDesign`), scenarios Earth Watch + Lunar Pathfinder.
-  - Design Review: red/amber/green with *why* + levers, per role (`src/i18n/en.ts`).
-  - UI: mission picker → tabs Mission / Payload / Spacecraft / Orbit & Launch / Ground & Comms / Review, live resource
-    dashboard with change deltas, one-orbit power chart, orbit schematic, solo "advisors" (4 roles talk).
-  - `docs/model.md` documents every formula and constant. Screenshots in `docs/screenshots/`.
-  - Tests: 27 passing (`tests/engine.test.ts`, `tests/evaluate.test.ts`), incl. known values (Kepler, eclipse, rocket
-    equation, link budget), acceptance (instrument moves mass/power/data/cost), absurd designs, and 2 winning designs per scenario.
-  - Verified in Chromium (Playwright): desktop + 390 px mobile, no console errors, no horizontal scroll.
+- Phase 0 (local): scaffold, CI.
+- Phase 1: pure design engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder, `docs/model.md`.
+- Phase 2:
+  - Engine: `simulate.ts` (weekly, seeded, events with role-owned decisions, bots), `score.ts` (0–1 000 + rank), `report.ts` (top-3 causes).
+  - UI: launch pad (seed, CSS/SVG launch animation with staging/explosion, skip, reduced-motion), mission control (play/speed,
+    live gauges, chart, log, decision dialog, per-role You/Bot delegation + bot personality), mission report (score breakdown,
+    causes + "what would you change", actual requirements, chart, redesign / fly again / new seed, local leaderboard).
+  - Roles renamed to Mission Director / Spacecraft Engineer / Astrophysicist / Astrobiologist; protagonist Dr. Pedro Goicochea in the briefing.
+  - Tests: 41 passing (determinism, replay with same decisions, 2 winning designs per scenario, launch failure, radiation death, bots, analysis).
+  - Verified in Chromium: full flow design → launch → 9 human decisions → report (983/1 000), no console errors; mobile 390 px no horizontal scroll.
+- Media tests (not in repo): 30 s intro test video (16:9, EN narration, word-by-word subtitles + .srt), 2 music tests. Script: `scripts/video/build_intro_test.py`.
 
 ## How to run
 ```
 npm install
-npm run dev        # local dev
-npm test           # vitest
-npm run build      # typecheck + production build
+npm run dev
+npm test
+npm run build
 ```
 
 ## Deploy
-Not deployed yet — see LOCAL_TODO.md §1 (Vercel account mismatch).
+Vercel project being linked from the cloud session (see README for the URL once live).
 
 ## Open risks
-- Recharts makes the bundle ~560 kB (warning only). Lazy-load charts in Phase 4 if load time matters.
-- Balancing is first-pass; Phase 2 simulation may require retuning (log changes in DECISIONS.md).
-- Videos (Phase 6) and in-app animated lessons (Phase 3) not started, by design (one phase at a time).
+- Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
+- Recharts bundle ~570 kB (warning only).
+- ElevenLabs licence for public/commercial use not verified (LOCAL_TODO).
 
 ## Next exact step
-Phase 2: `src/engine/simulate.ts` (weekly steps, seeded `mulberry32`), `events.ts`, `score.ts` (0–1 000, solo rescaled),
-`report.ts` (top-3 causes), launch screen + mission timeline + results screen; tests "same seed + same design = same result".
+Phase 3: campaign map (contracts, investors, Funds + Prestige), player name, difficulty levels, save/share link, hub with Watch Intro.

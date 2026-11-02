@@ -12,9 +12,9 @@ Inspired by the engineering spirit of Pedro Paulet and by chaos in orbital mecha
 | Phase | What | State |
 |---|---|---|
 | 0 | Scaffold, CI | ✅ |
-| 1 | Engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder | ✅ (branch `cloud/fase-1`) |
-| 2 | Launch, seeded mission simulation, events, score, post-mission analysis | next |
-| 3+ | Hub, team roles, save/share, lessons, 3-body module, Paulet mode, polish, videos | planned |
+| 1 | Engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder | ✅ |
+| 2 | Launch animation, seeded mission simulation, events with team decisions (or bots), score 0–1 000, post-mission analysis | ✅ (branch `cloud/fase-1`) |
+| 3+ | Campaign with investors, player name, difficulty levels, save/share, hub + intro video, lessons, 3-body module, Paulet legacy, polish | planned |
 
 Live demo: _pending deploy_.
 
@@ -23,6 +23,13 @@ Live demo: _pending deploy_.
 2. **Payload:** add instruments and set their duty cycle — watch the meters on the right react (with +/− deltas).
 3. **Spacecraft / Orbit & Launch / Ground & Comms:** size arrays and battery, pick pointing, propulsion, orbit, launcher, radio and ground stations.
 4. **Review:** red items block launch, amber ones are risky or wasteful; each explains *why* and *what to change*.
+5. **Launch** with a seed (same design + same seed + same decisions = same mission), then fly: answer events as your team
+   (Mission Director, Spacecraft Engineer, Astrophysicist, Astrobiologist) or delegate roles to bots.
+6. **Mission report:** score out of 1 000, the three main reasons for the result, and what to change next time.
+
+You play **Dr. Pedro Goicochea**, a fictional physicist from Arequipa inspired by the story of Pedro Paulet.
+
+![Mission report](docs/screenshots/phase2-report.png)
 
 ## Run locally
 ```bash
@@ -38,7 +45,7 @@ npm test
 
 ## Known limitations
 - Two-body circular orbits, daily-average data and power; no real link-budget or thermal analysis.
-- Launch and mission simulation not yet playable (Phase 2).
+- Weekly simulation with simplified event models; balance is first-pass.
 
 ## License
 MIT — see [LICENSE](LICENSE).

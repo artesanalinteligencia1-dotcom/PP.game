@@ -127,3 +127,58 @@ Transfer time: chemical lunar 0.2, GEO 0.3, MEO 0.2, heliocentric 8 months; elec
 
 Per instrument: `science value × scenario relevance × min(2, √(duty / default duty)) × pointing × lighting × compression`,
 then × the delivered/generated data fraction. Science/yr is a design estimate; Phase 2 turns it into the 0–1 000 score.
+
+---
+
+# Phase 2 — launch, mission simulation and score
+
+`createMission(design, scenario, seed)` → `advanceWeek(state)` / `decide(state, option)` → `scoreMission` → `analyseMission`.
+`simulateMission(design, scenario, seed, personality)` runs it all with a bot answering every decision.
+**Determinism:** all randomness comes from `mulberry32` with an explicit state (`rngNext`), seeded with `mixSeed(seed)`
+(murmur3 finaliser). Same design + same seed + same decisions ⇒ identical log, series and score (tested).
+
+## 11. Launch
+- Pre-launch: 25 % chance of a 1–3 month delay (counts against the schedule).
+- Failure probability = (1 − launcher reliability) × difficulty factor (beginner 0.5, engineer 1.0, expert 1.2).
+
+## 12. Weekly simulation
+| Quantity | Rule |
+|---|---|
+| Transfer | chemical/electric transfer months from §7; no science, radiation still accumulates |
+| Radiation | dose += orbit dose / 52 per week (+ flares). Dose ≥ OBC tolerance → computer fails, mission ends |
+| Power | P(t) = P_avg,BOL · panel damage · (1 − deg)^t. P/need < 0.6 → mission ends |
+| Battery | wear += eclipses per week / cycle life(DoD·anomaly factor) + calendar 1/(15·52). Wear ≥ 1 → mission ends |
+| Orbit keeping | Δv budget = station-keeping/yr × design life (+ 5 m/s debris-avoidance reserve in drag orbits). Exhausted → orbit lost. No propulsion → orbit life from §1 |
+| Data | generated/week = GB/day·7·duty factor (0 in safe mode); downlink/week = GB/day·7·(available stations' contact share); backlog beyond storage is lost |
+| Science | (science/yr ÷ design delivered fraction) / 52 × delivered fraction this week × √duty factor × min(1, power ratio) |
+| Money | reserve = contingency + unspent budget. Cuts and rentals come out of it; below 0 → investors stop operations |
+
+## 13. Events (per year, × difficulty factor for negative ones)
+| Event | Rate | Role | Choice |
+|---|---|---|---|
+| Solar flare | 1.0 (×1.5 if dose ≥ 5 krad/yr) | Astrophysicist | safe mode 2 wk (+0.5 krad) vs keep observing (+1/+3 krad; non-hardened OBC: 30 % reboot, 3 wk lost, backlog lost) |
+| Battery cell failure | 0.15 | Engineer | duty −20 % vs accept 25 % faster wear |
+| Ground station outage (2–6 wk) | 0.5 | Director | rent backup ($0.15 M/wk) vs wait |
+| Micrometeoroid | 0.12 | Engineer | none: −8 % array power |
+| Debris conjunction (LEO/SSO) | 1.0 | Astrophysicist | 0.5 m/s burn vs 2 % loss risk |
+| Budget cut (−10 % of ops + reserve) | 0.2 | Director | absorb from reserve vs cancel the most expensive station |
+| Science opportunity (scenario-specific) | 0.8 | owner of a matching instrument | retarget (+15 science, a week of extra data) vs ignore; missed if no matching instrument |
+| Lunar eclipse (lunar orbits) | 2.0 | Engineer | only if safe-mode DoD > 80 %: power down 1 wk vs ride it out (DoD > 100 % ⇒ lost) |
+
+Each option carries a quality (good / ok / poor) that depends on the situation (e.g. safe mode is "good" with an ordinary
+computer and only "ok" with a hardened one). Bots: *prudent* picks the safest option, *balanced* the best-quality one,
+*bold* the high-science/high-risk one.
+
+## 14. Score (0–1 000)
+| Component | Max | Rule |
+|---|---|---|
+| Mission success | 300 | share of mandatory requirements met, using **actual** life, delivered GB/day, cost and schedule |
+| Science | 250 | min(1, science / scenario target) — Earth Watch 160, Lunar Pathfinder 150 |
+| Resource efficiency | 150 | 50 each: launcher margin (ideal 15–35 %), EOL power margin (ideal 15–50 %), budget used (≤ 90 % full marks, 0 if over) |
+| Engineering decisions | 100 | 50 − 10 per design warning at launch, + 50 × average quality of flight decisions (good 1, ok 0.6, poor 0.2) |
+| Schedule | 50 | −10 per month late (development + launch delay) |
+| Collaboration | 100 | team play only (Phase 3). **Solo:** the 850 base points are rescaled to 950 |
+| Bonus objectives | +50 | scenario optional requirements |
+
+Rank: launch failure or < 50 % of requirements → **Fail**; some requirement missed → **Partial**; all met → **Success**;
+all met and ≥ 800 → **Outstanding**. Post-mission analysis ranks the causes by approximate point impact and shows the top 3.

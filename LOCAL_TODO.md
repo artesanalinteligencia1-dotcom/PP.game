@@ -12,3 +12,12 @@
 - **What:** review and merge `cloud/fase-1` into `main` (PR on GitHub).
 - **Why cloud can't:** merging is the user's decision.
 - **Done when:** `main` contains the Phase 1 commits and CI is green.
+
+## 3. Confirm ElevenLabs licence for public use
+- **What:** check your ElevenLabs plan allows publishing generated music/voice/images in a public repo and a public game.
+- **Why cloud can't:** depends on your account plan and terms.
+- **Done when:** confirmed in DECISIONS.md; then generated media can go into `public/` with CREDITS.md entries.
+
+## 4. NASA API key (later, user decision)
+- **What:** create a free key at api.nasa.gov and store it as a GitHub secret (never in the repo) for the daily data snapshot.
+- **Why cloud can't:** needs your account.
