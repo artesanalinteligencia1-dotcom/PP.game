@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useMusic } from '../../audio/audio'
 import { G0, deltaV } from '../../engine/budget'
+import { L2_LYAPUNOV, VU_KMS, butterfly } from '../../engine/threebody'
+import { CR3BPView, VIEW_WIDE } from '../threebody/CR3BPView'
 import { getLauncher } from '../../engine/catalog'
 import { useGame } from '../../store/game'
 import { Disclaimer, Slider } from '../components'
@@ -9,6 +11,7 @@ const TABS = [
   { id: 'orbit', label: '1 · What is an orbit?' },
   { id: 'budgets', label: '2 · Mass, power, data' },
   { id: 'rocket', label: '3 · The rocket equation' },
+  { id: 'chaos', label: '4 · Three bodies & chaos' },
   { id: 'paulet', label: '5 · Pedro Paulet' },
 ]
 
@@ -119,6 +122,92 @@ function RocketLesson() {
   )
 }
 
+const PERTURBATIONS: [number, string][] = [
+  [1e-6, '0.0001 %'],
+  [1e-5, '0.001 %'],
+  [1e-4, '0.01 %'],
+  [1e-3, '0.1 %'],
+]
+
+function ChaosLesson() {
+  const [rel, setRel] = useState(1e-4)
+  const [days, setDays] = useState(40)
+  const b = useMemo(() => butterfly(rel, days), [rel, days])
+  const cmPerS = Math.abs(L2_LYAPUNOV.vy0) * VU_KMS * rel * 1e5
+  // divergence chart, log scale 1 km … 1 000 000 km
+  const W = 600
+  const H = 160
+  const pts = b.divergence.map((d, i) => {
+    const x = (b.dayOf(i) / days) * W
+    const y = H - (Math.log10(Math.max(1, d)) / 6) * H
+    return `${i ? 'L' : 'M'}${x.toFixed(1)} ${Math.max(0, y).toFixed(1)}`
+  })
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-slate-300">Change in the starting speed of the second spacecraft:</span>
+        {PERTURBATIONS.map(([v, l]) => (
+          <button
+            key={l}
+            type="button"
+            onClick={() => setRel(v)}
+            className={`rounded-lg border px-2 py-1 ${rel === v ? 'border-orange-400 bg-orange-500/10 text-orange-200' : 'border-slate-700 text-slate-300'}`}
+          >
+            {l}
+          </button>
+        ))}
+        <span className="text-xs text-slate-400">≈ {cmPerS < 1 ? cmPerS.toFixed(2) : cmPerS.toFixed(1)} cm/s</span>
+      </div>
+      <Slider label="Days simulated" value={days} min={10} max={60} step={5} onChange={setDays} format={(v) => `${v} days`} />
+      <div className="overflow-hidden rounded-xl border border-slate-800">
+        <CR3BPView vp={VIEW_WIDE} className="h-64 w-full" label="Two almost identical spacecraft near L2">
+          {({ path }) => (
+            <g>
+              <path d={path(b.a.states)} fill="none" stroke="#fbbf24" strokeWidth={1.6} />
+              <path d={path(b.b.states)} fill="none" stroke="#f97316" strokeWidth={1.2} strokeDasharray="4 3" />
+            </g>
+          )}
+        </CR3BPView>
+      </div>
+      <div className="rounded-xl border border-slate-800 bg-slate-950 p-3">
+        <div className="mb-1 text-xs text-slate-400">Distance between the two spacecraft (log scale: 1 km → 1 000 000 km)</div>
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-36 w-full" role="img" aria-label="Divergence over time">
+          {[0, 1, 2, 3, 4, 5, 6].map((k) => (
+            <g key={k}>
+              <line x1="0" x2={W} y1={H - (k / 6) * H} y2={H - (k / 6) * H} stroke="#1e293b" />
+              <text x="4" y={H - (k / 6) * H - 2} fill="#64748b" fontSize="10">
+                {k === 0 ? '1 km' : k === 3 ? '1 000 km' : k === 6 ? '1 000 000 km' : ''}
+              </text>
+            </g>
+          ))}
+          <path d={pts.join(' ')} fill="none" stroke="#f97316" strokeWidth={2} />
+        </svg>
+      </div>
+      <p className="text-sm text-slate-200">
+        {b.daysTo1000km !== null
+          ? `After ${Math.round(b.daysTo1000km)} days the two spacecraft are already 1 000 km apart — although their speeds differed by about ${cmPerS < 1 ? cmPerS.toFixed(2) : cmPerS.toFixed(1)} cm/s at the start.`
+          : 'In this time they stay close… try more days or a bigger change.'}
+      </p>
+      <div className="space-y-2 text-sm text-slate-400">
+        <p>
+          <b className="text-slate-200">This is chaos.</b> The motion is perfectly deterministic — the same starting numbers give exactly the same path, every
+          time, in every browser (the game guarantees it). But near the Lagrange points tiny differences grow exponentially, so any small navigation error
+          soon becomes a big one. Henri Poincaré found this behaviour while studying the three-body problem around 1890. Look at the yellow
+          “perfect” orbit too: after a few loops even it slides away — the orbit is unstable, and the tiniest rounding error is enough.
+        </p>
+        <p>
+          <b className="text-slate-200">Why it matters:</b> spacecraft on halo orbits make small, regular correction burns — cheap if done early, expensive if
+          you wait. The same chaos is also a gift: low-energy routes use it to reach the Moon or L2 with very little propellant.
+        </p>
+        <p className="text-xs">
+          In the game: Cadets watch this lesson, Researchers choose between precomputed routes, Program Directors also size the correction reserve and decide
+          when to correct.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function BudgetsLesson() {
   const cards = [
     {
@@ -201,9 +290,10 @@ export function LearnScreen() {
         {tab === 'orbit' && <OrbitLesson />}
         {tab === 'budgets' && <BudgetsLesson />}
         {tab === 'rocket' && <RocketLesson />}
+        {tab === 'chaos' && <ChaosLesson />}
         {tab === 'paulet' && <PauletLesson />}
       </div>
-      <p className="mt-6 text-xs text-slate-500">Lesson 4 (the three-body problem and chaos) arrives with Act 2. Numbers are rounded, educational values.</p>
+      <p className="mt-6 text-xs text-slate-500">Numbers are rounded, educational values.</p>
       <div className="mt-2">
         <Disclaimer />
       </div>

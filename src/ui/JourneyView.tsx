@@ -1,11 +1,55 @@
-import { useMemo } from 'react'
-import { getOrbit } from '../engine/catalog'
+import { useEffect, useMemo, useState } from 'react'
+import { getOrbit, getRoute } from '../engine/catalog'
 import type { MissionState } from '../engine/simulate'
 import { SpacecraftDrawing } from './spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from './spacecraft/visual'
+import { CR3BPView, L2_ORBIT, routeSchematic } from './threebody/CR3BPView'
+
+/** Earth–Moon L2: the real periodic orbit from the engine, with the spacecraft moving along it. */
+function HaloJourney({ mission, playing }: { mission: MissionState; playing: boolean }) {
+  const v = useMemo(() => spacecraftVisual(mission.design), [mission.design])
+  const [i, setI] = useState(0)
+  const ended = mission.phase === 'ended'
+  const lost = ended && mission.endReason !== 'completed'
+  const inTransfer = mission.phase === 'transfer'
+  useEffect(() => {
+    if (!playing || ended) return
+    const id = window.setInterval(() => setI((k) => (k + 3) % L2_ORBIT.length), 60)
+    return () => window.clearInterval(id)
+  }, [playing, ended])
+  const route = getRoute(mission.design.orbitId, mission.design.routeId)
+  const progress = mission.transferWeeks > 0 ? Math.min(1, mission.week / mission.transferWeeks) : 1
+  return (
+    <CR3BPView className="h-56 w-full" label="Your spacecraft around Earth–Moon L2">
+      {({ path, px }) => {
+        const s = L2_ORBIT[i]
+        const [ex, ey] = px(0.02, 0)
+        const [lx] = px(1.19, 0)
+        const [x, y] = inTransfer ? [ex + (lx - ex) * progress, ey - Math.sin(Math.PI * progress) * 50] : px(s[0], s[1])
+        return (
+          <g>
+            {route && <path d={routeSchematic(route.id, px)} fill="none" stroke="#38bdf8" strokeDasharray="5 5" opacity={inTransfer ? 1 : 0.35} />}
+            <path d={path(L2_ORBIT)} fill="none" stroke="#fbbf24" strokeWidth={1.5} opacity={0.8} />
+            <g transform={`translate(${x} ${y}) scale(0.32) translate(-50 -50)`}>
+              <SpacecraftDrawing v={v} grey={lost} thrusting={inTransfer && mission.design.propulsionId === 'electric'} />
+            </g>
+            <text x={10} y={18} fill="#cbd5e1" fontSize="13">
+              {ended ? (lost ? 'Signal lost' : 'Mission complete — still looping around L2') : inTransfer ? `Transfer ${Math.round(progress * 100)}% · ${route?.name ?? ''}` : 'Halo orbit around L2 (one loop ≈ 15 days)'}
+            </text>
+          </g>
+        )
+      }}
+    </CR3BPView>
+  )
+}
 
 /** Live view of the journey: the player's own spacecraft (same drawing as in design/launch) orbiting or in transfer. */
 export function JourneyView({ mission, playing }: { mission: MissionState; playing: boolean }) {
+  if (mission.design.orbitId === 'em_l2_halo') return <HaloJourney mission={mission} playing={playing} />
+  return <OrbitJourney mission={mission} playing={playing} />
+}
+
+function OrbitJourney({ mission, playing }: { mission: MissionState; playing: boolean }) {
   const orbit = getOrbit(mission.design.orbitId)
   const v = useMemo(() => spacecraftVisual(mission.design), [mission.design])
   const W = 320

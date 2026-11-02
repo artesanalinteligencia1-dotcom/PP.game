@@ -3,7 +3,7 @@ import { evaluateDesign } from '../../engine/evaluate'
 import { getArray, getInstrument, getScenario } from '../../engine/catalog'
 import type { Design, Discipline } from '../../engine/types'
 
-export type InstrumentShape = 'camera' | 'bigCamera' | 'radar' | 'spectrometer' | 'boom' | 'detector' | 'laser' | 'canister' | 'dishDown'
+export type InstrumentShape = 'camera' | 'bigCamera' | 'radar' | 'spectrometer' | 'boom' | 'detector' | 'laser' | 'canister' | 'dishDown' | 'telescope' | 'dipoles'
 
 const SHAPE: Record<string, InstrumentShape> = {
   pan_camera: 'camera',
@@ -19,6 +19,8 @@ const SHAPE: Record<string, InstrumentShape> = {
   laser_altimeter: 'laser',
   neutron_spectrometer: 'canister',
   mw_radiometer: 'dishDown',
+  ir_telescope: 'telescope',
+  radio_array: 'dipoles',
 }
 
 export interface SpacecraftVisual {

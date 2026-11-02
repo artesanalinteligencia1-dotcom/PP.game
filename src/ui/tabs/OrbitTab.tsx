@@ -1,4 +1,5 @@
-import { getLauncher, getOrbit, launchCapacityKg, launchers, maintenanceDvPerYear, orbits } from '../../engine'
+import { defaultTcmReserve, getLauncher, getOrbit, getRoute, launchCapacityKg, launchers, maintenanceDvPerYear, orbits, routesFor } from '../../engine'
+import { CR3BPView, L2_ORBIT, routeSchematic } from '../threebody/CR3BPView'
 import type { Design, DesignReport } from '../../engine/types'
 import { fmt } from '../../i18n/en'
 import { useGame } from '../../store/game'
@@ -72,6 +73,63 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
           </div>
         </div>
       </Section>
+      {routesFor(orbit.id).length > 0 && (
+        <Section
+          title="Route — the three-body problem"
+          hint="Between the Earth and the Moon three bodies pull on your spacecraft. Faster routes cost propellant; slow “low-energy” routes let gravity do the work but cross chaotic regions where small errors grow."
+        >
+          <Grid>
+            {routesFor(orbit.id).map((r) => (
+              <OptionCard
+                key={r.id}
+                selected={getRoute(orbit.id, design.routeId)?.id === r.id}
+                onClick={() => update({ routeId: r.id, tcmReserveDv: undefined })}
+                title={r.name}
+                stats={[`arrival burn ${r.insertionDv} m/s`, `${fmt(r.transferMonths, 1)} months`, `corrections ~${r.tcmDv} m/s`]}
+              >
+                {r.description}
+              </OptionCard>
+            ))}
+          </Grid>
+          {(() => {
+            const route = getRoute(orbit.id, design.routeId)!
+            const reserve = design.tcmReserveDv ?? defaultTcmReserve(route)
+            return (
+              <div className="mt-3 space-y-3">
+                <Slider
+                  label="Trajectory-correction reserve (chaos insurance)"
+                  value={reserve}
+                  min={0}
+                  max={150}
+                  step={5}
+                  onChange={(v) => update({ tcmReserveDv: v })}
+                  format={(v) => `${fmt(v)} m/s (expected need ~${route.tcmDv}; what is left at arrival funds station-keeping)`}
+                />
+                <p className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-xs text-slate-300">
+                  <span className="font-semibold text-sky-300">In the real world: </span>
+                  {route.realWorld}
+                </p>
+                {orbit.id === 'em_l2_halo' && (
+                  <div className="overflow-hidden rounded-xl border border-slate-800">
+                    <CR3BPView label="Route to the L2 orbit">
+                      {({ path, px }) => (
+                        <g>
+                          <path d={routeSchematic(route.id, px)} fill="none" stroke="#38bdf8" strokeDasharray="5 5" />
+                          <path d={path(L2_ORBIT)} fill="none" stroke="#fbbf24" strokeWidth={2} />
+                          <text x={px(1.19, 0.12)[0]} y={px(1.19, 0.12)[1]} fill="#fbbf24" fontSize="11" textAnchor="middle">
+                            your orbit (~15-day loop)
+                          </text>
+                        </g>
+                      )}
+                    </CR3BPView>
+                    <p className="px-3 py-2 text-[11px] text-slate-500">Yellow: real periodic orbit computed in the game (planar version of a halo). Blue dashed: schematic route.</p>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+        </Section>
+      )}
       <Section title="Launcher" hint="Capacity shown for your chosen orbit. Your fully fuelled spacecraft must fit.">
         <Grid>
           {launchers.map((l) => {

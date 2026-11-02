@@ -59,6 +59,22 @@ function Instrument({ shape, x, y, color }: { shape: InstrumentShape; x: number;
       )
     case 'canister':
       return <rect x={x - 2.5} y={y} width={5} height={8} rx={2} fill={C.metal} stroke={color} strokeWidth={0.8} />
+    case 'telescope':
+      return (
+        <g>
+          <rect x={x - 5} y={y} width={10} height={14} fill="#e2e8f0" stroke={color} strokeWidth={0.8} />
+          <path d={`M${x - 8} ${y + 14} L${x + 8} ${y + 14} L${x + 6} ${y + 18} L${x - 6} ${y + 18} Z`} fill="#94a3b8" />
+          <circle cx={x} cy={y + 16} r={2.5} fill="#0f172a" />
+        </g>
+      )
+    case 'dipoles':
+      return (
+        <g stroke={color} strokeWidth={0.8}>
+          <line x1={x} y1={y} x2={x - 14} y2={y + 12} />
+          <line x1={x} y1={y} x2={x + 14} y2={y + 12} />
+          <line x1={x} y1={y} x2={x} y2={y + 15} />
+        </g>
+      )
     case 'dishDown':
       return <path d={`M${x - 5} ${y + 1} Q${x} ${y + 8} ${x + 5} ${y + 1} Z`} fill={C.metal} stroke={color} strokeWidth={0.8} />
   }
