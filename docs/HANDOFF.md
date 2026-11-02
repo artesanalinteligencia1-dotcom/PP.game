@@ -454,9 +454,10 @@ Tres niveles: Cadete / Investigador / Director de Programa. Tres cuerpos: verlo 
 | Etapa | Música | Estado |
 |---|---|---|
 | Pantalla de inicio / hub | **A** (andina-electrónica) | ✅ en el juego |
-| Briefing y diseño | loop tranquilo para concentrarse (charango + pads) | provisional: A suave; pista propia pendiente de aprobación de créditos |
+| Briefing y diseño | loop tranquilo para concentrarse (charango + pads) | generado (aprobado); falta descargar; mientras tanto A suave |
 | Lanzamiento | **B** (cinematográfica: crece hasta el clímax) | ✅ en el juego |
-| Vuelo / control de misión | loop ambiental espacial con tensión sutil | provisional: A muy suave; pista propia pendiente |
+| Vuelo / control de misión | loop ambiental espacial con tensión sutil | generado (aprobado); falta descargar; mientras tanto A muy suave |
+| Cuenta regresiva | voz de control de misión "T-minus ten… Ignition… Liftoff!" + frase de despedida variable (inglés); sin música hasta el despegue | generado; falta descargar |
 | Eventos / decisiones | efecto corto de alerta (no cambia la música) | generado, falta descargar |
 | Reporte | "sting" de éxito o de fracaso (sin música de fondo) | generado, falta descargar |
 - Versiones finales largas y en loop (crossfade); audio apagado hasta el primer clic; botón de silencio; voces en inglés con subtítulos.

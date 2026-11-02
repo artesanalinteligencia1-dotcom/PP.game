@@ -53,3 +53,11 @@
 - SFX generated (≈ 113 credits, 1 take each because the cloud cannot audition audio) but not downloadable: network policy blocks elevenlabsusercontent.com (LOCAL_TODO §5).
 - Fonts: Space Grotesk + Inter (OFL) self-hosted via @fontsource; static TTF instances for libass subtitles / Google Fonts CDN / offline-safe, same identity in game and videos.
 - HANDOFF §19 written as approved, plus 19.4 per-stage music table, 19.6 spacecraft-visibility rule and 19.7 final storytelling deliverable (from the user's same message).
+
+## Launch voice and per-stage loops (2026-11-02)
+- Movie-style countdown: mission-control voice "T-minus ten … one … Ignition … Liftoff!" + one of 5 farewell lines chosen from the seed ("Good luck, traveler.", …), always English / fixed line / user request ("frase que puede variar").
+- Voice: "Andy – Powerful, Gentle, Pleasant" (library) with light radio EQ in post / announcer voices / calm and credible, mission-control feel.
+- Countdown is 10 s with voice files, 3 s without (automatic) / always 10 s / no long silent countdown while files are missing.
+- Music: silence during the countdown so the voice is heard; B starts at liftoff / B from countdown / cinematic timing.
+- Design/flight loops generated (4 500 credits, below the 7 500 estimate) and wired to load automatically.
+- Not downloadable in this session: ElevenLabs now serves all outputs from elevenlabsusercontent.com, blocked by the session's network policy even after the user's change (probably only new sessions pick it up). A workaround through an ElevenLabs composition node was refused by the permission system as a policy bypass; not retried.

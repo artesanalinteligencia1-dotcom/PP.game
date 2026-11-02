@@ -22,7 +22,15 @@
 - **What:** create a free key at api.nasa.gov and store it as a GitHub secret (never in the repo) for the daily data snapshot.
 - **Why cloud can't:** needs your account.
 
-## 5. Download the 10 sound effects (or allow the domain for the cloud)
+## 5. Download the generated audio (or allow the domain for the next cloud session)
+All of it is already generated and paid for in the ElevenLabs flow "PP.game — media tests" (id `0LCbZREUNFxbn2azaj88`):
+- `PLAN — Design focus loop (150 s)` and `PLAN — Flight ambient loop (150 s)` (music, approved, 4 500 credits)
+- `VOICE — launch countdown` and `VOICE — farewell lines` (2 takes each; pick the cleaner one)
+- the 10 `SFX …` nodes (below)
+Then run: `python3 scripts/audio/prepare_launch_audio.py --countdown countdown.mp3 --farewells farewells.mp3 --design-loop design.mp3 --flight-loop flight.mp3`
+(splits the voice into `count_10…1`, `ignition`, `liftoff`, `farewell_1…5`; the game switches to the 10-second voiced countdown automatically).
+
+### 5b. Sound effects
 - **What:** in ElevenLabs open the flow "PP.game — media tests" (id `0LCbZREUNFxbn2azaj88`), download the nodes "SFX …" and save them as
   `src/assets/audio/sfx/{countdown,liftoff,staging,fairing,deploy,orbit,explosion,alert,success,failure}.mp3`
   (normalise: `ffmpeg -i in.mp3 -af loudnorm=I=-18:TP=-1.5 -b:a 96k out.mp3`). The game picks them up automatically.

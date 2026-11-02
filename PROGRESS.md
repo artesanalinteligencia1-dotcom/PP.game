@@ -29,6 +29,7 @@
 3. Player-experience storytelling → user's vision (scientist vs society/economy, investors, roles, NASA data, music) → Pedro Goicochea, 4 roles, 3 difficulty levels.
 4. Media tests with ElevenLabs (music A/B, 30 s intro) → Phase 2 (seeded simulation, events, bots, score, report).
 5. User feedback (launch pad basic, typography, videos per format) → HANDOFF §19 → visual identity, spacecraft everywhere, new launch pad, per-stage audio.
+6. Movie-style voiced countdown with ignition phase and varying farewell line; design/flight music loops generated; evaluation of rockets (reusables), Mars projects and the rest of Phase 3.
 
 ## How to run
 ```
@@ -45,7 +46,7 @@ Vercel project being linked from the cloud session (see README for the URL once 
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
 - Recharts bundle ~570 kB (warning only).
 - ElevenLabs licence for public/commercial use not verified (LOCAL_TODO).
-- SFX files missing until downloaded (LOCAL_TODO §5); per-stage loops for design/flight need credit approval (LOCAL_TODO §7).
+- Generated audio (SFX, voice countdown, design/flight loops) not yet in the repo: download blocked in this session (LOCAL_TODO §5).
 - Vercel deploy postponed by the user.
 
 ## Next exact step
