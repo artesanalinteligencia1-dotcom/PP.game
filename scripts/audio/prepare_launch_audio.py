@@ -63,7 +63,7 @@ def main():
             cut(a.countdown, s, e, os.path.join(VOICE, f"{name}.mp3"), radio=True)
         cut(a.countdown, segs[11][0], segs[-1][1], os.path.join(VOICE, "liftoff.mp3"), radio=True)
     if a.farewells:
-        segs = speech_segments(a.farewells, min_silence=0.6)
+        segs = speech_segments(a.farewells, min_silence=0.3)
         if len(segs) < 5:
             raise SystemExit(f"expected ≥ 5 farewell lines, found {len(segs)}")
         for i, (s, e) in enumerate(segs[:4], 1):

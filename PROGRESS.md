@@ -32,6 +32,12 @@
   - Lessons: Newton's cannon (orbit), budgets, rocket equation (sliders), Pedro Paulet facts. Intro video (test) with captions.
   - Share link (design + seed). Tests: 66 passing. Browser: full career loop with no console errors; progress survives reload.
 
+- Local session (2026-11-02): generated audio downloaded from ElevenLabs and added (LOCAL_TODO §5 done):
+  voiced countdown (take B: `count_10…1`, `ignition`, `liftoff`), farewells (take B: `farewell_1…5`), music loops
+  `design-focus` / `flight-ambient`, and the 10 SFX (loudness-normalised). Take B chosen because take A's countdown merges
+  "one / ignition / liftoff" into one segment. `prepare_launch_audio.py`: farewell split uses 0.3 s pauses (0.6 s found none).
+  Tests 66 passing; build passes once `intro.mp4` is present (see Open risks). Not listened to by a human yet.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
@@ -56,7 +62,9 @@ Vercel project being linked from the cloud session (see README for the URL once 
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
 - Recharts bundle ~570 kB (warning only).
 - ElevenLabs licence for public/commercial use not verified (LOCAL_TODO).
-- Generated audio (SFX, voice countdown, design/flight loops) not yet in the repo: download blocked in this session (LOCAL_TODO §5).
+- **`src/assets/video/intro.mp4` is missing from the repo** (it was blocked by the `*.mp4` rule in `.gitignore`), so a clean
+  checkout fails `npm run build` (and CI / Vercel). `.gitignore` now allows `src/assets/video/*.mp4`; the cloud session must
+  re-add and commit the file (regenerate with `scripts/video/build_intro_test.py` if the container no longer has it).
 - Vercel deploy postponed by the user.
 
 ## Next exact step

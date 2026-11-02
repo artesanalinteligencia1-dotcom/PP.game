@@ -22,7 +22,8 @@
 - **What:** create a free key at api.nasa.gov and store it as a GitHub secret (never in the repo) for the daily data snapshot.
 - **Why cloud can't:** needs your account.
 
-## 5. Download the generated audio (or allow the domain for the next cloud session)
+## 5. ✅ DONE (local, 2026-11-02) — Download the generated audio
+Voice (take B), music loops and the 10 SFX are in `src/assets/audio/`. Remaining: the user listens once in the game.
 All of it is already generated and paid for in the ElevenLabs flow "PP.game — media tests" (id `0LCbZREUNFxbn2azaj88`):
 - `PLAN — Design focus loop (150 s)` and `PLAN — Flight ambient loop (150 s)` (music, approved, 4 500 credits)
 - `VOICE — launch countdown` and `VOICE — farewell lines` (2 takes each; pick the cleaner one)
