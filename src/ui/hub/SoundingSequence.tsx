@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { audio, hasVoice } from '../../audio/audio'
 import { SPACE_LINE_KM, type SoundingResult } from '../../engine/sounding'
+import { AndesBackdrop, HighClouds, SkyBackdrop, Stars } from '../launch/LaunchScenery'
 
 const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 
@@ -67,7 +68,6 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
   const scaleMax = Math.max(130, ap * 1.1)
   const y = (km: number) => 430 - (km / scaleMax) * 360
   const space = clamp(alt / 100)
-  const sky = `rgb(${Math.round(29 - 27 * space)},${Math.round(78 - 72 * space)},${Math.round(216 - 193 * space)})`
   const burning = t >= T.ignition && t < T.burnout && !exploded
   const chute = t >= T.chute && !result.failed
   const descending = t >= T.apogee
@@ -101,11 +101,10 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800">
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Paulet-1 sounding flight">
-        <rect width="800" height="480" fill={sky} />
-        <g opacity={space}>
-          {Array.from({ length: 70 }, (_, i) => (
-            <circle key={i} cx={(i * 137) % 800} cy={(i * 97) % 300} r={0.8} fill="#e2e8f0" />
-          ))}
+        <SkyBackdrop space={space} />
+        <Stars space={space} count={70} height={300} />
+        <g opacity={1 - space}>
+          <HighClouds t={t} />
         </g>
         {/* altitude ladder */}
         {[0, 50, SPACE_LINE_KM].map((km) => (
@@ -118,9 +117,17 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
             )}
           </g>
         ))}
-        <path d="M0 400 L90 350 L170 380 L260 320 L330 360 L420 310 L500 350 L590 300 L680 345 L800 320 L800 440 L0 440 Z" fill="#1e1b4b" opacity={0.9} />
-        <rect x="0" y="430" width="800" height="50" fill="#0f172a" />
-        <rect x="380" y="360" width="5" height="70" fill="#78716c" />
+        <AndesBackdrop />
+        {/* launch rail: a braced mast and a small blockhouse, 1890s-workshop style */}
+        <g>
+          <rect x="384" y="350" width="4" height="80" fill="#78716c" />
+          <line x1="386" y1="430" x2="360" y2="430" stroke="#57534e" strokeWidth="3" />
+          <line x1="386" y1="372" x2="362" y2="430" stroke="#57534e" strokeWidth="2" />
+          <line x1="386" y1="372" x2="412" y2="430" stroke="#57534e" strokeWidth="2" />
+          <rect x="250" y="410" width="44" height="20" fill="#57534e" />
+          <rect x="250" y="406" width="44" height="5" fill="#44403c" />
+          <rect x="258" y="416" width="10" height="6" fill="#fde68a" opacity={0.8} />
+        </g>
         {/* rocket */}
         {!exploded && (
           <g transform={`translate(400 ${y(alt)}) rotate(${descending && !chute ? 180 : 0})`}>

@@ -53,7 +53,11 @@ Then run: `python3 scripts/audio/prepare_launch_audio.py --countdown countdown.m
 - **What:** two 150 s loops for "design" and "flight" (ElevenLabs estimate: 7 500 credits for both). Until then the game uses music A softly.
 - **Done when:** approved and generated, or replaced by local AI music.
 
-## 8. Launch-pad art upgrade (LOCAL, no ElevenLabs credits needed)
+## 8. ✅ DONE (local, 2026-11-02) — Launch-pad art upgrade
+Scenery layers live in `src/ui/launch/LaunchScenery.tsx` (inline SVG, see DECISIONS.md). Not done: per-launcher rocket sprites (optional);
+the booster-landing inset was type-checked but not watched in the browser. Remaining: the user looks at it once.
+
+Original task:
 - **What:** replace the flat shapes of the launch scene with illustrated layers in the intro's style (docs/video-style.md):
   sky gradient by altitude, Andes range with the Misti volcano, launch pad + tower, clouds for the cloud-layer crossing, ocean + drone ship for
   the booster landing, Earth limb from orbit. Optional: rocket sprites per launcher (Paulet-1 brass/copper, L-1, M-2, R-2 with legs/grid fins, H-3 with

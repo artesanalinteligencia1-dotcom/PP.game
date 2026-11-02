@@ -4,6 +4,7 @@ import type { Design } from '../../engine/types'
 import { audio, hasVoice, type Sfx } from '../../audio/audio'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
+import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SkyBackdrop, Stars } from './LaunchScenery'
 
 /** Timeline in seconds after pressing Launch. `count` = seconds of countdown before ignition (10 with the voice, 3 without). */
 export function makeTimeline(count: number) {
@@ -54,10 +55,6 @@ interface Props {
 function clamp(x: number, a = 0, b = 1) {
   return Math.max(a, Math.min(b, x))
 }
-function mix(a: number[], b: number[], k: number) {
-  return a.map((x, i) => Math.round(x + (b[i] - x) * k))
-}
-const hex = (c: number[]) => `rgb(${c[0]},${c[1]},${c[2]})`
 
 export function failureTime(seed: number, T: Timeline): { at: number; text: string } {
   const k = seed % 3
@@ -238,11 +235,10 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const dvSpent = flying ? velKms + 1.5 * clamp(p * 1.4) : 0
   // Before liftoff the clock follows the voiced countdown (T−0 = ignition); after liftoff it shows compressed mission time.
   const met = flying ? (t - T.liftoff) * MET_FACTOR : t - T.ignition
-  const space = clamp(altKm / 120)
-  const skyTop = hex(mix([29, 78, 216], [2, 6, 23], space))
-  const skyBottom = hex(mix([251, 146, 60], [2, 6, 23], clamp(space * 1.3)))
   const rise = flying ? Math.min(170, 1400 * p * p) : 0
   const worldShift = flying ? Math.max(0, 1400 * p * p - 170) : 0
+  // Sky darkening follows the camera (ground leaving the frame), not the HUD altitude, so the dawn sky lasts while the Andes are visible.
+  const space = clamp((worldShift - 150) / 600)
   const H = rocketHeight(launcher.id)
   const follow = H * 0.55 * clamp((t - T.meco - 0.3) / 1.5)
   const rocketY = 430 - rise + follow
@@ -283,30 +279,25 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800">
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Launch of the ${launcher.name}`}>
-        <defs>
-          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={skyTop} />
-            <stop offset="1" stopColor={skyBottom} />
-          </linearGradient>
-        </defs>
-        <rect width="800" height="480" fill="url(#sky)" />
-        {/* stars */}
-        <g opacity={space}>
-          {Array.from({ length: 90 }, (_, i) => (
-            <circle key={i} cx={(i * 137) % 800} cy={(i * 131) % 380} r={i % 7 === 0 ? 1.2 : 0.7} fill="#e2e8f0" />
-          ))}
-        </g>
+        <SkyBackdrop space={space} />
+        <Stars space={space} />
         {/* Earth limb appears high up */}
-        <g opacity={clamp((altKm - 40) / 80)}>
-          <ellipse cx="400" cy={1000 - 110 * clamp((altKm - 40) / 300)} rx="900" ry="520" fill="#38bdf8" opacity={0.35} />
-          <ellipse cx="400" cy={1006 - 110 * clamp((altKm - 40) / 300)} rx="900" ry="520" fill="#1d4ed8" />
-        </g>
-        {/* ground, mountains (Andes silhouette) and tower move away */}
+        <EarthLimb k={clamp((altKm - 40) / 300)} />
+        {space < 0.6 && (
+          <g opacity={1 - space / 0.6}>
+            <HighClouds t={t} />
+          </g>
+        )}
+        {/* Andes (parallax) and launch complex move away as the rocket climbs */}
+        {worldShift < 900 && <AndesBackdrop shift={worldShift} />}
         <g transform={`translate(0 ${worldShift})`}>
-          <path d="M0 380 L80 335 L150 362 L230 300 L300 345 L380 305 L450 350 L520 296 L600 342 L680 310 L740 348 L800 322 L800 440 L0 440 Z" fill="#1e1b4b" opacity={0.85} />
-          <rect x="0" y="430" width="800" height="60" fill="#0f172a" />
-          <rect x="350" y="420" width="100" height="12" fill="#334155" />
-          <rect x="432" y={430 - (launcher.id === 'light' ? 160 : launcher.id === 'medium' ? 210 : 240)} width="7" height={launcher.id === 'light' ? 160 : launcher.id === 'medium' ? 210 : 240} fill="#475569" />
+          {/* cloud layer just above the frame: the rocket climbs through it as the camera follows */}
+          {worldShift < 700 && (
+            <g opacity={1 - space * 0.6}>
+              <CloudDeck y={-30} />
+            </g>
+          )}
+          {worldShift < 480 && <LaunchPad towerHeight={launcher.id === 'light' ? 160 : launcher.id === 'medium' ? 210 : 240} t={t} />}
           {t >= T.ignition && t < T.liftoff + 2.5 && (
             <g opacity={t < T.liftoff ? 1 : clamp(1 - (t - T.liftoff) / 2.5)}>
               <circle cx="370" cy="428" r={20 + (t - T.ignition) * 22} fill="#cbd5e1" opacity={0.35} />
@@ -380,8 +371,7 @@ function BoosterLanding({ t, landed }: { t: number; landed: boolean }) {
     <div className="absolute bottom-16 right-3 w-44 overflow-hidden rounded-lg border border-slate-700 bg-slate-950/85 p-1 text-[10px] text-slate-300">
       <div className="px-1 font-semibold text-sky-300">Booster recovery</div>
       <svg viewBox="0 0 160 120" className="h-28 w-full">
-        <rect x="0" y="104" width="160" height="16" fill="#1e3a8a" />
-        <rect x="40" y="100" width="80" height="5" fill="#475569" />
+        <OceanWithShip />
         {!crashed && (
           <g transform={`translate(80 ${y})`}>
             <rect x="-4" y="-34" width="8" height="34" fill="#f1f5f9" />

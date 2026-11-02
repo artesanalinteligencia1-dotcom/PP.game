@@ -74,3 +74,6 @@
 - Home hub + lessons 1–3 + Paulet facts; intro test video bundled (720p, 2.9 MB) with English captions as the "Watch intro" placeholder.
 - Share links: design + seed in the URL hash, validated on load.
 - Launch-pad art upgrade delegated to the local chat (LOCAL_TODO §8); cloud kept the mechanics (rockets per launcher, booster landing, rideshare neighbours).
+- Launch scenery as inline SVG React components (`src/ui/launch/LaunchScenery.tsx`) / exported SVG or WebP files in `src/assets/launch/` (LOCAL_TODO §8) / vector stays sharp at any size, ~10 KB of code instead of image files, layers can parallax and recolour with altitude, no image-generation credits.
+- Sky darkening and the cloud-layer crossing follow the camera scroll, not the HUD altitude / tie them to km / the HUD altitude passes 100 km about 1.7 s after liftoff, which turned the sky black while the Andes were still on screen; telemetry is unchanged.
+- Misti drawn left of the pad inside the central 800×480 crop / at the far left / phones show only the middle of the scene (`slice`), and the volcano is the scene's landmark.
