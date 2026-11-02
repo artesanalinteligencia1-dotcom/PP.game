@@ -62,6 +62,8 @@
 6. Movie-style voiced countdown with ignition phase and varying farewell line; design/flight music loops generated; evaluation of rockets (reusables), Mars projects and the rest of Phase 3.
 7. Paulet-1 as the starting rocket (the user's idea), rockets progression up to reusables, Act 1 career with investors, hub, lessons, share links; Mars planned for Acts 3–4.
 8. Audio landed from the local session; voiced-countdown pass; Act 2: real three-body physics, routes, chaos lesson, Lagrange Observatory.
+9. The local session delivered the illustrated launch scenery (dawn sky, Andes with the Misti, lattice tower, drone ship); the cloud
+   session merged it with Act 2 and checked it against the voiced countdown in the browser (no overlaps, no errors).
 
 ## How to run
 ```
@@ -72,7 +74,7 @@ npm run build
 ```
 
 ## Deploy
-Vercel project being linked from the cloud session (see README for the URL once live).
+Postponed by the user (LOCAL_TODO §1).
 
 ## Open risks
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
@@ -82,4 +84,4 @@ Vercel project being linked from the cloud session (see README for the URL once 
 
 ## Next exact step
 Decide with the user: Act 3 (Mars "Stranded": launch windows, interplanetary transfer, entry-descent-landing subsystem) or polish/
-balance with playtests. In parallel (local): launch-pad art (LOCAL_TODO §8) and a human listen of the generated audio.
+balance with playtests. In parallel (local): a human listen of the generated audio and the animated intro (LOCAL_TODO §6).
