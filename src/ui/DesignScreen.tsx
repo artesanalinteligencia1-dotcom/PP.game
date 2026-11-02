@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { useMusic } from '../audio/audio'
+import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
 import { evaluateDesign } from '../engine/evaluate'
 import { getScenario } from '../engine/catalog'
 import type { Design } from '../engine/types'
@@ -30,6 +32,7 @@ export function DesignScreen({ design }: { design: Design }) {
   const designKey = JSON.stringify(design)
   const report = useMemo(() => evaluateDesign(design, scenario), [design, scenario])
   const blocking = report.review.filter((r) => r.blocking).length
+  useMusic('design')
 
   return (
     <div className="min-h-screen">
@@ -67,6 +70,15 @@ export function DesignScreen({ design }: { design: Design }) {
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <aside className="order-first lg:order-last">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 lg:sticky lg:top-28">
+            <div className="mb-3 flex items-center gap-3 border-b border-slate-800 pb-3">
+              <div className="rounded-lg bg-slate-950/80 p-1" title="Your spacecraft: every part you choose appears here, on the launch pad and in flight.">
+                <SpacecraftSprite design={design} size={92} />
+              </div>
+              <div className="text-xs text-slate-400">
+                <div className="font-display text-sm font-semibold text-slate-200">Your spacecraft</div>
+                Built from your choices: arrays, antenna, instruments (green = astrobiology, violet = astrophysics), thrusters and radiators.
+              </div>
+            </div>
             <Dashboard report={report} designKey={designKey} />
           </div>
         </aside>

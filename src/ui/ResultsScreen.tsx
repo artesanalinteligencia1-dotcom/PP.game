@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { audio, useMusic } from '../audio/audio'
+import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { getScenario } from '../engine/catalog'
 import { analyseMission } from '../engine/report'
@@ -39,6 +41,11 @@ export function ResultsScreen() {
   const score = useMemo(() => scoreMission(mission, scenario), [mission, scenario])
   const analysis = useMemo(() => analyseMission(mission, score, scenario), [mission, score, scenario])
   const [board, setBoard] = useState<BoardEntry[]>([])
+  useMusic('results')
+  const good = score.rank === 'Success' || score.rank === 'Outstanding'
+  useEffect(() => {
+    audio.play(good ? 'success' : 'failure')
+  }, [good])
 
   useEffect(() => {
     const all = loadBoard()
@@ -66,7 +73,10 @@ export function ResultsScreen() {
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
         <section className={`rounded-2xl border-2 bg-slate-900/70 p-6 text-center ${RANK_STYLE[score.rank]}`}>
-          <div className="text-6xl font-black">{score.total}</div>
+          <div className="mx-auto mb-2 w-fit rounded-lg bg-slate-950/70 p-1">
+            <SpacecraftSprite design={mission.design} size={84} />
+          </div>
+          <div className="font-display text-6xl font-black">{score.total}</div>
           <div className="text-sm text-slate-400">of 1 000 points</div>
           <div className="mt-2 text-2xl font-bold">{score.rank}</div>
           <ul className="mt-5 space-y-2 text-left text-xs">
