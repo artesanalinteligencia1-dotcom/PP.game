@@ -24,15 +24,16 @@ export const hasVoice = (name: string) => Boolean(voiceSrc(name))
 export const AVAILABLE_SFX = Object.keys(SFX_FILES).map((k) => k.split('/').pop()!.replace('.mp3', ''))
 
 /**
- * Stage → music. See HANDOFF §19.4: A (Andean-electronic) = home; B (cinematic) = launch.
- * Design and flight use their own loops when bundled (design-focus.mp3, flight-ambient.mp3), otherwise A softly.
+ * Stage → music. Soundtrack songs (ACE-Step 1.5, normalised to −16 LUFS): "Beneath the Misti" = home,
+ * "Paulet's Fire" = launch, "Lagrange" = results. Design and flight keep their quieter loops (≈ −20 LUFS)
+ * when bundled (design-focus.mp3, flight-ambient.mp3), otherwise the home song softly.
  */
 export const MUSIC: Record<Exclude<MusicStage, 'none'>, { src: string; volume: number } | null> = {
-  home: { src: music('home-andean-electronic'), volume: 0.55 },
-  design: music('design-focus') ? { src: music('design-focus'), volume: 0.4 } : { src: music('home-andean-electronic'), volume: 0.22 },
-  launch: { src: music('launch-cinematic'), volume: 0.6 },
-  flight: music('flight-ambient') ? { src: music('flight-ambient'), volume: 0.4 } : { src: music('home-andean-electronic'), volume: 0.16 },
-  results: null,
+  home: { src: music('home-beneath-the-misti'), volume: 0.45 },
+  design: music('design-focus') ? { src: music('design-focus'), volume: 0.4 } : { src: music('home-beneath-the-misti'), volume: 0.18 },
+  launch: { src: music('launch-paulets-fire'), volume: 0.5 },
+  flight: music('flight-ambient') ? { src: music('flight-ambient'), volume: 0.4 } : { src: music('home-beneath-the-misti'), volume: 0.14 },
+  results: { src: music('results-lagrange'), volume: 0.4 },
 }
 
 const SFX_VOLUME: Partial<Record<Sfx, number>> = { liftoff: 0.9, explosion: 0.8, alert: 0.5 }

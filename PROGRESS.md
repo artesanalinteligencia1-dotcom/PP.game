@@ -59,6 +59,12 @@
   ignition/liftoff/farewell on time), full launch with no new console errors. Not listened to by a human yet.
   Next steps for the cloud: `CLOUD_NEXT.md`.
 
+- Local session (2026-11-02, cloud out of credits — the local chat does everything for now): **soundtrack in the game.**
+  The user's favourite ACE-Step 1.5 songs (version A), loudness-normalised to −16 LUFS: "Beneath the Misti" → menu/home,
+  "Paulet's Fire" → launch, "Lagrange" → results (it had no music). Design and flight keep their loops. Old ElevenLabs
+  home/launch tests removed. `MUSIC` map only (engine logic untouched); CREDITS.md entry (ACE-Step 1.5 MIT, AI disclosed).
+  Tests 83 passing, build passes; browser: all five stage tracks load (200). Not listened to by a human yet.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
@@ -97,7 +103,7 @@ Postponed by the user (LOCAL_TODO §1).
 ## Open risks
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
 - Recharts bundle ~570 kB (warning only).
-- ElevenLabs licence for public/commercial use not verified (LOCAL_TODO).
+- ElevenLabs licence for public/commercial use not verified (LOCAL_TODO) — now only design/flight loops, voice and SFX; the songs are ACE-Step (MIT).
 - Vercel deploy postponed by the user.
 
 ## Next exact step

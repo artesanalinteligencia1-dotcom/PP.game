@@ -18,6 +18,11 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
   skip/unmount. Keep this pattern for any new timed sound (flight alerts, lessons): **never fire sounds from animation frames.**
 - `LaunchScenery.tsx`: three lights through `<SceneryLight style>` + `launchWindowStyle(target)`; `?pad=dawn|day|night` forces one.
 
+## Local session status (2026-11-02, cloud chat out of credits — local does everything for now)
+User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game · 3 final trailer (HyperFrames) · 4 Three.js launch (item 3 below).
+- ✅ Soundtrack: `MUSIC` = home "Beneath the Misti", launch "Paulet's Fire", results "Lagrange" (ACE-Step 1.5, −16 LUFS);
+  design/flight loops unchanged. Any new screen picks music through `useMusic(stage)` only.
+
 ## Next, in this order
 1. ✅ **DONE (cloud, 2026-11-03) — Offline build (the user's goal).** See PROGRESS step 10.
    - PWA: `vite-plugin-pwa`, precache everything (audio, video, fonts are already local — no external URLs in `src/`),
