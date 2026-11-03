@@ -4,6 +4,9 @@ import '@fontsource-variable/inter'
 import '@fontsource-variable/space-grotesk'
 import './index.css'
 import { App } from './ui/App'
+import { setupOffline } from './platform/offline'
+
+void setupOffline()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

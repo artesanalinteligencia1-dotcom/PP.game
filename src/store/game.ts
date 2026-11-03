@@ -16,6 +16,7 @@ import { scoreMission } from '../engine/score'
 import { advanceWeek, botChoice, createMission, decide, type MissionState, type Personality } from '../engine/simulate'
 import type { SoundingResult } from '../engine/sounding'
 import type { Design, Role } from '../engine/types'
+import { validateCampaign } from './save'
 import { readShareFromHash } from './share'
 
 export type TabId = 'mission' | 'payload' | 'spacecraft' | 'orbit' | 'comms' | 'review'
@@ -25,8 +26,7 @@ const CAMPAIGN_KEY = 'ppgame.campaign.v1'
 function loadCampaign(): CampaignState | null {
   try {
     const raw = localStorage.getItem(CAMPAIGN_KEY)
-    const c = raw ? (JSON.parse(raw) as CampaignState) : null
-    return c && c.version === 1 ? c : null
+    return raw ? validateCampaign(JSON.parse(raw)) : null
   } catch {
     return null
   }
@@ -70,6 +70,8 @@ interface GameState {
   go: (screen: Screen) => void
   openLearn: (tab?: string) => void
   startCampaign: (profile: Profile) => void
+  /** Replace the career with an imported save (already validated by parseSaveFile). */
+  loadCampaignState: (c: CampaignState) => void
   resetCampaign: () => void
   setProfile: (profile: Profile) => void
   startContract: (contractId: string) => void
@@ -125,6 +127,10 @@ export const useGame = create<GameState>((set, get) => ({
   openLearn: (tab) => set({ screen: 'learn', learnTab: tab ?? get().learnTab }),
   startCampaign: (profile) => {
     const c = newCampaign(profile)
+    saveCampaign(c)
+    set({ campaign: c, screen: 'campaign', mode: 'campaign', lastReward: null })
+  },
+  loadCampaignState: (c) => {
     saveCampaign(c)
     set({ campaign: c, screen: 'campaign', mode: 'campaign', lastReward: null })
   },
