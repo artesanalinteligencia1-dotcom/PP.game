@@ -1,5 +1,4 @@
 import introUrl from '../../assets/video/intro.mp4'
-import introVtt from '../../assets/video/intro.en.vtt?url'
 import { useMusic } from '../../audio/audio'
 import { useGame } from '../../store/game'
 import { Disclaimer } from '../components'
@@ -13,13 +12,12 @@ export function IntroScreen() {
         ← Home
       </button>
       <h1 className="mt-2 text-2xl font-semibold">Watch intro</h1>
-      <p className="mt-1 text-sm text-slate-400">Test version (30 s). The full animated intro is in production.</p>
-      <video className="mt-4 w-full rounded-xl border border-slate-800" controls preload="metadata" src={introUrl}>
-        <track kind="captions" srcLang="en" label="English" src={introVtt} default />
-      </video>
+      {/* English captions are burned into the video (word by word), so no <track>: it would show them twice. */}
+      <video className="mt-4 w-full rounded-xl border border-slate-800" controls preload="metadata" src={introUrl} />
+      <p className="mt-2 text-xs text-slate-500">31 s · English narration with captions.</p>
       <p className="mt-3 text-xs text-slate-500">
         Pedro Goicochea is a fictional character inspired by the story of Pedro Paulet (1874–1945). Narration, music and illustrations generated with
-        ElevenLabs for this project.
+        ElevenLabs for this project; animated in HyperFrames.
       </p>
       <div className="mt-6 flex gap-2">
         <button type="button" onClick={() => go('home')} className="btn-primary px-4 py-2 ">

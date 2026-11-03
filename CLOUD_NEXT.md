@@ -19,9 +19,11 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
 - `LaunchScenery.tsx`: three lights through `<SceneryLight style>` + `launchWindowStyle(target)`; `?pad=dawn|day|night` forces one.
 
 ## Local session status (2026-11-02, cloud chat out of credits — local does everything for now)
-User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game · 3 final trailer (HyperFrames) · 4 Three.js launch (item 3 below).
+User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final trailer (HyperFrames) · 4 Three.js launch (item 3 below).
 - ✅ Soundtrack: `MUSIC` = home "Beneath the Misti", launch "Paulet's Fire", results "Lagrange" (ACE-Step 1.5, −16 LUFS);
   design/flight loops unchanged. Any new screen picks music through `useMusic(stage)` only.
+- ✅ Intro: final 31 s video (720p, 4.4 MB) with burned-in captions; never add a `<track>` to it. Rebuild from
+  `C:\PPgame\intro-a` (`node build.mjs`, then HyperFrames render) and re-encode to 720p if the narration changes.
 
 ## Next, in this order
 1. ✅ **DONE (cloud, 2026-11-03) — Offline build (the user's goal).** See PROGRESS step 10.

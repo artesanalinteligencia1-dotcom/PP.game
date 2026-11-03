@@ -20,7 +20,9 @@
 - Licence/terms of the owner's ElevenLabs plan to be confirmed before any commercial use (see LOCAL_TODO.md).
 
 ## Video
-- "Watch intro" test video (illustrations, narration, music): generated with ElevenLabs for this project; assembled with `scripts/video/build_intro_test.py`.
+- "Watch intro" (style A "Painted cinema", 31 s, `src/assets/video/intro.mp4`): illustrations, narration (take B) and music
+  generated with ElevenLabs for this project; animated with HyperFrames (source `C:\PPgame\intro-a`, `build.mjs`),
+  English captions burned in; 720p H.264 encode of `intro_paulet.mp4`.
 
 ## Data
 - All component, launcher and mission values are simplified, fictional game values (see `docs/model.md`).

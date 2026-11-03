@@ -65,6 +65,11 @@
   home/launch tests removed. `MUSIC` map only (engine logic untouched); CREDITS.md entry (ACE-Step 1.5 MIT, AI disclosed).
   Tests 83 passing, build passes; browser: all five stage tracks load (200). Not listened to by a human yet.
 
+- Local session (2026-11-02): **final intro in the game.** `src/assets/video/intro.mp4` = `C:\PPgame\intro_paulet.mp4`
+  (style A "Painted cinema", HyperFrames source `C:\PPgame\intro-a`) re-encoded to 720p H.264 CRF 27 (4.4 MB, SSIM 0.965
+  vs the 1080p master). Its captions are burned in, so the `<track>` and `intro.en.vtt` were removed (no double captions).
+  Tests 83 passing, build passes; browser: Extras → Watch intro plays 1280×720, 31 s, no text tracks.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
