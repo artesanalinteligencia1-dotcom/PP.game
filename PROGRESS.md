@@ -101,5 +101,6 @@ Postponed by the user (LOCAL_TODO §1).
 - Vercel deploy postponed by the user.
 
 ## Next exact step
-CLOUD_NEXT item 3: launch-scene and rocket-motion improvements in SVG (the renderer choice — PixiJS recommended — is still
-the user's). The local chat tests the Windows installer from GitHub Actions (Desktop build → Artifacts).
+The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
+replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
+tests the Windows installer from GitHub Actions (Desktop build → Artifacts).
