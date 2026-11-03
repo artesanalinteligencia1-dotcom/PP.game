@@ -1,4 +1,5 @@
-import { useId } from 'react'
+import { createContext, useContext, useId, type ReactNode } from 'react'
+import type { LaunchTarget } from '../../engine/types'
 
 /**
  * Illustrated launch scenery (LOCAL_TODO §8): flat/painterly layers in the style of docs/video-style.md.
@@ -12,35 +13,143 @@ function mix(a: number[], b: number[], k: number) {
 }
 const SPACE = [2, 6, 23]
 
-/** Dawn sky over the Andes that fades to black with altitude (`space` 0 → 1). */
+/**
+ * Three lights for the launch site, picked by the mission's launch window (see `launchWindowStyle`).
+ * Same drawings and timing, different light: palette, sun or moon, stars from the ground, floodlights, city lights.
+ */
+const THEMES = {
+  dawn: {
+    sky: [[23, 37, 84], [67, 56, 128], [190, 110, 120], [253, 186, 116]],
+    glow: { x: 120, y: 372, r: 190, core: '#fff7ed', mid: '#fde68a', edge: '#fb923c' },
+    moon: false,
+    groundStars: 0,
+    haze: ['#8b7fb8', '#b58aa0'],
+    farSnow: '#ede9fe',
+    ridge: '#3f3466',
+    cone: '#4c3f75',
+    coneLit: '#6b5a9a',
+    snow: '#f5f3ff',
+    snowLit: '#ffffff',
+    snowShade: '#c4b5fd',
+    hills: '#2a2350',
+    plain: ['#5b4636', '#1c1917'],
+    track: '#78583f',
+    cloud: { base: '#a78bba', light: '#f3e8ff', top: '#faf5ff', edge: '#e9d5ff', under: '#d8b4fe', band: '#ede9fe' },
+    steel: ['#64748b', '#475569', '#94a3b8'],
+    flood: 0.08,
+    cityLights: false,
+  },
+  day: {
+    sky: [[30, 84, 200], [56, 128, 232], [128, 186, 240], [214, 234, 250]],
+    glow: { x: 650, y: 70, r: 130, core: '#ffffff', mid: '#fef9c3', edge: '#fde68a' },
+    moon: false,
+    groundStars: 0,
+    haze: ['#8fa6c8', '#b9c6da'],
+    farSnow: '#ffffff',
+    ridge: '#7c6a58',
+    cone: '#86705c',
+    coneLit: '#b39272',
+    snow: '#f8fafc',
+    snowLit: '#ffffff',
+    snowShade: '#cbd5e1',
+    hills: '#6b5a44',
+    plain: ['#b8925f', '#6b4f33'],
+    track: '#e2c595',
+    cloud: { base: '#cbd5e1', light: '#ffffff', top: '#ffffff', edge: '#f1f5f9', under: '#e2e8f0', band: '#ffffff' },
+    steel: ['#e2e8f0', '#94a3b8', '#f8fafc'],
+    flood: 0,
+    cityLights: false,
+  },
+  night: {
+    sky: [[2, 6, 23], [8, 16, 44], [18, 30, 70], [36, 50, 96]],
+    glow: { x: 650, y: 90, r: 90, core: '#f8fafc', mid: '#cbd5e1', edge: '#64748b' },
+    moon: true,
+    groundStars: 0.85,
+    haze: ['#1c2847', '#25345a'],
+    farSnow: '#94a3b8',
+    ridge: '#101931',
+    cone: '#15203d',
+    coneLit: '#22325a',
+    snow: '#cbd5e1',
+    snowLit: '#e2e8f0',
+    snowShade: '#64748b',
+    hills: '#0a1124',
+    plain: ['#151b2b', '#05070d'],
+    track: '#334155',
+    cloud: { base: '#1e293b', light: '#475569', top: '#64748b', edge: '#334155', under: '#1e293b', band: '#334155' },
+    steel: ['#94a3b8', '#64748b', '#cbd5e1'],
+    flood: 0.22,
+    cityLights: true,
+  },
+}
+export type SceneryStyle = keyof typeof THEMES
+
+/** `?pad=dawn|day|night` forces one look (for comparing them); otherwise the launch window decides. */
+function forcedStyle(): SceneryStyle | null {
+  try {
+    const q = new URLSearchParams(window.location.search).get('pad')
+    if (q && q in THEMES) return q as SceneryStyle
+  } catch {
+    // no window (tests)
+  }
+  return null
+}
+const FORCED = forcedStyle()
+
+/**
+ * Launch window → light at the pad. Sun-synchronous orbits are reached from launches near dawn or dusk,
+ * the station from a daytime window, transfers to GTO / the Moon from night windows (game simplification).
+ */
+export function launchWindowStyle(target: LaunchTarget): SceneryStyle {
+  return target === 'sso' ? 'dawn' : target === 'leo' ? 'day' : 'night'
+}
+
+const SceneryContext = createContext<SceneryStyle>('dawn')
+/** Wrap a scene to pick its light; scenery components read it. */
+export function SceneryLight({ style, children }: { style: SceneryStyle; children: ReactNode }) {
+  return <SceneryContext.Provider value={FORCED ?? style}>{children}</SceneryContext.Provider>
+}
+const useTheme = () => THEMES[useContext(SceneryContext)]
+
+/** Sky over the Andes that fades to black with altitude (`space` 0 → 1), lit by the sun or the moon. */
 export function SkyBackdrop({ space }: { space: number }) {
   const id = useId()
+  const S = useTheme()
   const s = clamp(space)
+  const g = S.glow
   return (
     <g>
       <defs>
         <linearGradient id={`${id}sky`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={mix([23, 37, 84], SPACE, s)} />
-          <stop offset="0.45" stopColor={mix([67, 56, 128], SPACE, s)} />
-          <stop offset="0.75" stopColor={mix([190, 110, 120], SPACE, clamp(s * 1.2))} />
-          <stop offset="1" stopColor={mix([253, 186, 116], SPACE, clamp(s * 1.4))} />
+          <stop offset="0" stopColor={mix(S.sky[0], SPACE, s)} />
+          <stop offset="0.45" stopColor={mix(S.sky[1], SPACE, s)} />
+          <stop offset="0.75" stopColor={mix(S.sky[2], SPACE, clamp(s * 1.2))} />
+          <stop offset="1" stopColor={mix(S.sky[3], SPACE, clamp(s * 1.4))} />
         </linearGradient>
         <radialGradient id={`${id}sun`} cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#fff7ed" />
-          <stop offset="0.12" stopColor="#fde68a" stopOpacity="0.9" />
-          <stop offset="0.45" stopColor="#fb923c" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#fb923c" stopOpacity="0" />
+          <stop offset="0" stopColor={g.core} />
+          <stop offset="0.12" stopColor={g.mid} stopOpacity="0.9" />
+          <stop offset="0.45" stopColor={g.edge} stopOpacity="0.35" />
+          <stop offset="1" stopColor={g.edge} stopOpacity="0" />
         </radialGradient>
       </defs>
       <rect width="800" height="480" fill={`url(#${id}sky)`} />
-      <circle cx="120" cy="372" r="190" fill={`url(#${id}sun)`} opacity={1 - clamp(s * 1.5)} />
+      <circle cx={g.x} cy={g.y} r={g.r} fill={`url(#${id}sun)`} opacity={(S.moon ? 0.45 : 1) * (1 - clamp(s * 1.5))} />
+      {S.moon && (
+        <g opacity={1 - clamp(s * 1.5)}>
+          <circle cx={g.x} cy={g.y} r="17" fill="#f1f5f9" />
+          <circle cx={g.x + 5} cy={g.y - 4} r="3.5" fill="#cbd5e1" />
+          <circle cx={g.x - 6} cy={g.y + 5} r="2.5" fill="#cbd5e1" />
+        </g>
+      )}
     </g>
   )
 }
 
 export function Stars({ space, count = 90, height = 380 }: { space: number; count?: number; height?: number }) {
+  const S = useTheme()
   return (
-    <g opacity={clamp(space)}>
+    <g opacity={Math.max(clamp(space), S.groundStars)}>
       {Array.from({ length: count }, (_, i) => (
         <circle key={i} cx={(i * 137) % 800} cy={(i * 131) % height} r={i % 7 === 0 ? 1.3 : i % 3 === 0 ? 0.9 : 0.6} fill="#e2e8f0" opacity={i % 5 === 0 ? 0.6 : 1} />
       ))}
@@ -94,16 +203,17 @@ export function EarthLimb({ k }: { k: number }) {
 /** Andes range with the Misti volcano, in three parallax layers. `shift` is the world scroll in px (0 on the ground). */
 export function AndesBackdrop({ shift = 0 }: { shift?: number }) {
   const id = useId()
+  const S = useTheme()
   return (
     <g>
       <defs>
         <linearGradient id={`${id}haze`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8b7fb8" />
-          <stop offset="1" stopColor="#b58aa0" />
+          <stop offset="0" stopColor={S.haze[0]} />
+          <stop offset="1" stopColor={S.haze[1]} />
         </linearGradient>
         <linearGradient id={`${id}plain`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#5b4636" />
-          <stop offset="1" stopColor="#1c1917" />
+          <stop offset="0" stopColor={S.plain[0]} />
+          <stop offset="1" stopColor={S.plain[1]} />
         </linearGradient>
       </defs>
       {/* far range (Chachani side), hazy */}
@@ -113,26 +223,32 @@ export function AndesBackdrop({ shift = 0 }: { shift?: number }) {
           fill={`url(#${id}haze)`}
           opacity={0.75}
         />
-        <path d="M120 276 L131 284 L140 280 L150 290 L158 284 L178 268 L170 282 L150 292 Z M640 262 L652 276 L664 272 L676 288 L640 276 Z" fill="#ede9fe" opacity={0.7} />
+        <path d="M120 276 L131 284 L140 280 L150 290 L158 284 L178 268 L170 282 L150 292 Z M640 262 L652 276 L664 272 L676 288 L640 276 Z" fill={S.farSnow} opacity={0.7} />
       </g>
       {/* Misti: lit flank towards the sun, shadow flank, snow cap with a flat crater rim */}
       <g transform={`translate(0 ${shift * 0.75})`}>
         {/* Pichu Pichu ridge to the right */}
-        <path d="M430 372 L500 318 L530 334 L556 304 L590 326 L640 296 L700 344 L760 330 L800 350 L800 380 L430 380 Z" fill="#3f3466" />
+        <path d="M430 372 L500 318 L530 334 L556 304 L590 326 L640 296 L700 344 L760 330 L800 350 L800 380 L430 380 Z" fill={S.ridge} />
         {/* the cone sits left of the pad but inside the central crop, so it shows on phones too */}
         <g transform="translate(90 0)">
-          <path d="M206 214 L214 214 L380 372 L40 372 Z" fill="#4c3f75" />
-          <path d="M206 214 L210 214 L214 372 L40 372 Z" fill="#6b5a9a" />
-          <path d="M206 214 L214 214 L238 238 L228 236 L222 246 L214 238 L206 250 L198 238 L190 244 L184 237 Z" fill="#f5f3ff" />
-          <path d="M184 237 L190 244 L198 238 L206 250 L206 214 Z" fill="#ffffff" />
-          <path d="M206 214 L214 214 L238 238 L228 236 L222 246 L214 238 Z" fill="#c4b5fd" opacity={0.6} />
+          <path d="M206 214 L214 214 L380 372 L40 372 Z" fill={S.cone} />
+          <path d="M206 214 L210 214 L214 372 L40 372 Z" fill={S.coneLit} />
+          <path d="M206 214 L214 214 L238 238 L228 236 L222 246 L214 238 L206 250 L198 238 L190 244 L184 237 Z" fill={S.snow} />
+          <path d="M184 237 L190 244 L198 238 L206 250 L206 214 Z" fill={S.snowLit} />
+          <path d="M206 214 L214 214 L238 238 L228 236 L222 246 L214 238 Z" fill={S.snowShade} opacity={0.6} />
         </g>
       </g>
       {/* near foothills and the high-desert plain */}
       <g transform={`translate(0 ${shift})`}>
-        <path d="M0 398 C80 374 140 390 220 378 C300 366 350 392 450 386 C540 380 620 394 700 382 C750 374 780 384 800 380 L800 440 L0 440 Z" fill="#2a2350" />
+        <path d="M0 398 C80 374 140 390 220 378 C300 366 350 392 450 386 C540 380 620 394 700 382 C750 374 780 384 800 380 L800 440 L0 440 Z" fill={S.hills} />
         <rect x="0" y="420" width="800" height="70" fill={`url(#${id}plain)`} />
-        <path d="M0 424 C120 420 260 426 400 422 C540 418 680 425 800 421" stroke="#78583f" strokeWidth="1.5" fill="none" opacity={0.6} />
+        <path d="M0 424 C120 420 260 426 400 422 C540 418 680 425 800 421" stroke={S.track} strokeWidth="1.5" fill="none" opacity={0.6} />
+        {/* the city's lights on the plain, away from the pad */}
+        {S.cityLights &&
+          Array.from({ length: 46 }, (_, i) => {
+            const x = i < 23 ? 10 + ((i * 53) % 290) : 510 + ((i * 47) % 280)
+            return <circle key={i} cx={x} cy={426 + ((i * 7) % 12)} r={i % 4 === 0 ? 1.4 : 0.9} fill={i % 3 === 0 ? '#fde68a' : '#fbbf24'} opacity={0.85} />
+          })}
       </g>
     </g>
   )
@@ -143,6 +259,8 @@ export function LaunchPad({ towerHeight, t = 0 }: { towerHeight: number; t?: num
   const top = 430 - towerHeight
   const rungs = Math.floor(towerHeight / 14)
   const blink = Math.floor(t * 1.5) % 2 === 0
+  const S = useTheme()
+  const [steel, steelDark, steelLight] = S.steel
   return (
     <g>
       {/* lightning masts with catenary wire */}
@@ -163,18 +281,28 @@ export function LaunchPad({ towerHeight, t = 0 }: { towerHeight: number; t?: num
         <rect x="-15" y="-70" width="30" height="24" rx="4" fill="#78716c" />
         <rect x="-15" y="-70" width="10" height="24" rx="3" fill="#a8a29e" opacity={0.6} />
       </g>
+      {/* ground floodlights aimed at the rocket (only visible in the dark) */}
+      {S.flood > 0.1 && (
+        <g>
+          <path d={`M338 428 L384 ${top - 10} L398 ${top - 10} Z`} fill="#fef3c7" opacity={S.flood * 0.6} />
+          <path d={`M470 428 L416 ${top - 10} L402 ${top - 10} Z`} fill="#fef3c7" opacity={S.flood * 0.6} />
+          <ellipse cx="400" cy="424" rx="90" ry="10" fill="#fde68a" opacity={S.flood} />
+          <rect x="334" y="424" width="8" height="5" fill="#fde68a" />
+          <rect x="466" y="424" width="8" height="5" fill="#fde68a" />
+        </g>
+      )}
       {/* pad deck and flame trench */}
       <path d="M330 432 L346 418 L454 418 L470 432 Z" fill="#57534e" />
       <rect x="346" y="418" width="108" height="3" fill="#a8a29e" />
       <rect x="383" y="421" width="34" height="11" fill="#0c0a09" />
       {/* lattice tower */}
       <g>
-        <line x1="436" y1="430" x2="436" y2={top} stroke="#64748b" strokeWidth="2" />
-        <line x1="450" y1="430" x2="450" y2={top} stroke="#475569" strokeWidth="2" />
+        <line x1="436" y1="430" x2="436" y2={top} stroke={steel} strokeWidth="2" />
+        <line x1="450" y1="430" x2="450" y2={top} stroke={steelDark} strokeWidth="2" />
         {Array.from({ length: rungs }, (_, i) => {
           const y = 430 - i * 14
           return (
-            <g key={i} stroke="#64748b" strokeWidth="0.9">
+            <g key={i} stroke={steel} strokeWidth="0.9">
               <line x1="436" y1={y} x2="450" y2={y} />
               <line x1="436" y1={y} x2="450" y2={y - 14} />
               <line x1="450" y1={y} x2="436" y2={y - 14} opacity={0.5} />
@@ -186,34 +314,36 @@ export function LaunchPad({ towerHeight, t = 0 }: { towerHeight: number; t?: num
         {/* service arms reaching to the rocket */}
         {[0.35, 0.62, 0.86].map((f) => {
           const y = 430 - towerHeight * f
-          return <path key={f} d={`M436 ${y} L414 ${y} L414 ${y + 3} L436 ${y + 5} Z`} fill="#94a3b8" />
+          return <path key={f} d={`M436 ${y} L414 ${y} L414 ${y + 3} L436 ${y + 5} Z`} fill={steelLight} />
         })}
         {/* floodlight */}
-        <path d={`M452 ${top + 24} L520 ${top + 70} L520 ${top + 90} Z`} fill="#fef3c7" opacity={0.08} />
+        <path d={`M452 ${top + 24} L520 ${top + 70} L520 ${top + 90} Z`} fill="#fef3c7" opacity={S.flood} />
       </g>
     </g>
   )
 }
 
-/** One puffy cloud; light from the lower left (dawn sun). */
+/** One puffy cloud, lit from the side of the sun (or moon). */
 export function Cloud({ x, y, s = 1, opacity = 0.9 }: { x: number; y: number; s?: number; opacity?: number }) {
+  const c = useTheme().cloud
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`} opacity={opacity}>
-      <ellipse cx="0" cy="8" rx="70" ry="13" fill="#a78bba" />
-      <circle cx="-34" cy="0" r="20" fill="#f3e8ff" />
-      <circle cx="-6" cy="-12" r="26" fill="#faf5ff" />
-      <circle cx="26" cy="-4" r="20" fill="#f3e8ff" />
-      <circle cx="48" cy="4" r="13" fill="#e9d5ff" />
-      <ellipse cx="0" cy="10" rx="62" ry="8" fill="#d8b4fe" opacity={0.55} />
+      <ellipse cx="0" cy="8" rx="70" ry="13" fill={c.base} />
+      <circle cx="-34" cy="0" r="20" fill={c.light} />
+      <circle cx="-6" cy="-12" r="26" fill={c.top} />
+      <circle cx="26" cy="-4" r="20" fill={c.light} />
+      <circle cx="48" cy="4" r="13" fill={c.edge} />
+      <ellipse cx="0" cy="10" rx="62" ry="8" fill={c.under} opacity={0.55} />
     </g>
   )
 }
 
 /** Cloud deck the rocket climbs through; the caller moves `y` from above the frame (< 0) to below it (> 480). */
 export function CloudDeck({ y }: { y: number }) {
+  const band = useTheme().cloud.band
   return (
     <g>
-      <rect x="0" y={y - 10} width="800" height="36" fill="#ede9fe" opacity={0.18} />
+      <rect x="0" y={y - 10} width="800" height="36" fill={band} opacity={0.18} />
       <Cloud x={90} y={y} s={1.3} />
       <Cloud x={300} y={y + 14} s={1.1} opacity={0.8} />
       <Cloud x={540} y={y - 6} s={1.5} />

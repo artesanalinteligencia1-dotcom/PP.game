@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { audio, hasVoice } from '../../audio/audio'
+import { audio, hasVoice, type Cue } from '../../audio/audio'
 import { SPACE_LINE_KM, type SoundingResult } from '../../engine/sounding'
-import { AndesBackdrop, HighClouds, SkyBackdrop, Stars } from '../launch/LaunchScenery'
+import { AndesBackdrop, HighClouds, SceneryLight, SkyBackdrop, Stars } from '../launch/LaunchScenery'
 
 const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 
@@ -16,41 +16,38 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
   }, [count])
   const [t, setT] = useState(0)
   const start = useRef<number | null>(null)
-  const fired = useRef(new Set<string>())
   const done = useRef(false)
 
+  // Animation clock + sound scheduled on the audio clock from the same instant (see LaunchSequence).
   useEffect(() => {
     if (!running) return
+    if (start.current === null) start.current = performance.now()
+    const t0 = start.current
+    const elapsed = (performance.now() - t0) / 1000
+    const cues: Cue[] = voice ? Array.from({ length: count }, (_, k) => ({ at: k, voice: `count_${count - k}` })) : [{ at: 0, sfx: 'countdown' }]
+    if (voice) cues.push({ at: T.ignition, voice: 'ignition' })
+    cues.push({ at: T.ignition, sfx: 'liftoff' }, result.failed ? { at: T.fail, sfx: 'explosion' } : { at: T.apogee, sfx: 'orbit' })
+    const cancel = audio.schedule(cues.map((c) => ({ ...c, at: c.at - elapsed })))
     let raf = 0
     const tick = (now: number) => {
-      if (start.current === null) start.current = now
-      const tt = (now - start.current) / 1000
+      const tt = (now - t0) / 1000
       setT(tt)
       if (tt < T.end + 0.3) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [running, T])
+    return () => {
+      cancelAnimationFrame(raf)
+      cancel()
+    }
+  }, [running, T, voice, count, result.failed])
 
   useEffect(() => {
     if (!running) return
-    const once = (k: string, at: number, fn: () => void) => {
-      if (t >= at && !fired.current.has(k)) {
-        fired.current.add(k)
-        fn()
-      }
-    }
-    if (voice) for (let k = 0; k < count; k++) once(`c${k}`, k, () => audio.say(`count_${count - k}`))
-    else once('beep', 0, () => audio.play('countdown'))
-    once('ign', T.ignition, () => (voice ? audio.say('ignition') : undefined))
-    once('roar', T.ignition, () => audio.play('liftoff'))
-    if (result.failed) once('boom', T.fail, () => audio.play('explosion'))
-    else once('top', T.apogee, () => audio.play('orbit'))
     if (!done.current && t >= (result.failed ? T.fail + 1.5 : T.end)) {
       done.current = true
       onDone()
     }
-  }, [t, running, voice, count, T, result.failed, onDone])
+  }, [t, running, T, result.failed, onDone])
 
   // Altitude profile (km): powered ease-in, ballistic coast, fall, parachute.
   const ap = result.apogeeKm
@@ -101,6 +98,7 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800">
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Paulet-1 sounding flight">
+        <SceneryLight style="dawn">
         <SkyBackdrop space={space} />
         <Stars space={space} count={70} height={300} />
         <g opacity={1 - space}>
@@ -118,6 +116,7 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
           </g>
         ))}
         <AndesBackdrop />
+        </SceneryLight>
         {/* launch rail: a braced mast and a small blockhouse, 1890s-workshop style */}
         <g>
           <rect x="384" y="350" width="4" height="80" fill="#78716c" />

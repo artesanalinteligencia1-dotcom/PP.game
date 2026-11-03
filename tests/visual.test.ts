@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { getScenario, type Design } from '../src/engine'
 import { spacecraftVisual } from '../src/ui/spacecraft/visual'
 import { FAREWELLS, failureTime, farewellIndex, makeTimeline } from '../src/ui/launch/LaunchSequence'
+import { launchWindowStyle } from '../src/ui/launch/LaunchScenery'
 
 const base = getScenario('earth_watch').baseDesign
 
@@ -49,5 +50,11 @@ describe('launch sequence timeline', () => {
   it('the farewell line is chosen deterministically from the seed', () => {
     expect(farewellIndex(123456)).toBe(farewellIndex(123456))
     expect(new Set([0, 1, 2, 3, 4].map((s) => FAREWELLS[farewellIndex(s)])).size).toBe(5)
+  })
+  it('the launch window sets the light at the pad', () => {
+    expect(launchWindowStyle('sso')).toBe('dawn')
+    expect(launchWindowStyle('leo')).toBe('day')
+    expect(launchWindowStyle('gto')).toBe('night')
+    expect(launchWindowStyle('tli')).toBe('night')
   })
 })

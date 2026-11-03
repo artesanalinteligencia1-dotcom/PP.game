@@ -53,6 +53,12 @@
   - Tests: 77 passing (Lagrange points, Jacobi, periodicity, determinism snapshot 1e-12, butterfly, Lagrange designs/outcomes).
   - Browser: lesson 4 + full Lagrange mission (low-energy route, drift decisions) → 901/1 000, no console errors.
 
+- Local session (2026-11-02, after the user's playtest): audio engine on the Web Audio clock (scheduled, cancellable
+  cues; one music track; ducking) fixing the "countdown at random moments" and overlapping songs; the three launch lights
+  (dawn/day/night) chosen by the launch window. Tests 78 passing; browser: cue times checked (one count per second,
+  ignition/liftoff/farewell on time), full launch with no new console errors. Not listened to by a human yet.
+  Next steps for the cloud: `CLOUD_NEXT.md`.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).

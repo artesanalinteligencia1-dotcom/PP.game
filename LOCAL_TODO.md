@@ -66,6 +66,19 @@ Original task:
 - **Why local:** you can use the image tools on your PC at no credit cost; the cloud keeps the mechanics.
 - **Done when:** the scene reads as "illustrated" at 1280×720 and on a phone, with no change to the timing or the tests.
 
+## 10. Listen to the new audio engine (user)
+- **What:** play one launch (any mission) and the Paulet-1 prologue: the countdown should be one number per second, no lines
+  piling up, music never doubled, music lower while mission control speaks. Also try switching windows mid-countdown.
+- **Done when:** the user confirms, or reports what still sounds wrong.
+
+## 11. Test the offline builds (local, after CLOUD_NEXT §1)
+- **What:** install the Windows build from GitHub Actions and the PWA; play with the network off.
+- **Why local:** needs your PC (installer, SmartScreen warning for unsigned builds).
+
+## 12. Art direction and renderer (user decisions, then local assets)
+- **What:** pick one of the 3 coded mock-ups (CLOUD_NEXT §2) and the renderer for scenes (PixiJS 2.5D recommended).
+  Painted layers / textures can then be made locally with image tools (credits only with explicit approval).
+
 ## 9. Opening a cloud session that can download from ElevenLabs
 - In claude.ai/code: environment menu (session title bar) → Edit → Network access → add `elevenlabsusercontent.com` under Allowed domains
   (keep "allow package managers" ticked). Then start a **new** session in that environment on this repo (branch `cloud/fase-1`).

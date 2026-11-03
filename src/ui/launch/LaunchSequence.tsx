@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getLauncher, getOrbit } from '../../engine/catalog'
 import type { Design } from '../../engine/types'
-import { audio, hasVoice, type Sfx } from '../../audio/audio'
+import { audio, hasVoice, type Cue } from '../../audio/audio'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
-import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SkyBackdrop, Stars } from './LaunchScenery'
+import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SceneryLight, SkyBackdrop, Stars, launchWindowStyle } from './LaunchScenery'
 
 /** Timeline in seconds after pressing Launch. `count` = seconds of countdown before ignition (10 with the voice, 3 without). */
 export function makeTimeline(count: number) {
@@ -169,64 +169,56 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const parking = orbit.body === 'earth' && orbit.launchTarget !== 'gto' ? Math.min(orbit.defaultAltitudeKm, design.altitudeKm) : 200
   const vOrbit = Math.sqrt(MU / (RE + parking))
 
+  // Animation clock and sound. Voice and SFX are scheduled once on the audio clock from the same start instant,
+  // so they stay in time even when frames stall or the tab is hidden; skipping or leaving cancels them.
   useEffect(() => {
     if (!running) return
     if (skipTo) {
       setT(fail ? fail.at + 1.5 : T.end)
       return
     }
+    if (start.current === null) start.current = performance.now()
+    const t0 = start.current
+    const elapsed = (performance.now() - t0) / 1000
+    const cues: Cue[] = []
+    if (voice) {
+      for (let k = 0; k < T.count; k++) cues.push({ at: k, voice: `count_${T.count - k}` })
+      cues.push({ at: T.ignition, voice: 'ignition' }, { at: T.liftoff, voice: 'liftoff' }, { at: T.farewell, voice: `farewell_${farewellIndex(seed) + 1}` })
+    } else cues.push({ at: Math.max(0, T.count - 3), sfx: 'countdown' })
+    cues.push({ at: T.ignition, sfx: 'liftoff' })
+    if (design.launcherId === 'heavy') cues.push({ at: T.boosterSep, sfx: 'staging' })
+    cues.push({ at: T.meco, sfx: 'staging' }, { at: T.fairing, sfx: 'fairing' }, { at: T.deploy, sfx: 'deploy' }, { at: T.end, sfx: 'orbit' })
+    const kept = fail ? [...cues.filter((c) => c.at <= fail.at), { at: fail.at, sfx: 'explosion' as const }] : cues
+    const cancel = audio.schedule(kept.map((c) => ({ ...c, at: c.at - elapsed })))
     let raf = 0
     const tick = (now: number) => {
-      if (start.current === null) start.current = now
-      const tt = (now - start.current) / 1000
+      const tt = (now - t0) / 1000
       setT(tt)
       if (tt < (fail ? fail.at + 2 : T.end + 0.2)) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [running, skipTo, fail, T])
+    return () => {
+      cancelAnimationFrame(raf)
+      cancel()
+    }
+  }, [running, skipTo, fail, T, voice, seed, design.launcherId])
 
-  // Sound cues and completion.
+  // Music changes and completion.
   useEffect(() => {
     if (!running) return
-    const cue = (key: string, at: number, sfx: Sfx) => {
-      if (t >= at && !fired.current.has(key) && (!fail || at <= fail.at)) {
-        fired.current.add(key)
-        if (!skipTo) audio.play(sfx)
-      }
-    }
-    const say = (key: string, at: number, line: string) => {
-      if (t >= at && !fired.current.has(key) && (!fail || at <= fail.at)) {
-        fired.current.add(key)
-        if (!skipTo) audio.say(line)
-      }
-    }
-    if (voice) {
-      for (let k = 0; k < T.count; k++) say(`c${k}`, k, `count_${T.count - k}`)
-      say('ign', T.ignition, 'ignition')
-      say('lift', T.liftoff, 'liftoff')
-      say('bye', T.farewell, `farewell_${farewellIndex(seed) + 1}`)
-    } else cue('count', Math.max(0, T.count - 3), 'countdown')
-    cue('liftoff', T.ignition, 'liftoff')
     if (t >= T.liftoff && !fired.current.has('music') && (!fail || T.liftoff <= fail.at)) {
       fired.current.add('music')
       audio.setStage('launch')
     }
-    if (design.launcherId === 'heavy') cue('boost', T.boosterSep, 'staging')
-    cue('meco', T.meco, 'staging')
-    cue('fairing', T.fairing, 'fairing')
-    cue('deploy', T.deploy, 'deploy')
     if (fail && t >= fail.at && !fired.current.has('boom')) {
       fired.current.add('boom')
-      if (!skipTo) audio.play('explosion')
       audio.setStage('none')
     }
     if (!done.current && ((fail && t >= fail.at + 1.4) || (!fail && t >= T.end))) {
       done.current = true
-      if (!fail && !skipTo) audio.play('orbit')
       onDone(fail ? 'failure' : 'success')
     }
-  }, [t, running, fail, onDone, skipTo, design.launcherId, T, voice, seed])
+  }, [t, running, fail, onDone, T])
 
   const p = clamp((t - T.liftoff) / (T.seco - T.liftoff))
   const flying = t >= T.liftoff
@@ -279,6 +271,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800">
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Launch of the ${launcher.name}`}>
+        <SceneryLight style={launchWindowStyle(orbit.launchTarget)}>
         <SkyBackdrop space={space} />
         <Stars space={space} />
         {/* Earth limb appears high up */}
@@ -305,6 +298,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
             </g>
           )}
         </g>
+        </SceneryLight>
         {/* rocket */}
         <g transform={`translate(400 ${rocketY})`}>
           <Rocket launcherId={launcher.id} t={t} failAt={fail?.at ?? null} v={v} T={T} />

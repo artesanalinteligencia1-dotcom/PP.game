@@ -85,3 +85,8 @@
 - Unused correction reserve is kept for station-keeping; default reserve 2× expected + 10 m/s / reserve lost at arrival / found in calibration: otherwise most halo missions ran out of propellant.
 - Lagrange Observatory: the low-energy route is what lets the telescope fit the Medium rocket (370/400 kg); the direct route needs R-3 or busts the budget with H-3 — designed trade-off time ↔ propellant ↔ money.
 - Launch audio pass: "T-minus ten" sped up to fit 1 s (atempo 1.3, pitch kept); farewell moved after the 2.5 s liftoff call; pre-liftoff clock counts to ignition.
+
+## Local session — user feedback pass (2026-11-02)
+- Audio on the Web Audio clock (`src/audio/audio.ts`): voice/SFX decoded at the first gesture and *scheduled* from the launch start; cues more than 0.3 s late are dropped; skip/unmount cancels them; one music track at a time with a 1.6 s crossfade; music ducks to 35 % under speech / HTMLAudio fired from animation frames / user heard the countdown "at random moments" (frames stalled or a hidden tab made lines pile up; files loaded on demand) and songs overlapping (concurrent volume ramps, nothing ever stopped).
+- Long music loops are decoded on demand and dropped when they stop / keep every decoded buffer / a 150 s loop is ~55 MB decoded.
+- All three launch lights kept (dawn / day / night) and picked by the launch window: SSO → dawn, LEO (station) → day, GTO and lunar/L2 → night; Paulet-1 → dawn; `?pad=` forces one for comparison / pick one look / user: "se podría usar las 3"; teaches launch windows.
