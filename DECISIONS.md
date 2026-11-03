@@ -109,3 +109,8 @@
   (`.hud` + `.hud-panel`, `.hud-label`, `.btn-primary`, `.btn-secondary` in `src/index.css`) instead of rewriting every
   screen: the layer restyles the existing slate palette (glass, thin borders, square corners). The most-seen screens
   (main menu, design header/tabs, free mission, settings) were rebuilt to match the mock-up exactly.
+
+## User choices (2026-11-03)
+- Launch renderer: **Three.js** (3D, real lights and camera) over PixiJS 2.5D and SVG — user, after comparing `?proto=three` / `?proto=pixi`.
+- Intro video style: **A "Painted cinema"** (illustrations with slow camera push, letterbox, grain, word-by-word captions) over notebook / mission-control / kinetic type.
+- Trailer: Stellaris-like test with AI video clips (option 3); soundtrack with female vocals generated with local music AI (ACE-Step 1.5), five songs.

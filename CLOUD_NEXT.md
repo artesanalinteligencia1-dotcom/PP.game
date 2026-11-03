@@ -36,14 +36,18 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
      and stop for the user to choose: (1) "Paulet's notebook" — paper, blueprint ink, hand-drawn icons for design screens +
      mission-control console for launch/flight; (2) retro-futurist console everywhere; (3) clean modern space-agency HUD.
      Use `docs/video-style.md` fonts/palette as the base.
-3. **Launch scene and rocket motion — ON HOLD, do not rework the SVG launch.** The local chat built two renderer prototypes
-   with the same choreography (`src/ui/proto/launchScript.ts`): `?proto=pixi` (PixiJS 2.5D: painted parallax + particle
-   smoke/flame) and `?proto=three` (Three.js 3D: lattice tower, shadows, following camera), each with `&light=dawn|day|night`
-   and `&t=<s>` to freeze a moment. They load lazily and are not in the game flow. The user is comparing them; once chosen,
-   the winner replaces the launch scene and the motion list below moves into it: ignition shake, hold-down release, arms swing
-   away, slow first metres (T/W ≈ 1.3), gravity turn, flame lighting the pad, particle smoke, plume widening, Max-Q vapour,
-   staging flash. Keep `makeTimeline`, the captions and the telemetry unchanged (tests).
-   Until then work on §1 (offline build) and §2 (game shell).
+3. **Launch scene in Three.js — USER CHOSE THREE.JS (2026-11-03). Go.** Start from `src/ui/proto/ThreeLaunch.tsx` +
+   `launchScript.ts` (`?proto=three`) and replace the SVG launch scene in `LaunchSequence`:
+   - Drive it from the game's `makeTimeline` (countdown, ignition, liftoff, max-Q, booster sep, MECO, fairing, SECO, deploy),
+     the seeded failure moment and the booster landing; keep the captions, HUD telemetry and the audio cues as they are (tests).
+   - One rocket model per launcher (Paulet-1 brass/copper sounding rocket, L-1, M-2, H-3 with side boosters, R-2/R-3 with
+     legs + grid fins), the procedural spacecraft inside the fairing (port `SpacecraftDrawing` to a simple 3D or billboard).
+   - The three lights stay (dawn/day/night from `launchWindowStyle`); add the Andes + Misti on the horizon (it is off-frame in the
+     prototype), Earth limb at altitude, cloud layer crossing, booster landing on the drone ship.
+   - Lazy-load three (separate chunk); keep a lightweight fallback (the current SVG) for reduced motion / no WebGL.
+   - Use the same Three.js scene for the Paulet-1 prologue (`SoundingSequence`).
+   PixiJS prototype can be deleted once the Three.js scene ships.
+   **Intro video:** the user chose style A "Painted cinema" (local chat builds it in HyperFrames; nothing to do in the cloud).
 4. **Multiplayer (later, online only)**: the engine is deterministic, so start asynchronous — same seed + same scenario,
    compare scores/leaderboard; real-time co-op (4 roles) needs a server and comes after.
 
