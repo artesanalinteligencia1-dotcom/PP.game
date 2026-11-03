@@ -74,8 +74,8 @@
   `C:\PPgame\trailer-final` (`build.mjs`: one scene per shot, camera moves, titles, satellite crossing): the user's 8 Gemini
   stills in STORYBOARD order (upscaled ×4 with Real-ESRGAN), music "Beneath the Misti" cut to the song (first cut on the drum
   entry at 10.85 s, bar-aligned jump to the song's real ending), launch SFX, logo "Paulet — Andes to Orbit". Output
-  `C:\PPgame\trailer_paulet.mp4` (1080p, −14 LUFS) + 720p. The closing still is provisional (shot2 + animated satellite)
-  until the rooftop image is generated (≈ 406 ElevenLabs credits, waiting for approval, or free in Gemini).
+  `C:\PPgame\trailer_paulet.mp4` (1080p, −14 LUFS) + 720p. The rooftop ending (shot2 + animated satellite) was approved by the user and stays;
+  Gemini first/last-frame clips (v1–v7) will replace the stills later.
   `docs/PLAYBOOK.md` written for the definitive game (stack, hard-won rules, media pipeline, NASA sources, order of work).
   Also outside the repo: a Spanish learning manual for the owner (artifact) and `MEJORAS_DESDE_PAULET.md` for Goicochea Studio.
 

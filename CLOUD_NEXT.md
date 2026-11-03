@@ -24,7 +24,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
   design/flight loops unchanged. Any new screen picks music through `useMusic(stage)` only.
 - ✅ Intro: final 31 s video (720p, 4.4 MB) with burned-in captions; never add a `<track>` to it. Rebuild from
   `C:\PPgame\intro-a` (`node build.mjs`, then HyperFrames render) and re-encode to 720p if the narration changes.
-- ✅ Trailer: `C:\PPgame\trailer_paulet.mp4` (54 s) from `C:\PPgame\trailer-final` (see its README). Closing still provisional.
+- ✅ Trailer: `C:\PPgame\trailer_paulet.mp4` (54 s) from `C:\PPgame\trailer-final` (see its README). The rooftop ending with the animated
+  satellite is approved and stays. Next for the trailer: the user's 7 Gemini first/last-frame clips (v1–v7, 8 s each) replace
+  the stills; prompts in `C:\PPgame\trailer\PROMPTS_GEMINI.md`.
 - ✅ `docs/PLAYBOOK.md`: read it first when the definitive game starts.
 - Next: item 3 below (Three.js launch) — the user wants a usage estimate before it starts.
 
