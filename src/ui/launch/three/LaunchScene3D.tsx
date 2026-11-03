@@ -78,7 +78,10 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     sun.castShadow = true
     sun.shadow.mapSize.set(2048, 2048)
     Object.assign(sun.shadow.camera, { left: -120, right: 120, top: 120, bottom: -40, near: 10, far: 8000 })
-    scene.add(sun, new THREE.HemisphereLight(...L.hemi))
+    // soft fill from the camera side, so a rocket lit from behind (dawn) still reads
+    const fill = new THREE.DirectionalLight(0xdfe6ff, light === 'day' ? 0.5 : light === 'dawn' ? 1.1 : 0.6)
+    fill.position.set(-400, 250, 700)
+    scene.add(sun, fill, new THREE.HemisphereLight(...L.hemi))
     const flameLight = new THREE.PointLight(0xffa64d, 0, 400, 1.6)
     scene.add(flameLight)
 
@@ -309,6 +312,7 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     const fogBase = new THREE.Color(L.fog)
     const OPEN_CAM = new THREE.Vector3(-70, 22, 130)
     const camPos = OPEN_CAM.clone()
+    const camOff = OPEN_CAM.clone().sub(new THREE.Vector3(0, 4.8, 0))
     const up = new THREE.Vector3()
     const tmp = new THREE.Vector3()
     let last = -1
@@ -318,7 +322,8 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     let raf = 0
 
     const frame = (now: number) => {
-      const dt = Math.min(0.05, (now - prev) / 1000)
+      const wall = (now - prev) / 1000
+      const dt = Math.min(0.05, wall)
       prev = now
       const time = tRef.current
       if (time < last - 0.01) {
@@ -330,9 +335,10 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
           s1.rotation.set(0, 0, 0)
           sepDone = false
         }
-        camPos.copy(OPEN_CAM)
+        camOff.copy(OPEN_CAM).sub(tmp.set(0, 4.8, 0))
       }
-      const jumped = time - last > 1 // skip: settle instantly
+      // "Skip animation" moves the clock much further than the wall clock did: settle instantly. Slow frames are not skips.
+      const jumped = time - last > wall + 0.5
       last = time
       const r = ascentAt(time, T)
       const exploded = failAt !== null && time >= failAt
@@ -369,7 +375,7 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
       if (r.fairing >= 1 && !fairingGone) fairingGone = true
       const flashK = Math.max(0, 1 - Math.abs(time - T.meco - 0.15) / 0.35)
       flash.position.copy(rocket.position).addScaledVector(up, h1 + 0.5)
-      flash.scale.setScalar(4 + flashK * 50)
+      flash.scale.setScalar(3 + flashK * 18)
       ;(flash.material as THREE.SpriteMaterial).opacity = exploded ? 0 : flashK
 
       // flame: longer and wider in thin air; blue-ish on the upper stage
@@ -441,10 +447,13 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
       if (close > 0) {
         const near = rocket.position.clone().addScaledVector(up, h1 + h2 * 0.5)
         target.lerp(near, close)
-        want.lerp(near.clone().add(tmp.set(-38, -10, 62)), close)
+        want.lerp(near.clone().add(tmp.set(-17, -5, 28)), close)
       }
-      if (jumped) camPos.copy(want)
-      else camPos.lerp(want, 1 - Math.exp(-dt * 2.5))
+      // smooth the framing (offset from the rocket), not the position: the rocket climbs too fast for a lagging camera
+      const wantOff = want.sub(rocket.position)
+      if (jumped) camOff.copy(wantOff)
+      else camOff.lerp(wantOff, 1 - Math.exp(-dt * 2.5))
+      camPos.copy(rocket.position).add(camOff)
       const sh = r.shake * 0.35
       camera.position.set(camPos.x + sh * Math.sin(time * 71), camPos.y + sh * Math.cos(time * 53), camPos.z)
       camera.lookAt(target)

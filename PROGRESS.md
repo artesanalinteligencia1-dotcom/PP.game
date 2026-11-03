@@ -79,6 +79,17 @@
   `docs/PLAYBOOK.md` written for the definitive game (stack, hard-won rules, media pipeline, NASA sources, order of work).
   Also outside the repo: a Spanish learning manual for the owner (artifact) and `MEJORAS_DESDE_PAULET.md` for Goicochea Studio.
 
+- Local session (2026-11-03): **Three.js launch, delivery 1** (CLOUD_NEXT §3). `src/ui/launch/three/LaunchScene3D.tsx`
+  (lazy chunk, precached offline) driven by the game timeline through `ascent.ts` (pure, 8 tests): pad, lattice tower with
+  service arms, Andes + Misti on the horizon, cloud deck at ~650 m, stars, the three lights (dawn/day/night, same Settings
+  choice as the SVG), a two-stage rocket sized per launcher with flame, smoke, Max-Q vapour, stage separation, fairing halves,
+  failure explosion; the camera follows the rocket's framing and closes in on the upper stage after MECO. HUD, captions,
+  countdown digits, deployed spacecraft (2D), booster-landing inset and every sound stay in LaunchSequence. SVG scene kept
+  for reduced motion, no WebGL and the side-booster rockets (heavy, reusable_heavy). Checked in headless Chrome (real UI flow,
+  Earth Watch on L-1): 61–121 fps, no console errors. Tests 91 passing.
+  Trailer fixed after the owner's review: Gemini's end-of-clip jumps (v2, v4, v5) cut and cross-faded; music jump moved into
+  the song's quiet breath (40 s → 127.2 s, same passage) and ends on the song's own ending; 56 s.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
