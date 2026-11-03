@@ -36,12 +36,14 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
      and stop for the user to choose: (1) "Paulet's notebook" — paper, blueprint ink, hand-drawn icons for design screens +
      mission-control console for launch/flight; (2) retro-futurist console everywhere; (3) clean modern space-agency HUD.
      Use `docs/video-style.md` fonts/palette as the base.
-3. **Launch scene and rocket motion** — wait for the user's choice of renderer (local chat presented the options:
-   PixiJS 2.5D painted layers + particles [recommended], Three.js 3D, SVG kept, pre-rendered video plates). Meanwhile these
-   improvements apply to any renderer and can be done in SVG now: ignition shake, hold-down release, service arms swing away
-   before liftoff, slow first metre (thrust/weight ≈ 1.3), gravity-turn pitch after clearing the tower, flame lighting the pad,
-   particle smoke (seeded) instead of two circles, plume widening with altitude, Max-Q vapour cone, staging flash.
-   Keep `makeTimeline`, the captions and the telemetry unchanged (tests).
+3. **Launch scene and rocket motion — ON HOLD, do not rework the SVG launch.** The local chat built two renderer prototypes
+   with the same choreography (`src/ui/proto/launchScript.ts`): `?proto=pixi` (PixiJS 2.5D: painted parallax + particle
+   smoke/flame) and `?proto=three` (Three.js 3D: lattice tower, shadows, following camera), each with `&light=dawn|day|night`
+   and `&t=<s>` to freeze a moment. They load lazily and are not in the game flow. The user is comparing them; once chosen,
+   the winner replaces the launch scene and the motion list below moves into it: ignition shake, hold-down release, arms swing
+   away, slow first metres (T/W ≈ 1.3), gravity turn, flame lighting the pad, particle smoke, plume widening, Max-Q vapour,
+   staging flash. Keep `makeTimeline`, the captions and the telemetry unchanged (tests).
+   Until then work on §1 (offline build) and §2 (game shell).
 4. **Multiplayer (later, online only)**: the engine is deterministic, so start asynchronous — same seed + same scenario,
    compare scores/leaderboard; real-time co-op (4 roles) needs a server and comes after.
 
