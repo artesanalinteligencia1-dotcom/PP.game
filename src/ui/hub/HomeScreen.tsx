@@ -30,20 +30,17 @@ export function MenuBackdrop() {
   )
 }
 
-function MenuItem({ label, hint, onClick, primary }: { label: string; hint?: string; onClick: () => void; primary?: boolean }) {
+function MenuItem({ n, label, hint, onClick, primary }: { n: number; label: string; hint?: string; onClick: () => void; primary?: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group flex w-full items-baseline gap-3 rounded-lg px-4 py-2.5 text-left transition focus:outline-none ${
-        primary ? 'bg-orange-500/15 text-white' : 'text-slate-200'
-      } hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-2 focus-visible:ring-sky-400`}
+      className="group flex w-full items-center gap-6 border-b border-white/15 py-3 text-left text-white/75 transition hover:text-white focus:outline-none focus-visible:text-white"
     >
-      <span className="w-3 text-sky-400 opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true">
-        ›
-      </span>
-      <span className="font-display text-2xl font-semibold tracking-tight">{label}</span>
-      {hint && <span className="ml-auto text-xs text-slate-400">{hint}</span>}
+      <span className="w-6 font-mono text-xs text-sky-300/80">{String(n).padStart(2, '0')}</span>
+      <span className={`font-display text-2xl transition group-hover:translate-x-1 group-focus-visible:translate-x-1 ${primary ? 'font-semibold text-white' : 'font-light'}`}>{label}</span>
+      {hint && <span className="ml-auto text-xs text-white/45 opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">{hint}</span>}
+      {primary && <span className="h-1.5 w-1.5 rounded-full bg-orange-400 shadow-[0_0_10px_#fb923c]" />}
     </button>
   )
 }
@@ -75,56 +72,65 @@ export function HomeScreen() {
     e.preventDefault()
   }
 
-  return (
-    <main className="relative h-full overflow-hidden">
-      <MenuBackdrop />
-      <div className="absolute inset-y-0 left-0 w-[620px] bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-transparent" />
-      <div className="relative flex h-full w-[520px] flex-col px-14 py-12">
-        <p className="text-xs uppercase tracking-[0.35em] text-sky-300">Space Mission Design</p>
-        <h1 className="mt-1 text-7xl font-bold tracking-tight">PP.game</h1>
-        <p className="mt-2 max-w-sm text-sm text-slate-300">Design it. Launch it. Learn from it.</p>
+  let n = 0
+  const item = (label: string, onClick: () => void, hint?: string, primary?: boolean) => <MenuItem key={label} n={++n} label={label} hint={hint} onClick={onClick} primary={primary} />
 
-        <nav ref={navRef} onKeyDown={onKey} className="mt-10 space-y-1" aria-label="Main menu">
+  return (
+    <main className="relative h-full overflow-hidden text-white">
+      <MenuBackdrop />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
+      <div className="absolute inset-x-12 top-8 flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-white/60">
+        <span>PP.game · Mission Directorate</span>
+        <span>Arequipa launch site · 16.4° S · dawn</span>
+      </div>
+      <div className="absolute left-16 top-[130px] w-[520px]">
+        <p className="hud-label text-sm">Space mission design</p>
+        <h1 className="mt-2 text-[104px] leading-none tracking-tight">
+          PP<b>.game</b>
+        </h1>
+        <nav ref={navRef} onKeyDown={onKey} className="mt-10 border-t border-white/15" aria-label="Main menu">
           {!extras ? (
             <>
-              {campaign ? (
-                <MenuItem primary label="Continue" hint={`$${campaign.fundsM} M · ★ ${campaign.prestige}`} onClick={() => go('campaign')} />
-              ) : (
-                <MenuItem primary label="New career" hint="Start with Paulet-1" onClick={() => setNewCareer(true)} />
-              )}
-              {campaign && <MenuItem label="New career" onClick={() => setNewCareer(true)} />}
-              <MenuItem label="Free mission" hint="No career progress" onClick={() => go('free')} />
-              <MenuItem label="Learn" hint="Orbits, rockets, chaos" onClick={() => openLearn('orbit')} />
-              <MenuItem label="Extras" hint="Intro, Paulet, sandbox" onClick={() => setExtras(true)} />
-              <MenuItem label="Settings" onClick={() => openSettings(true)} />
-              {canQuit && <MenuItem label="Quit" onClick={() => void quitGame()} />}
+              {campaign ? item('Continue career', () => go('campaign'), `${campaign.profile.title} ${campaign.profile.name}`, true) : item('New career', () => setNewCareer(true), 'Start with Paulet-1', true)}
+              {campaign && item('New career', () => setNewCareer(true), 'Replaces the current career')}
+              {item('Free mission', () => go('free'), 'No career progress')}
+              {item('Learn', () => openLearn('orbit'), 'Orbits, rockets, chaos')}
+              {item('Extras', () => setExtras(true), 'Intro, Paulet, sandbox')}
+              {item('Settings', () => openSettings(true), 'Sound, display, saves')}
+              {canQuit && item('Quit', () => void quitGame())}
             </>
           ) : (
             <>
-              <MenuItem label="Watch intro" hint="90 s story" onClick={() => go('intro')} />
-              <MenuItem label="Legacy: Paulet" hint="Facts vs. legend" onClick={() => openLearn('paulet')} />
-              <MenuItem label="Sandbox" hint="Just physics" onClick={() => startScenario('sandbox')} />
-              <MenuItem label="← Back" onClick={() => setExtras(false)} />
+              {item('Watch intro', () => go('intro'), '90 s story')}
+              {item('Legacy: Paulet', () => openLearn('paulet'), 'Facts vs. legend')}
+              {item('Sandbox', () => startScenario('sandbox'), 'Just physics')}
+              {item('Back', () => setExtras(false))}
             </>
           )}
         </nav>
-
-        <div className="mt-auto flex items-center gap-3">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-orange-500 to-violet-600 font-display font-bold">
-            {who
-              .replace(/^(Dr\.|Eng\.)\s*/, '')
-              .split(' ')
-              .map((w) => w[0])
-              .slice(0, 2)
-              .join('')}
-          </div>
-          <div className="text-xs">
-            <div className="font-display text-sm font-semibold">{who}</div>
-            <div className="text-slate-400">Fictional character inspired by Pedro Paulet (1874–1945).</div>
-          </div>
-        </div>
-        <p className="mt-3 text-[11px] text-slate-500">Simplified educational model — game values, not real engineering data.</p>
       </div>
+      <div className="hud-panel absolute bottom-20 right-12 w-[420px] p-5">
+        <p className="hud-label mb-3">{campaign ? 'Program status' : 'Your program'}</p>
+        {campaign ? (
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              ['Funds', `$${campaign.fundsM} M`],
+              ['Prestige', String(campaign.prestige)],
+              ['Contracts', String(Object.keys(campaign.completed).length)],
+            ].map(([k, v]) => (
+              <div key={k}>
+                <p className="text-[11px] uppercase tracking-widest text-white/50">{k}</p>
+                <p className="font-display text-2xl tabular-nums">{v}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-white/75">A small institute in Arequipa, one home-built rocket and a lot of ambition. Investors are watching.</p>
+        )}
+        <p className="mt-4 text-xs text-white/60">{who} · Mission Director</p>
+        <p className="mt-1 text-[11px] text-white/40">Fictional character inspired by Pedro Paulet (1874–1945).</p>
+      </div>
+      <p className="absolute bottom-6 left-16 text-[11px] text-white/40">Simplified educational model — game values, not real engineering data.</p>
       {newCareer && (
         <ProfileDialog
           title="New career"

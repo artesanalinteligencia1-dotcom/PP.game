@@ -103,7 +103,7 @@ export function LaunchScreen() {
             <button
               type="button"
               onClick={go}
-              className="font-display w-full rounded-xl bg-orange-500 px-4 py-4 text-lg font-bold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-400"
+              className="font-display w-full btn-primary px-4 py-4 text-lg "
             >
               🚀 Launch
             </button>

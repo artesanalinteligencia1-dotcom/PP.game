@@ -83,7 +83,7 @@ export function CampaignScreen() {
             if (!list.length) return null
             return (
               <div key={act}>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">{ACT_TITLE[act]}</h2>
+                <h2 className="hud-label">{ACT_TITLE[act]}</h2>
                 <div className="mt-2 grid gap-3 sm:grid-cols-2">
                   {list.map((k) => {
                     const status = contractStatus(c, k)
@@ -118,7 +118,7 @@ export function CampaignScreen() {
                           <button
                             type="button"
                             onClick={() => startContract(k.id)}
-                            className="mt-3 rounded-lg bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-sky-500"
+                            className="mt-3 btn-primary px-3 py-1.5 text-sm "
                           >
                             {status === 'completed' ? 'Fly again' : 'Accept contract'}
                           </button>
@@ -134,7 +134,7 @@ export function CampaignScreen() {
 
         <aside className="space-y-4">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Technology</h2>
+            <h2 className="hud-label">Technology</h2>
             <p className="mt-1 text-xs text-slate-400">Money buys capabilities — never a bigger contract budget.</p>
             <ul className="mt-3 space-y-3">
               {TECH.map((t) => {
@@ -166,7 +166,7 @@ export function CampaignScreen() {
             </ul>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Your launchers</h2>
+            <h2 className="hud-label">Your launchers</h2>
             <ul className="mt-2 space-y-1 text-xs text-slate-300">
               {launchersNow.map((id) => (
                 <li key={id}>• {getLauncher(id).name}</li>

@@ -52,7 +52,7 @@ export function ReviewTab({ report }: { report: DesignReport }) {
           disabled={errors.length > 0}
           onClick={goToLaunchPad}
           className={`w-full rounded-lg px-4 py-3 font-semibold ${
-            errors.length ? 'cursor-not-allowed bg-slate-800 text-slate-500' : 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-400'
+            errors.length ? 'cursor-not-allowed bg-slate-800 text-slate-500' : 'btn-primary'
           }`}
         >
           {errors.length ? `Fix ${errors.length} blocking issue${errors.length > 1 ? 's' : ''} to launch` : 'Go to the launch pad 🚀'}

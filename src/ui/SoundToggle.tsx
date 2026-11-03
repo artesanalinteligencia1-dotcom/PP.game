@@ -6,7 +6,7 @@ export function SoundToggle() {
     <button
       type="button"
       onClick={() => audio.setMuted(!muted)}
-      className="rounded-full border border-slate-700 bg-slate-900/90 px-3 py-2 text-sm text-slate-200 shadow-lg hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+      className="btn-secondary h-9 px-3 text-sm"
       aria-pressed={!muted}
       aria-label={muted ? 'Turn sound on' : 'Mute sound'}
       title={muted ? 'Sound off' : 'Sound on'}

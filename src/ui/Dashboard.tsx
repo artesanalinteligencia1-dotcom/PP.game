@@ -99,7 +99,7 @@ export function Dashboard({ report, designKey }: { report: DesignReport; designK
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Resources</h2>
+        <h2 className="hud-label">Resources</h2>
         <span className={`text-xs font-semibold ${errors ? 'text-rose-400' : warns ? 'text-amber-400' : 'text-emerald-400'}`}>
           {errors ? `${errors} blocking` : 'Launchable'}
           {warns ? ` · ${warns} warnings` : ''}

@@ -79,6 +79,9 @@
     per bus (music / effects / mission control), interface sounds, fullscreen (F11), launch light Auto/Dawn/Day/Night,
     motion, save export/import and offline install; screen transitions. Three art-direction mock-ups (`?mock=1|2|3`) wait
     for the user's choice.
+12. The user chose mock-up 3, "modern space-agency HUD". Applied to the whole game: the launch site blurred behind every
+    screen, glass panels with corner brackets, light titles, sky-blue labels, one orange call to action; main menu, design,
+    free-mission and settings rebuilt as in the mock-up, the rest restyled through a theme layer (`.hud` in `src/index.css`).
 
 ## How to run
 ```
@@ -98,6 +101,5 @@ Postponed by the user (LOCAL_TODO §1).
 - Vercel deploy postponed by the user.
 
 ## Next exact step
-The user picks an art direction from `?mock=1|2|3` (notebook / retro console / modern HUD); then restyle every screen in
-it. In parallel the local chat downloads the Windows installer from GitHub Actions (Desktop build → Artifacts) and tests it.
-Launch-motion improvements (CLOUD_NEXT item 3) can start in SVG meanwhile.
+CLOUD_NEXT item 3: launch-scene and rocket-motion improvements in SVG (the renderer choice — PixiJS recommended — is still
+the user's). The local chat tests the Windows installer from GitHub Actions (Desktop build → Artifacts).

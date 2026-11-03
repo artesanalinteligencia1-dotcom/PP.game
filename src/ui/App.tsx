@@ -10,7 +10,7 @@ import { ScenarioSelect } from './ScenarioSelect'
 import { SoundToggle } from './SoundToggle'
 import { CampaignScreen } from './hub/CampaignScreen'
 import { FirstLightScreen } from './hub/FirstLightScreen'
-import { HomeScreen } from './hub/HomeScreen'
+import { HomeScreen, MenuBackdrop } from './hub/HomeScreen'
 import { IntroScreen } from './hub/IntroScreen'
 import { LearnScreen } from './hub/LearnScreen'
 import { MockScreen, mockFromUrl } from './mock/MockScreen'
@@ -79,12 +79,21 @@ export function App() {
 
   return (
     <Stage>
-      <div className={`h-full ${reduce ? 'reduce-motion' : ''}`}>
+      <div className={`hud relative h-full ${reduce ? 'reduce-motion' : ''}`}>
+        {/* The launch site, blurred and darkened, sits behind every screen except the menu (which shows it sharp). */}
+        {booted && screen !== 'home' && (
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+            <div className="absolute inset-0 scale-110 blur-md">
+              <MenuBackdrop />
+            </div>
+            <div className="absolute inset-0 bg-slate-950/80" />
+          </div>
+        )}
         {!booted ? (
           <BootScreen onStart={start} />
         ) : (
           <>
-            <div key={screen} className="stage-scroll screen-in h-full overflow-y-auto">
+            <div key={screen} className="stage-scroll screen-in relative h-full overflow-y-auto">
               <CurrentScreen />
             </div>
             <div className="absolute bottom-4 right-4 z-40 flex gap-2">
@@ -92,7 +101,7 @@ export function App() {
               <button
                 type="button"
                 onClick={() => openSettings(true)}
-                className="rounded-full border border-slate-700 bg-slate-900/90 px-3 py-2 text-sm text-slate-200 shadow-lg hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                className="btn-secondary h-9 w-9 text-sm"
                 aria-label="Settings"
                 title="Settings (Esc)"
               >

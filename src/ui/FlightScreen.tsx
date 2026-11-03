@@ -117,7 +117,7 @@ export function FlightScreen() {
       <div className="mt-4 grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)_320px]">
         {/* Team */}
         <section className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Your team</h2>
+          <h2 className="hud-label">Your team</h2>
           <p className="mt-1 text-xs text-slate-400">Take a role yourself or hand it to a bot. Advisors always explain the call.</p>
           <ul className="mt-3 space-y-2">
             {ALL_ROLES.map((role: Role) => (
@@ -173,7 +173,7 @@ export function FlightScreen() {
             </div>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Mission log</h2>
+            <h2 className="hud-label">Mission log</h2>
             <ul className="mt-2 max-h-64 space-y-1 overflow-y-auto pr-1 text-sm" aria-live="polite">
               {logs.map((l, i) => (
                 <li key={`${l.week}-${i}`} className={LOG_COLOR[l.severity]}>
@@ -190,7 +190,7 @@ export function FlightScreen() {
 
         {/* Gauges */}
         <section className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Spacecraft status</h2>
+          <h2 className="hud-label">Spacecraft status</h2>
           <Gauge
             label="Science"
             value={`${fmt(mission.science)} / ${scenario.scienceTarget}`}
@@ -247,7 +247,7 @@ export function FlightScreen() {
             <span className="font-mono text-slate-200">{fmt(mission.dataLostGb)} GB</span>
           </div>
           {ended && (
-            <button type="button" onClick={showResults} className="mt-2 w-full rounded-lg bg-sky-600 px-4 py-3 font-semibold text-white hover:bg-sky-500">
+            <button type="button" onClick={showResults} className="mt-2 w-full btn-primary px-4 py-3 ">
               Mission report →
             </button>
           )}

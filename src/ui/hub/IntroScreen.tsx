@@ -22,7 +22,7 @@ export function IntroScreen() {
         ElevenLabs for this project.
       </p>
       <div className="mt-6 flex gap-2">
-        <button type="button" onClick={() => go('home')} className="rounded-lg bg-sky-600 px-4 py-2 font-semibold text-white hover:bg-sky-500">
+        <button type="button" onClick={() => go('home')} className="btn-primary px-4 py-2 ">
           Start playing
         </button>
       </div>

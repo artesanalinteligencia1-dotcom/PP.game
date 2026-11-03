@@ -88,7 +88,7 @@ export function FirstLightScreen() {
                   audio.unlock()
                   setPhase('flying')
                 }}
-                className="font-display w-full rounded-xl bg-orange-500 px-4 py-4 text-lg font-bold text-white hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-slate-700"
+                className="font-display w-full btn-primary px-4 py-4 text-lg  disabled:cursor-not-allowed disabled:bg-slate-700"
               >
                 🔥 Launch Paulet-1
               </button>

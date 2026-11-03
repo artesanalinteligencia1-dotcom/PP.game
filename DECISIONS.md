@@ -105,3 +105,7 @@
 - **Interface sounds are synthesized** (two short oscillator blips) and fire from real input events only — never from
   animation frames. Gamepad: menus are keyboard-navigable; direct Gamepad API support is left for later.
 - **Mock-ups are lazy-loaded** with their own fonts (Caveat, JetBrains Mono, both OFL) so the normal game never downloads them.
+- **Art direction: mock-up 3, "modern space-agency HUD"** (user's choice, 2026-11-03). Implemented as a theme layer
+  (`.hud` + `.hud-panel`, `.hud-label`, `.btn-primary`, `.btn-secondary` in `src/index.css`) instead of rewriting every
+  screen: the layer restyles the existing slate palette (glass, thin borders, square corners). The most-seen screens
+  (main menu, design header/tabs, free mission, settings) were rebuilt to match the mock-up exactly.

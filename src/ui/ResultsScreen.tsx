@@ -104,7 +104,7 @@ export function ResultsScreen() {
 
         <section className="min-w-0 space-y-5">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Why it went this way</h2>
+            <h2 className="hud-label">Why it went this way</h2>
             <ol className="mt-2 space-y-2">
               {analysis.causes.map((c) => {
                 const m = CAUSE_TEXT[c.code]?.(c.params) ?? { title: c.code, why: '' }
@@ -139,7 +139,7 @@ export function ResultsScreen() {
           </div>
 
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Requirements (actual)</h2>
+            <h2 className="hud-label">Requirements (actual)</h2>
             <ul className="mt-2 space-y-1 text-sm">
               {score.requirements.map((q) => (
                 <li key={q.id} className="flex gap-2">
@@ -173,7 +173,7 @@ export function ResultsScreen() {
             >
               🔗 {copied ? 'Link copied!' : 'Share this mission'}
             </button>
-            <button type="button" onClick={backToDesign} className="rounded-lg bg-sky-600 px-4 py-2 font-semibold text-white hover:bg-sky-500">
+            <button type="button" onClick={backToDesign} className="btn-primary px-4 py-2 ">
               ✎ Redesign
             </button>
             <button type="button" onClick={() => flyAgain(true)} className="rounded-lg border border-slate-600 px-4 py-2 hover:border-slate-300">
@@ -185,7 +185,7 @@ export function ResultsScreen() {
           </div>
 
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Your best {scenario.name} missions (this browser)</h2>
+            <h2 className="hud-label">Your best {scenario.name} missions (this browser)</h2>
             <ol className="mt-2 space-y-1 text-xs">
               {board.map((e, i) => (
                 <li key={`${e.seed}-${e.score}-${i}`} className="flex flex-wrap gap-x-3 text-slate-300">

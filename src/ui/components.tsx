@@ -12,7 +12,7 @@ export const SEV_BORDER: Record<Severity, string> = {
 export function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
     <section className="mb-6">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">{title}</h3>
+      <h3 className="hud-label">{title}</h3>
       {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
       <div className="mt-3">{children}</div>
     </section>

@@ -37,42 +37,43 @@ export function DesignScreen({ design }: { design: Design }) {
 
   return (
     <div className="min-h-full">
-      <header className="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2">
-          <button type="button" onClick={exit} className="text-sm text-slate-400 hover:text-slate-100">
-            ← {mode === 'campaign' ? 'Career' : 'Missions'}
-          </button>
-          <h1 className="text-lg font-semibold">
-            {mode === 'campaign' && <span className="mr-2 rounded bg-orange-500/20 px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase text-orange-300">contract</span>}
-            {scenario.name} <span className="text-sm font-normal text-slate-400">· {scenario.tagline}</span>
-          </h1>
-          <button type="button" onClick={resetDesign} className="ml-auto text-xs text-slate-400 hover:text-slate-100">
-            Reset design
-          </button>
-        </div>
-        <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4" aria-label="Design steps">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              aria-current={tab === t.id ? 'page' : undefined}
-              className={`whitespace-nowrap border-b-2 px-3 py-2 text-sm transition ${
-                tab === t.id ? 'border-sky-400 text-sky-300' : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {t.label}
-              {t.id === 'review' && blocking > 0 && (
-                <span className="ml-1 rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">{blocking}</span>
-              )}
+      <header className="sticky top-0 z-20 bg-slate-950/40 backdrop-blur-md">
+        <div className="mx-10 flex items-end gap-6 border-b border-white/15 pb-3 pt-5">
+          <div className="min-w-0">
+            <button type="button" data-sound="back" onClick={exit} className="hud-label hover:text-white">
+              ← {mode === 'campaign' ? 'Career' : 'Missions'}
+              {mode === 'campaign' && <span className="ml-3 text-orange-300">· Contract</span>}
             </button>
-          ))}
-        </nav>
+            <h1 className="mt-1 truncate font-display text-3xl">
+              {scenario.name} <span className="text-base text-white/50">· {scenario.tagline}</span>
+            </h1>
+          </div>
+          <nav className="ml-auto flex shrink-0 gap-5" aria-label="Design steps">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                aria-current={tab === t.id ? 'page' : undefined}
+                className={`whitespace-nowrap border-b-2 pb-1 text-sm transition focus:outline-none focus-visible:text-white ${
+                  tab === t.id ? 'border-orange-400 text-white' : 'border-transparent text-white/55 hover:text-white'
+                }`}
+              >
+                {t.label}
+                {t.id === 'review' && blocking > 0 && <span className="ml-1 rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">{blocking}</span>}
+              </button>
+            ))}
+            <button type="button" onClick={resetDesign} className="pb-1 text-xs text-white/40 hover:text-white">
+              Reset
+            </button>
+          </nav>
+        </div>
       </header>
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <aside className="order-first lg:order-last">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 lg:sticky lg:top-28">
-            <div className="mb-3 flex items-center gap-3 border-b border-slate-800 pb-3">
+      <div className="mx-10 grid gap-8 py-6 grid-cols-[minmax(0,1fr)_380px]">
+        <aside className="order-last">
+          <div className="hud-panel sticky top-28 p-5">
+            <p className="hud-label mb-3">Spacecraft &amp; budgets</p>
+            <div className="mb-3 flex items-center gap-3 border-b border-white/10 pb-3">
               <div className="rounded-lg bg-slate-950/80 p-1" title="Your spacecraft: every part you choose appears here, on the launch pad and in flight.">
                 <SpacecraftSprite design={design} size={92} />
               </div>

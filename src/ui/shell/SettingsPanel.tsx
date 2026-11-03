@@ -83,7 +83,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div id="settings-dialog" className="absolute inset-0 z-[60] grid place-items-center bg-slate-950/80 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-      <div ref={panelRef} className="max-h-[760px] w-[720px] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+      <div ref={panelRef} className="hud-panel max-h-[760px] w-[720px] overflow-y-auto p-6 shadow-2xl">
         <div className="flex items-center">
           <h2 id="settings-title" className="text-2xl font-bold">
             Settings
@@ -93,7 +93,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <h3 className="mt-5 text-xs uppercase tracking-widest text-sky-400">Sound</h3>
+        <h3 className="hud-label mt-5">Sound</h3>
         <Row label="Sound">
           <Segmented label="Sound" value={muted ? 'off' : 'on'} options={[['on', 'On'], ['off', 'Off']]} onChange={(v) => audio.setMuted(v === 'off')} />
         </Row>
@@ -119,7 +119,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <Segmented label="Interface sounds" value={s.uiSounds ? 'on' : 'off'} options={[['on', 'On'], ['off', 'Off']]} onChange={(v) => s.set('uiSounds', v === 'on')} />
         </Row>
 
-        <h3 className="mt-5 text-xs uppercase tracking-widest text-sky-400">Display</h3>
+        <h3 className="hud-label mt-5">Display</h3>
         <Row label="Fullscreen" hint="Also F11">
           <Segmented label="Fullscreen" value={full ? 'on' : 'off'} options={[['on', 'On'], ['off', 'Off']]} onChange={() => toggleFullscreen().then(setFull)} />
         </Row>
@@ -133,7 +133,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <Segmented label="Language" value={s.language} options={[['en', 'English']]} onChange={() => undefined} />
         </Row>
 
-        <h3 className="mt-5 text-xs uppercase tracking-widest text-sky-400">Save &amp; offline</h3>
+        <h3 className="hud-label mt-5">Save &amp; offline</h3>
         <Row label="Career save" hint="Back up your career to a file, or load one">
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={exportSave} disabled={!campaign} className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm hover:bg-slate-600 disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
@@ -159,7 +159,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         {!isDesktop && (
           <Row label="Play offline" hint={offline.offlineReady ? 'Ready: the whole game is stored on this device' : 'The game stores itself for offline play after loading'}>
             {offline.canInstall ? (
-              <button type="button" onClick={offline.install} className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
+              <button type="button" onClick={offline.install} className="btn-primary px-3 py-1.5 text-sm  focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
                 Install PP.game
               </button>
             ) : (

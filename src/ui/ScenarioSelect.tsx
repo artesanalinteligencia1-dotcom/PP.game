@@ -8,21 +8,21 @@ export function ScenarioSelect() {
   const go = useGame((s) => s.go)
   useMusic('home')
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <button type="button" onClick={() => go('home')} className="text-sm text-slate-400 hover:text-slate-100">
-        ← Home
-      </button>
-      <header className="text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-sky-400">Space Mission Design</p>
-        <h1 className="mt-2 text-4xl font-bold sm:text-5xl">PP.game</h1>
-        <p className="mx-auto mt-3 max-w-xl text-slate-300">
-          Design a real-feeling space mission. Every choice moves mass, power, data, budget, schedule and lifetime — and there is
-          never just one right answer.
+    <main className="mx-10 py-6">
+      <header className="flex items-end gap-6 border-b border-white/15 pb-3">
+        <div>
+          <button type="button" data-sound="back" onClick={() => go('home')} className="hud-label hover:text-white">
+            ← Main menu
+          </button>
+          <h1 className="mt-1 font-display text-3xl">Free mission</h1>
+        </div>
+        <p className="ml-auto max-w-xl text-right text-sm text-white/60">
+          Any scenario, no career progress. Every choice moves mass, power, data, budget, schedule and lifetime — and there is never
+          just one right answer.
         </p>
       </header>
-      <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">Free mission — choose any scenario (no career progress)</h2>
-        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+      <section className="mt-6">
+                <div className="grid grid-cols-3 gap-4">
           {scenarios.map((s) => (
             <button
               key={s.id}
