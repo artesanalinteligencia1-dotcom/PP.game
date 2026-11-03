@@ -70,6 +70,15 @@
 8. Audio landed from the local session; voiced-countdown pass; Act 2: real three-body physics, routes, chaos lesson, Lagrange Observatory.
 9. The local session delivered the illustrated launch scenery (dawn sky, Andes with the Misti, lattice tower, drone ship); the cloud
    session merged it with Act 2 and checked it against the voiced countdown in the browser (no overlaps, no errors).
+10. Offline build (user's goal: "a game you download and play offline"): installable PWA that stores the whole game (code,
+    fonts, audio, intro video — 10 MB) on the first visit and was tested with the network cut; Tauri 2 desktop wrapper and a
+    GitHub Actions workflow (`Desktop build`) that produces the Windows installer (.exe/.msi, unsigned) as a downloadable
+    artifact; versioned save files with export/import (Settings → Career save).
+11. Game shell: fixed 16:9 stage (1440×810, zoomed to the window, letterboxed, no page scroll), "Press any key" boot screen
+    (also the audio unlock gesture), main menu over the launch site with arrow-key navigation, Settings (Esc) with volumes
+    per bus (music / effects / mission control), interface sounds, fullscreen (F11), launch light Auto/Dawn/Day/Night,
+    motion, save export/import and offline install; screen transitions. Three art-direction mock-ups (`?mock=1|2|3`) wait
+    for the user's choice.
 
 ## How to run
 ```
@@ -89,5 +98,6 @@ Postponed by the user (LOCAL_TODO §1).
 - Vercel deploy postponed by the user.
 
 ## Next exact step
-Decide with the user: Act 3 (Mars "Stranded": launch windows, interplanetary transfer, entry-descent-landing subsystem) or polish/
-balance with playtests. In parallel (local): a human listen of the generated audio and the animated intro (LOCAL_TODO §6).
+The user picks an art direction from `?mock=1|2|3` (notebook / retro console / modern HUD); then restyle every screen in
+it. In parallel the local chat downloads the Windows installer from GitHub Actions (Desktop build → Artifacts) and tests it.
+Launch-motion improvements (CLOUD_NEXT item 3) can start in SVG meanwhile.

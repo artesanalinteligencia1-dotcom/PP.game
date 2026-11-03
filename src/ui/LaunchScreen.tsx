@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import { prefersReducedMotion } from '../store/settings'
 import { audio, useMusic } from '../audio/audio'
 import { getLauncher, getOrbit, getScenario } from '../engine/catalog'
 import { evaluateDesign } from '../engine/evaluate'
@@ -10,7 +11,6 @@ import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
 
 type Phase = 'ready' | 'flying' | 'success' | 'failure'
 
-const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 export function LaunchScreen() {
   const design = useGame((s) => s.design)!
@@ -34,7 +34,7 @@ export function LaunchScreen() {
   const go = () => {
     launch()
     audio.unlock()
-    setSkip(reducedMotion())
+    setSkip(prefersReducedMotion())
     setPhase('flying')
   }
   const onDone = useCallback((o: LaunchOutcome) => setPhase(o), [])

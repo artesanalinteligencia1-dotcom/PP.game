@@ -19,13 +19,14 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
 - `LaunchScenery.tsx`: three lights through `<SceneryLight style>` + `launchWindowStyle(target)`; `?pad=dawn|day|night` forces one.
 
 ## Next, in this order
-1. **Offline build (the user's goal).**
+1. ✅ **DONE (cloud, 2026-11-03) — Offline build (the user's goal).** See PROGRESS step 10.
    - PWA: `vite-plugin-pwa`, precache everything (audio, video, fonts are already local — no external URLs in `src/`),
      manifest + icons, "installable" prompt. Done when the built game works with the network off after one visit.
    - Desktop: Tauri 2 wrapper (Windows first; macOS/Linux free), GitHub Actions workflow that builds the Windows installer
      as an artifact on tags/branch pushes. No code signing yet (needs the user). The local chat will install and test the .exe.
    - Saves already use localStorage; keep a versioned save format and add export/import of the save file (offline backups).
-2. **Game shell (it must stop looking like a web page).**
+2. 🟡 **SHELL DONE, ART DIRECTION WAITING FOR THE USER — Game shell (it must stop looking like a web page).** See PROGRESS step 11.
+   Mock-ups live at `?mock=1`, `?mock=2`, `?mock=3` (switcher at the bottom). Once the user picks one, restyle every screen in it.
    - Fixed 16:9 stage scaled to the window (letterbox), no page scroll, fullscreen toggle (F11 / button), keyboard + gamepad-friendly focus.
    - Main menu with title, Continue / New / Free mission / Learn / Settings / Quit (Tauri), loading screen, screen transitions,
      UI sounds (hover/click — reuse the SFX bus via `audio.play`).

@@ -39,3 +39,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   [style*="orbit-spin"] { animation: none !important; }
 }
+
+/* ---------- Game shell ---------- */
+.stage { contain: layout paint; }
+.stage-scroll { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+@keyframes screen-in { from { opacity: 0; transform: translateY(10px) scale(0.995); } to { opacity: 1; transform: none; } }
+.screen-in { animation: screen-in 0.32s ease-out both; }
+@keyframes boot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+.boot-pulse { animation: boot-pulse 1.6s ease-in-out infinite; }
+.reduce-motion .screen-in, .reduce-motion .boot-pulse { animation: none; }

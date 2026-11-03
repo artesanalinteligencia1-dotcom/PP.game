@@ -39,6 +39,19 @@ const SFX_VOLUME: Partial<Record<Sfx, number>> = { liftoff: 0.9, explosion: 0.8,
 const VOICE_VOLUME = 0.95
 
 const MUTE_KEY = 'ppgame.muted'
+const VOLUME_KEY = 'ppgame.volumes'
+/** Player-set volume per bus (0–1), on top of the mix levels above. */
+export type Bus = 'music' | 'fx' | 'voice'
+export const DEFAULT_VOLUMES: Record<Bus, number> = { music: 0.8, fx: 0.9, voice: 1 }
+function readVolumes(): Record<Bus, number> {
+  try {
+    const v = JSON.parse(localStorage.getItem(VOLUME_KEY) ?? 'null') as Partial<Record<Bus, unknown>> | null
+    const ok = (x: unknown, d: number) => (typeof x === 'number' && x >= 0 && x <= 1 ? x : d)
+    return { music: ok(v?.music, DEFAULT_VOLUMES.music), fx: ok(v?.fx, DEFAULT_VOLUMES.fx), voice: ok(v?.voice, DEFAULT_VOLUMES.voice) }
+  } catch {
+    return { ...DEFAULT_VOLUMES }
+  }
+}
 const CROSSFADE = 1.6
 /** Music level while mission control speaks. */
 const DUCK = 0.35
@@ -70,10 +83,14 @@ function readMuted(): boolean {
 class AudioEngine {
   muted = typeof window !== 'undefined' ? readMuted() : true
   unlocked = false
+  volumes: Record<Bus, number> = typeof window !== 'undefined' ? readVolumes() : { ...DEFAULT_VOLUMES }
   private ctx: AudioContext | null = null
   private master: GainNode | null = null
   private musicBus: GainNode | null = null
   private fxBus: GainNode | null = null
+  private voiceBus: GainNode | null = null
+  /** Player volume for music, separate from musicBus (which ducks under speech). */
+  private musicVol: GainNode | null = null
   private buffers = new Map<string, Promise<AudioBuffer | null>>()
   private stage: MusicStage = 'none'
   private track: Track | null = null
@@ -101,10 +118,17 @@ class AudioEngine {
     this.master = ctx.createGain()
     this.master.gain.value = this.muted ? 0 : 1
     this.master.connect(ctx.destination)
+    this.musicVol = ctx.createGain()
+    this.musicVol.gain.value = this.volumes.music
+    this.musicVol.connect(this.master)
     this.musicBus = ctx.createGain()
-    this.musicBus.connect(this.master)
+    this.musicBus.connect(this.musicVol)
     this.fxBus = ctx.createGain()
+    this.fxBus.gain.value = this.volumes.fx
     this.fxBus.connect(this.master)
+    this.voiceBus = ctx.createGain()
+    this.voiceBus.gain.value = this.volumes.voice
+    this.voiceBus.connect(this.master)
     this.unlocked = true
     // Voice and SFX are small: decode them now so a countdown never waits for a file.
     ;[...Object.values(VOICE_FILES), ...Object.values(SFX_FILES)].forEach((src) => this.load(src))
@@ -120,6 +144,46 @@ class AudioEngine {
     }
     if (this.ctx && this.master) this.master.gain.setTargetAtTime(m ? 0 : 1, this.ctx.currentTime, 0.05)
     this.emit()
+  }
+
+  /** Player volume per bus (0–1), persisted. */
+  setBusVolume(bus: Bus, v: number) {
+    const value = Math.max(0, Math.min(1, v))
+    this.volumes = { ...this.volumes, [bus]: value }
+    try {
+      localStorage.setItem(VOLUME_KEY, JSON.stringify(this.volumes))
+    } catch {
+      /* ignore */
+    }
+    const node = bus === 'music' ? this.musicVol : bus === 'fx' ? this.fxBus : this.voiceBus
+    if (this.ctx && node) node.gain.setTargetAtTime(value, this.ctx.currentTime, 0.05)
+    this.emit()
+  }
+
+  /**
+   * Short synthesized interface sounds (no files): 'hover' a soft tick, 'click' a confirm blip, 'back' a lower blip.
+   * Rate-limited so sweeping the mouse over a menu does not machine-gun.
+   */
+  private lastUi = 0
+  ui(kind: 'hover' | 'click' | 'back') {
+    const ctx = this.ctx
+    if (!ctx || !this.fxBus || this.muted) return
+    const now = ctx.currentTime
+    if (kind === 'hover' && now - this.lastUi < 0.06) return
+    this.lastUi = now
+    const [f0, f1, dur, vol] = kind === 'hover' ? [1800, 1500, 0.035, 0.05] : kind === 'click' ? [660, 990, 0.09, 0.12] : [520, 330, 0.1, 0.1]
+    const o = ctx.createOscillator()
+    const g = ctx.createGain()
+    o.type = kind === 'hover' ? 'sine' : 'triangle'
+    o.frequency.setValueAtTime(f0, now)
+    o.frequency.exponentialRampToValueAtTime(f1, now + dur)
+    g.gain.setValueAtTime(0, now)
+    g.gain.linearRampToValueAtTime(vol, now + 0.005)
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur)
+    o.connect(g).connect(this.fxBus)
+    o.start(now)
+    o.stop(now + dur + 0.02)
+    o.onended = () => g.disconnect()
   }
 
   setStage(stage: MusicStage) {
@@ -240,7 +304,7 @@ class AudioEngine {
         s.buffer = buf
         const g = ctx.createGain()
         g.gain.value = c.voice ? VOICE_VOLUME : (SFX_VOLUME[c.sfx!] ?? 0.7)
-        s.connect(g).connect(this.fxBus!)
+        s.connect(g).connect(c.voice ? this.voiceBus! : this.fxBus!)
         s.start(Math.max(when, ctx.currentTime))
         live.add(s)
         s.onended = () => {
@@ -309,6 +373,10 @@ export function useMusic(stage: MusicStage) {
   useEffect(() => {
     audio.setStage(stage)
   }, [stage])
+}
+
+export function useVolumes(): Record<Bus, number> {
+  return useSyncExternalStore(audio.subscribe, () => audio.volumes, () => DEFAULT_VOLUMES)
 }
 
 export function useMuted(): boolean {

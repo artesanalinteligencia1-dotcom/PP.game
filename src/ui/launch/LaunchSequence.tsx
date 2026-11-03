@@ -65,7 +65,7 @@ export function failureTime(seed: number, T: Timeline): { at: number; text: stri
 
 export const rocketHeight = (id: string) => (id === 'light' ? 150 : id === 'heavy' ? 230 : 200)
 
-function Rocket({ launcherId, t, failAt, v, T }: { launcherId: string; t: number; failAt: number | null; v: ReturnType<typeof spacecraftVisual>; T: Timeline }) {
+export function Rocket({ launcherId, t, failAt, v, T }: { launcherId: string; t: number; failAt: number | null; v: ReturnType<typeof spacecraftVisual>; T: Timeline }) {
   const H = rocketHeight(launcherId)
   const w = launcherId === 'light' ? 16 : launcherId === 'heavy' ? 24 : 22
   const reusable = launcherId === 'reusable_medium'

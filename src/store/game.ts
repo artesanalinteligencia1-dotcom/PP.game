@@ -70,6 +70,8 @@ interface GameState {
   go: (screen: Screen) => void
   openLearn: (tab?: string) => void
   startCampaign: (profile: Profile) => void
+  settingsOpen: boolean
+  openSettings: (open: boolean) => void
   /** Replace the career with an imported save (already validated by parseSaveFile). */
   loadCampaignState: (c: CampaignState) => void
   resetCampaign: () => void
@@ -123,6 +125,8 @@ export const useGame = create<GameState>((set, get) => ({
   speed: 13,
   delegated: { lead: false, engineer: false, astrophysicist: false, astrobiologist: false },
   personality: 'balanced',
+  settingsOpen: false,
+  openSettings: (open) => set({ settingsOpen: open, playing: open ? false : get().playing }),
   go: (screen) => set({ screen, playing: false }),
   openLearn: (tab) => set({ screen: 'learn', learnTab: tab ?? get().learnTab }),
   startCampaign: (profile) => {

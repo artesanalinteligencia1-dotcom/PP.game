@@ -3,6 +3,8 @@
 ## Fonts
 - **Inter** — © The Inter Project Authors, SIL Open Font License 1.1 (`scripts/video/fonts/OFL-Inter.txt`).
 - **Space Grotesk** — © The Space Grotesk Project Authors, SIL Open Font License 1.1 (`scripts/video/fonts/OFL-SpaceGrotesk.txt`).
+- **Caveat** — © The Caveat Project Authors, SIL Open Font License 1.1 (via `@fontsource/caveat`; art-direction mock-up 1 only).
+- **JetBrains Mono** — © The JetBrains Mono Project Authors, SIL Open Font License 1.1 (via `@fontsource-variable/jetbrains-mono`; mock-up 2 only).
   Static TTF instances in `scripts/video/fonts/` were generated from the variable fonts for subtitle rendering.
 
 ## Audio

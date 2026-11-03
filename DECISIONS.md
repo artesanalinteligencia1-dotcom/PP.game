@@ -90,3 +90,18 @@
 - Audio on the Web Audio clock (`src/audio/audio.ts`): voice/SFX decoded at the first gesture and *scheduled* from the launch start; cues more than 0.3 s late are dropped; skip/unmount cancels them; one music track at a time with a 1.6 s crossfade; music ducks to 35 % under speech / HTMLAudio fired from animation frames / user heard the countdown "at random moments" (frames stalled or a hidden tab made lines pile up; files loaded on demand) and songs overlapping (concurrent volume ramps, nothing ever stopped).
 - Long music loops are decoded on demand and dropped when they stop / keep every decoded buffer / a 150 s loop is ~55 MB decoded.
 - All three launch lights kept (dawn / day / night) and picked by the launch window: SSO → dawn, LEO (station) → day, GTO and lunar/L2 → night; Paulet-1 → dawn; `?pad=` forces one for comparison / pick one look / user: "se podría usar las 3"; teaches launch windows.
+
+## Phase 4 — Offline build and game shell (cloud, 2026-11-03)
+- **PWA with manual registration** (`src/platform/offline.ts`): the service worker precaches every built file (largest is the
+  2.9 MB intro video; limit raised to 8 MB). Registration is skipped in dev and in the desktop build.
+- **Tauri 2** for the desktop build (small installer, uses the system WebView2; the installer embeds the WebView2 bootstrapper
+  for old Windows). Installer per user (no admin rights). No code signing yet: Windows SmartScreen will warn.
+  Permissions limited to closing the window and fullscreen.
+- **Saves**: `ppgame-save` JSON with `saveVersion`; unknown/retired contracts are dropped rather than rejecting the file;
+  a save from a newer version is refused with a readable message. The browser and desktop builds keep separate local
+  storage, so export/import is how a career moves between them.
+- **Stage 1440×810 with CSS `zoom`** (not `transform: scale`): text stays sharp and pointer coordinates stay correct.
+  Screens taller than the stage scroll inside it.
+- **Interface sounds are synthesized** (two short oscillator blips) and fire from real input events only — never from
+  animation frames. Gamepad: menus are keyboard-navigable; direct Gamepad API support is left for later.
+- **Mock-ups are lazy-loaded** with their own fonts (Caveat, JetBrains Mono, both OFL) so the normal game never downloads them.

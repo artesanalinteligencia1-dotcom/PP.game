@@ -1,4 +1,5 @@
 import { createContext, useContext, useId, type ReactNode } from 'react'
+import { useSettings } from '../../store/settings'
 import type { LaunchTarget } from '../../engine/types'
 
 /**
@@ -84,8 +85,8 @@ const THEMES = {
 }
 export type SceneryStyle = keyof typeof THEMES
 
-/** `?pad=dawn|day|night` forces one look (for comparing them); otherwise the launch window decides. */
-function forcedStyle(): SceneryStyle | null {
+/** Settings → Launch light: Auto (the launch window decides) or a fixed look. `?pad=` still works for comparisons. */
+function urlStyle(): SceneryStyle | null {
   try {
     const q = new URLSearchParams(window.location.search).get('pad')
     if (q && q in THEMES) return q as SceneryStyle
@@ -94,7 +95,7 @@ function forcedStyle(): SceneryStyle | null {
   }
   return null
 }
-const FORCED = forcedStyle()
+const URL_STYLE = urlStyle()
 
 /**
  * Launch window → light at the pad. Sun-synchronous orbits are reached from launches near dawn or dusk,
@@ -107,7 +108,9 @@ export function launchWindowStyle(target: LaunchTarget): SceneryStyle {
 const SceneryContext = createContext<SceneryStyle>('dawn')
 /** Wrap a scene to pick its light; scenery components read it. */
 export function SceneryLight({ style, children }: { style: SceneryStyle; children: ReactNode }) {
-  return <SceneryContext.Provider value={FORCED ?? style}>{children}</SceneryContext.Provider>
+  const setting = useSettings((s) => s.padLight)
+  const chosen = URL_STYLE ?? (setting === 'auto' ? style : setting)
+  return <SceneryContext.Provider value={chosen}>{children}</SceneryContext.Provider>
 }
 const useTheme = () => THEMES[useContext(SceneryContext)]
 
