@@ -1,10 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { getLauncher, getOrbit } from '../../engine/catalog'
 import type { Design } from '../../engine/types'
 import { audio, hasVoice, type Cue } from '../../audio/audio'
+import { useReducedMotion } from '../../store/settings'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
-import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SceneryLight, SkyBackdrop, Stars, launchWindowStyle } from './LaunchScenery'
+import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SceneryLight, SkyBackdrop, Stars, launchWindowStyle, useSceneryStyle } from './LaunchScenery'
+import { LAUNCHERS_3D } from './three/ascent'
+
+// The Three.js scene is a separate chunk; the SVG scene below stays as the fallback (reduced motion, no WebGL,
+// and the side-booster rockets until they are modelled in 3D).
+const LaunchScene3D = lazy(() => import('./three/LaunchScene3D'))
+let webgl: boolean | null = null
+function webglAvailable() {
+  if (webgl === null) {
+    try {
+      const c = document.createElement('canvas')
+      webgl = Boolean(c.getContext('webgl2') ?? c.getContext('webgl'))
+    } catch {
+      webgl = false
+    }
+  }
+  return webgl
+}
 
 /** Timeline in seconds after pressing Launch. `count` = seconds of countdown before ignition (10 with the voice, 3 without). */
 export function makeTimeline(count: number) {
@@ -165,6 +183,11 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const T = useMemo(() => makeTimeline(voice ? 10 : 3), [voice])
   const fail = useMemo(() => (failed ? failureTime(seed, T) : null), [failed, seed, T])
   const farewell = FAREWELLS[farewellIndex(seed)]
+  const reduced = useReducedMotion()
+  const light = useSceneryStyle(launchWindowStyle(orbit.launchTarget))
+  const use3D = !reduced && LAUNCHERS_3D.has(launcher.id) && webglAvailable()
+  const tRef = useRef(0)
+  tRef.current = t
 
   const parking = orbit.body === 'earth' && orbit.launchTarget !== 'gto' ? Math.min(orbit.defaultAltitudeKm, design.altitudeKm) : 200
   const vOrbit = Math.sqrt(MU / (RE + parking))
@@ -269,8 +292,15 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   }
 
   return (
-    <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800">
+    <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+      {use3D && (
+        <Suspense fallback={null}>
+          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} />
+        </Suspense>
+      )}
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Launch of the ${launcher.name}`}>
+        {!use3D && (
+        <>
         <SceneryLight style={launchWindowStyle(orbit.launchTarget)}>
         <SkyBackdrop space={space} />
         <Stars space={space} />
@@ -309,9 +339,11 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
             <circle r={10 + (t - fail!.at) * 35} fill="#fde68a" opacity={clamp(1 - (t - fail!.at) / 1.2)} />
           </g>
         )}
-        {/* deployed spacecraft */}
+        </>
+        )}
+        {/* deployed spacecraft (over the 3D scene too, where the camera frames the upper stage near the centre) */}
         {!exploded && t >= T.deploy && (
-          <g transform={`translate(${400 + deployK * 110} ${scTopY - deployK * 70}) scale(${0.45 + deployK * 1.6}) translate(-50 -50)`}>
+          <g transform={`translate(${400 + deployK * 110} ${(use3D ? 215 : scTopY) - deployK * 70}) scale(${0.45 + deployK * 1.6}) translate(-50 -50)`}>
             <SpacecraftDrawing v={v} deployed={t >= T.deploy + 0.5} />
           </g>
         )}

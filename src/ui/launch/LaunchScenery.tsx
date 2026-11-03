@@ -105,11 +105,16 @@ export function launchWindowStyle(target: LaunchTarget): SceneryStyle {
   return target === 'sso' ? 'dawn' : target === 'leo' ? 'day' : 'night'
 }
 
+/** The light actually shown: `?pad=`, else the Settings choice, else the launch window's `style`. */
+export function useSceneryStyle(style: SceneryStyle): SceneryStyle {
+  const setting = useSettings((s) => s.padLight)
+  return URL_STYLE ?? (setting === 'auto' ? style : setting)
+}
+
 const SceneryContext = createContext<SceneryStyle>('dawn')
 /** Wrap a scene to pick its light; scenery components read it. */
 export function SceneryLight({ style, children }: { style: SceneryStyle; children: ReactNode }) {
-  const setting = useSettings((s) => s.padLight)
-  const chosen = URL_STYLE ?? (setting === 'auto' ? style : setting)
+  const chosen = useSceneryStyle(style)
   return <SceneryContext.Provider value={chosen}>{children}</SceneryContext.Provider>
 }
 const useTheme = () => THEMES[useContext(SceneryContext)]
