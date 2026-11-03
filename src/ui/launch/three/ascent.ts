@@ -5,8 +5,14 @@ import type { Timeline } from '../LaunchSequence'
 
 const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 
-/** Launchers drawn in 3D so far (the side-booster rockets come with the next delivery). */
-export const LAUNCHERS_3D = new Set(['light', 'medium', 'rideshare', 'reusable_medium'])
+/** Launchers drawn in 3D (all of them since delivery 2). */
+export const LAUNCHERS_3D = new Set(['light', 'medium', 'rideshare', 'reusable_medium', 'heavy', 'reusable_heavy'])
+
+/** Strap-on side boosters (they drop away just before MECO). */
+export const hasSideBoosters = (id: string) => id === 'heavy' || id === 'reusable_heavy'
+
+/** First stages that carry legs and grid fins for landing. */
+export const isReusableLauncher = (id: string) => id === 'reusable_medium' || id === 'reusable_heavy'
 
 /** Rocket height in metres per launcher (the SVG heights scaled: medium = 50 m). */
 export const rocketMetres = (id: string) => (id === 'light' ? 38 : id === 'heavy' || id === 'reusable_heavy' ? 58 : 50)

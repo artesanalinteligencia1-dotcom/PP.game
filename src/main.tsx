@@ -12,9 +12,16 @@ void setupOffline()
 const proto = new URLSearchParams(window.location.search).get('proto')
 const ProtoScreen = lazy(() => import('./ui/proto/ProtoScreen'))
 
+const scene3d = new URLSearchParams(window.location.search).get('scene3d')
+const SceneDebug = lazy(() => import('./ui/launch/three/SceneDebug'))
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {proto === 'pixi' || proto === 'three' ? (
+    {scene3d ? (
+      <Suspense fallback={null}>
+        <SceneDebug launcherId={scene3d} />
+      </Suspense>
+    ) : proto === 'pixi' || proto === 'three' ? (
       <Suspense fallback={null}>
         <ProtoScreen kind={proto} />
       </Suspense>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { makeTimeline } from '../src/ui/launch/LaunchSequence'
-import { LAUNCHERS_3D, ascentAt, rocketMetres } from '../src/ui/launch/three/ascent'
+import { LAUNCHERS_3D, ascentAt, hasSideBoosters, isReusableLauncher, rocketMetres } from '../src/ui/launch/three/ascent'
 
 describe('3D launch choreography', () => {
   const T = makeTimeline(10)
@@ -56,8 +56,11 @@ describe('3D launch choreography', () => {
     expect(ascentAt(S.seco, S).space).toBe(1)
   })
 
-  it('covers the single-core launchers; side-booster rockets keep the SVG scene for now', () => {
-    expect([...LAUNCHERS_3D].sort()).toEqual(['light', 'medium', 'reusable_medium', 'rideshare'])
+  it('draws every launcher in 3D; only the heavy ones carry side boosters, only reusables carry legs', () => {
+    expect([...LAUNCHERS_3D].sort()).toEqual(['heavy', 'light', 'medium', 'reusable_heavy', 'reusable_medium', 'rideshare'])
     expect(rocketMetres('light')).toBeLessThan(rocketMetres('medium'))
+    expect(rocketMetres('heavy')).toBeGreaterThan(rocketMetres('medium'))
+    expect(hasSideBoosters('heavy') && hasSideBoosters('reusable_heavy') && !hasSideBoosters('medium')).toBe(true)
+    expect(isReusableLauncher('reusable_medium') && isReusableLauncher('reusable_heavy') && !isReusableLauncher('heavy')).toBe(true)
   })
 })

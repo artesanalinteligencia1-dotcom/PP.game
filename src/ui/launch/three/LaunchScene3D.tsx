@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { mulberry32 } from '../../../engine/rng'
 import type { Timeline } from '../LaunchSequence'
 import type { SceneryStyle } from '../LaunchScenery'
-import { ascentAt, rocketMetres } from './ascent'
+import { ascentAt, hasSideBoosters, isReusableLauncher, rocketMetres } from './ascent'
 
 /**
  * The launch in Three.js (loaded on demand). Driven by the game timeline through `tRef` (seconds after pressing Launch);
@@ -221,6 +221,42 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
       fin.rotation.y = -(i * Math.PI) / 2
       s1.add(fin)
     }
+    // reusable first stages: grid fins near the top and landing legs folded against the body (they open for the landing)
+    if (isReusableLauncher(launcherId)) {
+      for (let i = 0; i < 4; i++) {
+        const a = (i * Math.PI) / 2 + Math.PI / 4
+        const fin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.6, 1.8), dark)
+        fin.position.set(Math.cos(a) * (R + 0.9), h1 - 3, Math.sin(a) * (R + 0.9))
+        fin.rotation.y = -a
+        s1.add(fin)
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.35, 9, 0.35), dark)
+        leg.position.set(Math.cos(a) * (R + 0.35), 5.2, Math.sin(a) * (R + 0.35))
+        leg.rotation.set(Math.sin(a) * 0.08, 0, -Math.cos(a) * 0.08)
+        s1.add(leg)
+      }
+    }
+    // strap-on boosters for the heavy launchers
+    const Rs = R * 0.55
+    const hs = h1 * 0.72
+    const sideFlameMat = new THREE.MeshBasicMaterial({ map: softTexture('255,190,100'), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })
+    const sides = hasSideBoosters(launcherId)
+      ? [0.6, Math.PI + 0.6].map((a) => {
+          const g = new THREE.Group()
+          const body = new THREE.Mesh(new THREE.CylinderGeometry(Rs, Rs, hs, 20), white)
+          body.position.y = hs / 2
+          const nose = new THREE.Mesh(new THREE.ConeGeometry(Rs, Rs * 2.4, 20), orange)
+          nose.position.y = hs + Rs * 1.2
+          const nz = new THREE.Mesh(new THREE.CylinderGeometry(Rs * 0.5, Rs * 0.8, 1.1, 14, 1, true), dark)
+          nz.position.y = -0.4
+          g.add(body, nose, nz)
+          const home = new THREE.Vector3(Math.cos(a) * (R + Rs + 0.15), 0.2, Math.sin(a) * (R + Rs + 0.15))
+          g.position.copy(home)
+          const f = new THREE.Mesh(new THREE.ConeGeometry(Rs * 0.9, 1, 14, 1, true), sideFlameMat)
+          f.rotation.x = Math.PI
+          g.add(f)
+          return { g, home, drift: new THREE.Vector3(Math.cos(a), -0.1, Math.sin(a)).multiplyScalar(7), flame: f }
+        })
+      : []
     const s2 = new THREE.Group()
     const inter = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 1, 24), dark)
     inter.position.y = h1 + 0.5
@@ -234,6 +270,12 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     const bus = new THREE.Mesh(new THREE.BoxGeometry(R * 0.9, hf * 0.35, R * 0.9), gold)
     const dish = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.45, R * 0.1, 0.4, 16), white)
     dish.position.y = hf * 0.22
+    const panelMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, metalness: 0.6, roughness: 0.3 })
+    for (const sx of [-1, 1]) {
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(0.12, hf * 0.3, R * 0.8), panelMat)
+      panel.position.x = sx * (R * 0.45 + 0.1)
+      craft.add(panel)
+    }
     craft.add(bus, dish)
     craft.position.y = h1 + h2 + hf * 0.3
     const fairingShape = Array.from({ length: 12 }, (_, i) => new THREE.Vector2((R + 0.15) * Math.cos((i / 11) * (Math.PI / 2)) ** 0.7, (i / 11) * hf))
@@ -246,6 +288,7 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     })
     s2.add(inter, body2, nozzle2, craft, ...halves)
     rocket.add(s1, s2)
+    sides.forEach((s) => rocket.add(s.g))
     rocket.traverse((o) => (o.castShadow = true))
     rocket.position.y = 4.8
     scene.add(rocket)
@@ -318,6 +361,7 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     let last = -1
     let prev = performance.now()
     let sepDone = false
+    let sideDone = false
     let fairingGone = false
     let raf = 0
 
@@ -334,6 +378,14 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
           s1.position.set(0, 0, 0)
           s1.rotation.set(0, 0, 0)
           sepDone = false
+        }
+        if (sideDone) {
+          sides.forEach((s) => {
+            rocket.add(s.g)
+            s.g.position.copy(s.home)
+            s.g.rotation.set(0, 0, 0)
+          })
+          sideDone = false
         }
         camOff.copy(OPEN_CAM).sub(tmp.set(0, 4.8, 0))
       }
@@ -362,6 +414,25 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
         s1.position.x -= 8 * dt
         s1.rotation.z += 0.5 * dt
       }
+      const thin = Math.min(1, r.alt / 900)
+      const flick = 0.85 + 0.3 * Math.abs(Math.sin(time * 37)) * Math.abs(Math.cos(time * 23))
+      // side boosters burn out and swing away just before MECO
+      if (sides.length && time >= T.meco - 0.4 && !sideDone) {
+        sideDone = true
+        sides.forEach((s) => scene.attach(s.g))
+      }
+      for (const s of sides) {
+        s.flame.visible = !sideDone && r.thrust > 0.02 && !exploded
+        const sl = (RH * 0.25 + thin * RH * 0.5) * r.thrust * flick
+        s.flame.scale.set(1 + thin * 2, sl, 1 + thin * 2)
+        s.flame.position.y = -0.9 - sl / 2
+        if (sideDone && s.g.parent === scene) {
+          const k = time - (T.meco - 0.4)
+          s.g.position.addScaledVector(s.drift, dt)
+          s.g.position.y -= (4 + k * 35) * dt
+          s.g.rotation.z += 0.4 * dt
+        }
+      }
       nozzle2.visible = sepDone
       craft.visible = time < T.deploy // the 2D spacecraft takes over at deployment (LaunchSequence)
       // fairing halves swing open and drift off
@@ -379,8 +450,6 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
       ;(flash.material as THREE.SpriteMaterial).opacity = exploded ? 0 : flashK
 
       // flame: longer and wider in thin air; blue-ish on the upper stage
-      const thin = Math.min(1, r.alt / 900)
-      const flick = 0.85 + 0.3 * Math.abs(Math.sin(time * 37)) * Math.abs(Math.cos(time * 23))
       const len = (RH * 0.3 + thin * RH * 0.8) * r.thrust * flick
       flameGroup.visible = r.thrust > 0.02
       flameGroup.position.y = (r.stage === 2 ? h1 - 0.9 : -1.2) - len / 2
