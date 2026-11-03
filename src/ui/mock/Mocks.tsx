@@ -103,7 +103,7 @@ function NotebookMenu() {
           Mission notebook — Dr. Pedro Goicochea
         </p>
         <h1 style={{ ...hand, fontSize: 120, lineHeight: 1 }} className="mt-1 font-bold">
-          PP.game
+          Paulet
         </h1>
         <svg viewBox="0 0 400 20" className="-mt-2 w-[380px]" style={{ filter: 'url(#rough)' }}>
           <path d="M5 12 C100 4 220 18 395 8" stroke={RED} strokeWidth="3" fill="none" strokeLinecap="round" />
@@ -470,13 +470,13 @@ function HudMenu() {
       <MenuBackdrop />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
       <div className="absolute inset-x-12 top-8 flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-white/60">
-        <span>PP.game · Mission Directorate</span>
+        <span>Paulet · Mission Directorate</span>
         <span>Arequipa launch site · 16.4° S · dawn</span>
       </div>
       <div className="absolute left-16 top-[150px] w-[520px]">
         <p className="text-sm uppercase tracking-[0.4em] text-sky-300">Space mission design</p>
         <h1 className="mt-2 text-[104px] font-light leading-none tracking-tight">
-          PP<span className="font-bold">.game</span>
+          Paulet
         </h1>
         <div className="mt-10 border-t border-white/15">
           {MENU.map((m, i) => (

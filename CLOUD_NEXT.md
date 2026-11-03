@@ -51,6 +51,10 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
 4. **Multiplayer (later, online only)**: the engine is deterministic, so start asynchronous — same seed + same scenario,
    compare scores/leaderboard; real-time co-op (4 roles) needs a server and comes after.
 
+## Game name (2026-11-03)
+**Paulet: Andes to Orbit.** Use `GAME_NAME` / `GAME_SUBTITLE` / `GAME_TITLE` from `src/brand.ts` for any new text; never hard-code
+the name. The local chat already renamed the boot screen, main menu, settings, save messages, PWA manifest and Tauri config.
+
 ## Rules that still apply
 No secrets in the repo; no paid generation (ElevenLabs etc.) without the user's explicit approval; no real brands;
 Paulet facts as "claimed"; UI/code in English, explanations to the user in Spanish; commit/push to `cloud/fase-1`, never force-push.

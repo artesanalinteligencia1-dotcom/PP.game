@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "PP.game",
+  "productName": "Paulet - Andes to Orbit",
   "version": "0.1.0",
-  "identifier": "game.pp.spacemission",
+  "identifier": "game.paulet.andestoorbit",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "PP.game — Space Mission Design",
+        "title": "Paulet: Andes to Orbit",
         "width": 1600,
         "height": 900,
         "minWidth": 960,

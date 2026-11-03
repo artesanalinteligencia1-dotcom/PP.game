@@ -14,8 +14,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/apple-touch-icon.png', 'icons/icon.svg'],
       manifest: {
-        name: 'PP.game — Space Mission Design',
-        short_name: 'PP.game',
+        name: 'Paulet: Andes to Orbit',
+        short_name: 'Paulet',
         description: 'Design, launch and fly space missions with real physics, money and investors.',
         theme_color: '#0b1026',
         background_color: '#020617',

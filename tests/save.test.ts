@@ -13,7 +13,7 @@ describe('save files', () => {
     expect(parseSaveFile(JSON.stringify(base))).toEqual(base)
   })
   it('rejects junk, damaged and future saves with a readable message', () => {
-    expect(() => parseSaveFile('hello')).toThrow(/not a PP.game save/)
+    expect(() => parseSaveFile('hello')).toThrow(/not a Paulet save/)
     expect(() => parseSaveFile(JSON.stringify({ ...base, fundsM: 'lots' }))).toThrow(/damaged/)
     expect(() => parseSaveFile(JSON.stringify({ ...toSaveFile(base), saveVersion: 99 }))).toThrow(/newer version/)
   })

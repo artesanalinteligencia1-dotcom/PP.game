@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { audio, useMuted, useVolumes, type Bus } from '../../audio/audio'
+import { GAME_NAME } from '../../brand'
 import { isFullscreen, toggleFullscreen } from '../../platform/desktop'
 import { isDesktop, useOffline } from '../../platform/offline'
 import { useGame } from '../../store/game'
@@ -160,7 +161,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <Row label="Play offline" hint={offline.offlineReady ? 'Ready: the whole game is stored on this device' : 'The game stores itself for offline play after loading'}>
             {offline.canInstall ? (
               <button type="button" onClick={offline.install} className="btn-primary px-3 py-1.5 text-sm  focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
-                Install PP.game
+                Install {GAME_NAME}
               </button>
             ) : (
               <span className="text-sm text-slate-400">{offline.offlineReady ? '✓ Available offline' : 'Use your browser menu → Install app'}</span>

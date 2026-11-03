@@ -114,3 +114,8 @@
 - Launch renderer: **Three.js** (3D, real lights and camera) over PixiJS 2.5D and SVG — user, after comparing `?proto=three` / `?proto=pixi`.
 - Intro video style: **A "Painted cinema"** (illustrations with slow camera push, letterbox, grain, word-by-word captions) over notebook / mission-control / kinetic type.
 - Trailer: Stellaris-like test with AI video clips (option 3); soundtrack with female vocals generated with local music AI (ACE-Step 1.5), five songs.
+- Game name: **Paulet: Andes to Orbit** (user's choice, 2026-11-03) over "Paulet" alone — "Paulet" is also the name of CONIDA's
+  sounding-rocket series (Paulet I 2006, I-B 2013, 1C 2021), so the subtitle keeps the game distinct and says what it is.
+  One source in `src/brand.ts`; plain text in index.html, vite.config.ts (PWA) and src-tauri. Tauri identifier
+  `game.paulet.andestoorbit` (changed before any release). Save format id `ppgame-save` kept for compatibility. GitHub repo
+  name unchanged (user's call). Trademark not checked (Indecopi) — recommended before publishing.

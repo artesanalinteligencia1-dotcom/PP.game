@@ -1,6 +1,7 @@
 // Loading screen → "Press any key". The key/click is also the gesture browsers require before playing audio.
 import { useEffect, useState } from 'react'
 import { MenuBackdrop } from '../hub/HomeScreen'
+import { GAME_NAME, GAME_SUBTITLE } from '../../brand'
 
 export function BootScreen({ onStart }: { onStart: () => void }) {
   const [ready, setReady] = useState(false)
@@ -35,7 +36,8 @@ export function BootScreen({ onStart }: { onStart: () => void }) {
       <div className="relative grid h-full place-items-center text-center">
         <div>
           <p className="text-xs uppercase tracking-[0.4em] text-sky-300">Space Mission Design</p>
-          <h1 className="mt-2 text-8xl font-bold tracking-tight">PP.game</h1>
+          <h1 className="mt-2 text-8xl font-bold tracking-tight">{GAME_NAME}</h1>
+          <p className="mt-3 text-xl uppercase tracking-[0.4em] text-orange-400">{GAME_SUBTITLE}</p>
           <div className="mx-auto mt-10 h-1 w-64 overflow-hidden rounded bg-slate-800">
             <div className={`h-full bg-orange-500 transition-all duration-700 ${ready ? 'w-full' : 'w-1/3'}`} />
           </div>

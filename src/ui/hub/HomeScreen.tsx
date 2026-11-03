@@ -1,6 +1,7 @@
 // Main menu: the launch site at rest behind a vertical, keyboard-friendly menu.
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useMusic } from '../../audio/audio'
+import { GAME_NAME, GAME_SUBTITLE } from '../../brand'
 import { getScenario } from '../../engine/catalog'
 import { PROTAGONIST } from '../../i18n/en'
 import { canQuit, quitGame } from '../../platform/desktop'
@@ -80,14 +81,15 @@ export function HomeScreen() {
       <MenuBackdrop />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
       <div className="absolute inset-x-12 top-8 flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-white/60">
-        <span>PP.game · Mission Directorate</span>
+        <span>{GAME_NAME} · Mission Directorate</span>
         <span>Arequipa launch site · 16.4° S · dawn</span>
       </div>
       <div className="absolute left-16 top-[130px] w-[520px]">
         <p className="hud-label text-sm">Space mission design</p>
         <h1 className="mt-2 text-[104px] leading-none tracking-tight">
-          PP<b>.game</b>
+          {GAME_NAME}
         </h1>
+        <p className="mt-2 text-2xl uppercase tracking-[0.35em] text-orange-400">{GAME_SUBTITLE}</p>
         <nav ref={navRef} onKeyDown={onKey} className="mt-10 border-t border-white/15" aria-label="Main menu">
           {!extras ? (
             <>

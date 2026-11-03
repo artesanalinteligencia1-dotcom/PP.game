@@ -1,7 +1,7 @@
 [package]
 name = "ppgame"
 version = "0.1.0"
-description = "PP.game — Space Mission Design (desktop build)"
+description = "Paulet: Andes to Orbit (desktop build)"
 license = "MIT"
 edition = "2021"
 

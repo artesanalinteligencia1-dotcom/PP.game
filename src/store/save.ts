@@ -1,6 +1,7 @@
 // Save file format (versioned). The campaign lives in localStorage; players can also export it to a file and
 // import it back (offline backups, moving between the web and desktop builds). Pure: no DOM, testable.
 import { CONTRACTS, type CampaignState } from '../engine/campaign'
+import { GAME_NAME } from '../brand'
 
 export const SAVE_FORMAT = 'ppgame-save'
 export const SAVE_VERSION = 1
@@ -64,11 +65,11 @@ export function parseSaveFile(text: string): CampaignState {
   try {
     data = JSON.parse(text)
   } catch {
-    throw new Error('This is not a PP.game save file (not JSON).')
+    throw new Error(`This is not a ${GAME_NAME} save file (not JSON).`)
   }
   const f = data as Partial<SaveFile>
   if (f && f.format === SAVE_FORMAT) {
-    if (!num(f.saveVersion) || f.saveVersion! > SAVE_VERSION) throw new Error('This save comes from a newer version of PP.game. Update the game first.')
+    if (!num(f.saveVersion) || f.saveVersion! > SAVE_VERSION) throw new Error(`This save comes from a newer version of ${GAME_NAME}. Update the game first.`)
     return validateCampaign(f.campaign)
   }
   return validateCampaign(data)
