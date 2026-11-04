@@ -37,6 +37,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
   reusable_heavy → add them to `LAUNCHERS_3D`), legs + grid fins on reusables, the procedural spacecraft in 3D; delivery 3 =
   booster landing on the drone ship, Earth limb, Paulet-1 prologue (`SoundingSequence`) in the same scene, polish.
 
+- Teaser (2nd trailer, 23 s): `C:\PPgame\teaser_paulet.mp4` from `C:\PPgame\trailer-test`. Owner's wishes for the definitive
+  game (language choice, Rocket Engineer pad, Astrobiologist pad): `docs/PLAYBOOK.md` §6b.
+
 ## Next, in this order
 1. ✅ **DONE (cloud, 2026-11-03) — Offline build (the user's goal).** See PROGRESS step 10.
    - PWA: `vite-plugin-pwa`, precache everything (audio, video, fonts are already local — no external URLs in `src/`),

@@ -60,6 +60,7 @@ Explanations to the owner are in Spanish; code, docs and in-game text in English
 | Intro (style A "Painted cinema", 31 s) | HyperFrames, `C:\PPgame\intro-a\build.mjs` (captions from narration timings) | `src/assets/video/intro.mp4` |
 | Trailer stills | owner, Gemini, from `C:\PPgame\trailer\PROMPTS_GEMINI.md` | `C:\PPgame\trailer\gemini` |
 | Trailer (54 s) | HyperFrames, `C:\PPgame\trailer-final\build.mjs` (one scene per shot, camera moves, titles, satellite) | `C:\PPgame\trailer_paulet.mp4` |
+| Teaser (23 s, second trailer) | HyperFrames `C:\PPgame\trailer-test` (3 Kling clips, style A titles, logo) | `C:\PPgame\teaser_paulet.mp4` (+ 720p) |
 | Upscaling stills ×4 | Real-ESRGAN (`pienza_studio\tools\realesrgan`) | before camera moves, so zooms stay sharp |
 
 ## 6. Start the definitive game here (recommended order)
@@ -74,6 +75,16 @@ Explanations to the owner are in Spanish; code, docs and in-game text in English
 3. **Three.js launch** per CLOUD_NEXT §3 (one model per launcher, failure moment, booster landing, Andes + Misti, SVG fallback).
 4. **Multiplayer:** start asynchronous (same seed + scenario, compare scores), then real-time co-op of the 4 roles with a server.
 5. **Media:** music = ACE-Step (write `SONGS.md` first), stills = Gemini, animation = HyperFrames; voice = ElevenLabs only with a quoted cost.
+
+## 6b. Owner's wishes for the definitive game (2026-11-03)
+- **Language choice in the game** (Settings already has a language placeholder; `src/i18n` exists): at least English and
+  Spanish, every in-game string through the i18n table, voice/captions per language.
+- **Rocket Engineer pad:** a hands-on workbench for the rocket itself: its parts (stages, engines, tanks, fairing, boosters,
+  legs/grid fins), materials and layout, with live mass / thrust-to-weight / Δv feedback. This is what the engineer role
+  manipulates (today the game only lets you pick a launcher).
+- **Astrobiologist pad:** a separate workbench for the science side: instruments, targets (biosignatures, water, habitability),
+  observation plans and data budgets.
+- Both pads reuse the 3D scene (`src/ui/launch/three/`) and the engine's pure evaluation functions, so every change is testable.
 
 ## 7. Where things are
 - Repo `artesanalinteligencia1-dotcom/PP.game`, branch `cloud/fase-1`, local clone `C:\PPgame\PP.game`.
