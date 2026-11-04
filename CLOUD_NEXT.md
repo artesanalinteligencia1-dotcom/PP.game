@@ -30,8 +30,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 - ✅ `docs/PLAYBOOK.md`: read it first when the definitive game starts.
 - ✅ Three.js delivery 2 (2026-11-03, this session): side boosters on heavy/reusable_heavy (drop at MECO−0.4 s), legs + grid fins on
   reusables (legs still stowed), solar panels on the stand-in spacecraft, all six launchers in `LAUNCHERS_3D`. Debug view without
-  playing the game: `?scene3d=<launcherId>&pad=dawn|day|night&t=<seconds>`. Still open in delivery 2: a real procedural spacecraft
-  (port of `SpacecraftDrawing`). Delivery 3 untouched.
+  playing the game: `?scene3d=<launcherId>&pad=dawn|day|night&t=<seconds>`. Procedural spacecraft in 3D done too
+  (`spacecraft3d.ts`, deploys in 3D). **Delivery 3 next:** booster landing on the drone ship in 3D (replaces the SVG inset), Earth
+  limb at altitude, failure check, Paulet-1 prologue (`SoundingSequence`) in the same scene, polish.
 - ✅ Three.js launch delivery 1: `src/ui/launch/three/` (scene + `ascent.ts`). Next: delivery 2 = side boosters (heavy,
   reusable_heavy → add them to `LAUNCHERS_3D`), legs + grid fins on reusables, the procedural spacecraft in 3D; delivery 3 =
   booster landing on the drone ship, Earth limb, Paulet-1 prologue (`SoundingSequence`) in the same scene, polish.

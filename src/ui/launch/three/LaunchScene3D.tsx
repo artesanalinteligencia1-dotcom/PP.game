@@ -3,11 +3,13 @@ import * as THREE from 'three'
 import { mulberry32 } from '../../../engine/rng'
 import type { Timeline } from '../LaunchSequence'
 import type { SceneryStyle } from '../LaunchScenery'
+import type { SpacecraftVisual } from '../../spacecraft/visual'
 import { ascentAt, hasSideBoosters, isReusableLauncher, rocketMetres } from './ascent'
+import { buildSpacecraft } from './spacecraft3d'
 
 /**
  * The launch in Three.js (loaded on demand). Driven by the game timeline through `tRef` (seconds after pressing Launch);
- * the HUD, captions, countdown digits and every sound stay in LaunchSequence. Started from the `?proto=three` prototype.
+ * the HUD, captions, countdown digits and every sound stay in LaunchSequence; the spacecraft is built from the design. Started from the `?proto=three` prototype.
  */
 
 const LIGHTS: Record<SceneryStyle, { sky: [string, string]; sun: [number, number, number]; sunColor: number; sunI: number; hemi: [number, number, number]; fog: number; hills: number; ground: number; stars: number; floods: boolean }> = {
@@ -53,9 +55,11 @@ interface Props {
   T: Timeline
   tRef: { current: number }
   failAt: number | null
+  /** the player's spacecraft (`spacecraftVisual(design)`) */
+  visual: SpacecraftVisual
 }
 
-export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Props) {
+export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visual }: Props) {
   const host = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = host.current!
@@ -205,7 +209,6 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     const white = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.45 })
     const dark = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 })
     const orange = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.5 })
-    const gold = new THREE.MeshStandardMaterial({ color: 0xd4a017, metalness: 0.8, roughness: 0.35 })
     const rocket = new THREE.Group()
     const s1 = new THREE.Group()
     const body1 = new THREE.Mesh(new THREE.CylinderGeometry(R, R, h1, 24), white)
@@ -265,19 +268,13 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
     const nozzle2 = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.35, R * 0.6, 1.4, 16, 1, true), dark)
     nozzle2.position.y = h1 - 0.2
     nozzle2.visible = false
-    // spacecraft inside the fairing (a stand-in until the procedural spacecraft is ported to 3D)
-    const craft = new THREE.Group()
-    const bus = new THREE.Mesh(new THREE.BoxGeometry(R * 0.9, hf * 0.35, R * 0.9), gold)
-    const dish = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.45, R * 0.1, 0.4, 16), white)
-    dish.position.y = hf * 0.22
-    const panelMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a, metalness: 0.6, roughness: 0.3 })
-    for (const sx of [-1, 1]) {
-      const panel = new THREE.Mesh(new THREE.BoxGeometry(0.12, hf * 0.3, R * 0.8), panelMat)
-      panel.position.x = sx * (R * 0.45 + 0.1)
-      craft.add(panel)
-    }
-    craft.add(bus, dish)
-    craft.position.y = h1 + h2 + hf * 0.3
+    // the player's spacecraft (procedural, from the design) stowed inside the fairing
+    const busM = R * (0.55 + 0.5 * Math.min(1, Math.max(0, (visual.bus - 16) / 14)))
+    const sc = buildSpacecraft(visual, busM)
+    const craft = sc.group
+    const below = (visual.instruments.some((i) => i.shape === 'telescope') ? 19 : visual.instruments.some((i) => i.shape === 'bigCamera') ? 13 : 9) * (busM / visual.bus)
+    const craftHome = new THREE.Vector3(0, h1 + h2 + 0.3 + below + busM / 2, 0)
+    craft.position.copy(craftHome)
     const fairingShape = Array.from({ length: 12 }, (_, i) => new THREE.Vector2((R + 0.15) * Math.cos((i / 11) * (Math.PI / 2)) ** 0.7, (i / 11) * hf))
     const halves = [0, Math.PI].map((phi) => {
       const g = new THREE.Group()
@@ -352,6 +349,9 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
 
     const skyTop = new THREE.Color(L.sky[0])
     const black = new THREE.Color(0x02040c)
+    const white3 = new THREE.Color(0xffffff)
+    const sunPad = new THREE.Vector3(...L.sun)
+    const sunSpace = new THREE.Vector3(-600, 900, 1400) // from behind the camera, so the spacecraft's visible side is lit
     const fogBase = new THREE.Color(L.fog)
     const OPEN_CAM = new THREE.Vector3(-70, 22, 130)
     const camPos = OPEN_CAM.clone()
@@ -434,7 +434,12 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
         }
       }
       nozzle2.visible = sepDone
-      craft.visible = time < T.deploy // the 2D spacecraft takes over at deployment (LaunchSequence)
+      // deployment: the spacecraft pushes off the upper stage, turns slowly and unfolds its arrays
+      const dk = Math.min(1, Math.max(0, (time - T.deploy) / 3.5))
+      const de = 1 - (1 - dk) ** 2
+      craft.position.set(craftHome.x + de * busM * 1.2, craftHome.y + de * busM * 4, craftHome.z + de * busM * 2.5)
+      craft.rotation.set(de * 0.3, de * 0.25, -de * 0.15)
+      sc.setDeploy((time - T.deploy - 0.6) / 1.6)
       // fairing halves swing open and drift off
       halves.forEach((g, i) => {
         const s = i === 0 ? 1 : -1
@@ -518,6 +523,13 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
         target.lerp(near, close)
         want.lerp(near.clone().add(tmp.set(-17, -5, 28)), close)
       }
+      if (dk > 0) {
+        // close-up on the spacecraft while it unfolds its arrays
+        const cw = craft.getWorldPosition(new THREE.Vector3())
+        const k = Math.min(1, dk * 1.6)
+        target.lerp(cw, k)
+        want.lerp(cw.clone().add(tmp.set(-busM * 1.2, -busM * 1.4, busM * 8.5)), k)
+      }
       // smooth the framing (offset from the rocket), not the position: the rocket climbs too fast for a lagging camera
       const wantOff = want.sub(rocket.position)
       if (jumped) camOff.copy(wantOff)
@@ -533,6 +545,10 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
       renderer.setClearColor(skyTop.clone().lerp(black, r.space))
       scene.backgroundIntensity = 1 - r.space * 0.97
       starMat.opacity = Math.max(L.stars, r.space)
+      // above the atmosphere the Sun lights the rocket fully, whatever the light at the pad
+      sun.intensity = L.sunI + (2.6 - L.sunI) * r.space
+      sun.position.lerpVectors(sunPad, sunSpace, r.space)
+      sun.color.setHex(L.sunColor).lerp(white3, r.space)
       renderer.render(scene, camera)
       raf = requestAnimationFrame(frame)
     }
@@ -551,6 +567,6 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt }: Pr
       renderer.dispose()
       el.removeChild(renderer.domElement)
     }
-  }, [launcherId, light, T, tRef, failAt])
+  }, [launcherId, light, T, tRef, failAt, visual])
   return <div ref={host} className="absolute inset-0" />
 }

@@ -90,6 +90,14 @@
   Trailer fixed after the owner's review: Gemini's end-of-clip jumps (v2, v4, v5) cut and cross-faded; music jump moved into
   the song's quiet breath (40 s → 127.2 s, same passage) and ends on the song's own ending; 56 s.
 
+- Local session (2026-11-03): **Three.js launch, delivery 2 done.** All six launchers in 3D: side boosters on heavy and
+  reusable_heavy (drop just before MECO), legs + grid fins on reusables, and the player's **procedural spacecraft in 3D**
+  (`src/ui/launch/three/spacecraft3d.ts`, built from the same `spacecraftVisual(design)` as the 2D drawing: bus, body/deployable/
+  tracking arrays, antenna, radiator, thruster, every instrument shape). It rides in the fairing, pushes off at deployment and
+  unfolds its arrays while the camera closes in; above the atmosphere the Sun lights it from the camera side. The 2D spacecraft
+  overlay now only appears on the SVG fallback. Debug view: `?scene3d=<launcher>&pad=&t=&mission=&inst=&array=&area=`.
+  Checked in headless Chrome (debug views + the real Earth Watch flow): 121 fps, no console errors. Tests 91 passing.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).

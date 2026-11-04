@@ -295,7 +295,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
       {use3D && (
         <Suspense fallback={null}>
-          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} />
+          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} visual={v} />
         </Suspense>
       )}
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Launch of the ${launcher.name}`}>
@@ -341,9 +341,9 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
         )}
         </>
         )}
-        {/* deployed spacecraft (over the 3D scene too, where the camera frames the upper stage near the centre) */}
-        {!exploded && t >= T.deploy && (
-          <g transform={`translate(${400 + deployK * 110} ${(use3D ? 215 : scTopY) - deployK * 70}) scale(${0.45 + deployK * 1.6}) translate(-50 -50)`}>
+        {/* deployed spacecraft (the 3D scene deploys its own) */}
+        {!use3D && !exploded && t >= T.deploy && (
+          <g transform={`translate(${400 + deployK * 110} ${scTopY - deployK * 70}) scale(${0.45 + deployK * 1.6}) translate(-50 -50)`}>
             <SpacecraftDrawing v={v} deployed={t >= T.deploy + 0.5} />
           </g>
         )}
