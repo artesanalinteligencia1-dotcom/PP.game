@@ -4,48 +4,14 @@ import { mulberry32 } from '../../../engine/rng'
 import type { Timeline } from '../LaunchSequence'
 import type { SceneryStyle } from '../LaunchScenery'
 import type { SpacecraftVisual } from '../../spacecraft/visual'
-import { ascentAt, hasSideBoosters, isReusableLauncher, rocketMetres } from './ascent'
+import { LANDING_TOUCH, ascentAt, boosterLandingAt, hasSideBoosters, isReusableLauncher, rocketMetres } from './ascent'
+import { EARTH_R, LIGHTS, addAndes, addStars, makeEarth, skyTexture, softTexture } from './common'
 import { buildSpacecraft } from './spacecraft3d'
 
 /**
  * The launch in Three.js (loaded on demand). Driven by the game timeline through `tRef` (seconds after pressing Launch);
  * the HUD, captions, countdown digits and every sound stay in LaunchSequence; the spacecraft is built from the design. Started from the `?proto=three` prototype.
  */
-
-const LIGHTS: Record<SceneryStyle, { sky: [string, string]; sun: [number, number, number]; sunColor: number; sunI: number; hemi: [number, number, number]; fog: number; hills: number; ground: number; stars: number; floods: boolean }> = {
-  dawn: { sky: ['#433880', '#fdba74'], sun: [1200, 160, -5200], sunColor: 0xffc58a, sunI: 2.4, hemi: [0x8b7fb8, 0x3b2a20, 0.9], fog: 0xb58aa0, hills: 0x5a4a85, ground: 0x5b4636, stars: 0.25, floods: false },
-  day: { sky: ['#1e54c8', '#d6eafa'], sun: [500, 900, 300], sunColor: 0xfffbea, sunI: 2.8, hemi: [0xbcdcff, 0x8a6a45, 1.3], fog: 0xb9c6da, hills: 0x8a735e, ground: 0xb8925f, stars: 0, floods: false },
-  night: { sky: ['#020617', '#243260'], sun: [400, 600, -300], sunColor: 0x9fb4e0, sunI: 0.35, hemi: [0x1c2847, 0x05070d, 0.35], fog: 0x121e46, hills: 0x1c2847, ground: 0x151b2b, stars: 1, floods: true },
-}
-
-function softTexture(rgb = '255,255,255') {
-  const c = document.createElement('canvas')
-  c.width = c.height = 128
-  const x = c.getContext('2d')!
-  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64)
-  g.addColorStop(0, `rgba(${rgb},1)`)
-  g.addColorStop(0.4, `rgba(${rgb},0.45)`)
-  g.addColorStop(1, `rgba(${rgb},0)`)
-  x.fillStyle = g
-  x.fillRect(0, 0, 128, 128)
-  const tex = new THREE.CanvasTexture(c)
-  tex.colorSpace = THREE.SRGBColorSpace
-  return tex
-}
-function skyTexture(top: string, bottom: string) {
-  const c = document.createElement('canvas')
-  c.width = 4
-  c.height = 256
-  const x = c.getContext('2d')!
-  const g = x.createLinearGradient(0, 0, 0, 256)
-  g.addColorStop(0, top)
-  g.addColorStop(1, bottom)
-  x.fillStyle = g
-  x.fillRect(0, 0, 4, 256)
-  const tex = new THREE.CanvasTexture(c)
-  tex.colorSpace = THREE.SRGBColorSpace
-  return tex
-}
 
 interface Puff { s: THREE.Sprite; life: number; max: number; v: THREE.Vector3; grow: number; a0: number; drag: number }
 
@@ -57,9 +23,14 @@ interface Props {
   failAt: number | null
   /** the player's spacecraft (`spacecraftVisual(design)`) */
   visual: SpacecraftVisual
+  /** reusable launchers: whether the booster lands on the drone ship (mission roll); drawn in a 3D inset */
+  landed?: boolean
 }
 
-export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visual }: Props) {
+/** Booster-recovery inset, in CSS pixels from the bottom-right corner (LaunchSequence puts its labels on the same box). */
+export const LANDING_INSET = { right: 12, bottom: 64, widthFrac: 0.26, aspect: 0.6 }
+
+export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visual, landed = true }: Props) {
   const host = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = host.current!
@@ -94,47 +65,10 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
     ground.rotation.x = -Math.PI / 2
     ground.receiveShadow = true
     scene.add(ground)
-    const hillMat = new THREE.MeshStandardMaterial({ color: L.hills, flatShading: true, roughness: 1 })
-    const snowMat = new THREE.MeshStandardMaterial({ color: 0xf5f3ff, flatShading: true, roughness: 0.8 })
-    // view axis of the opening shot: from (-70, 22, 130) towards the pad; "right" is perpendicular on the ground
-    const fwd = new THREE.Vector3(70, 0, -130).normalize()
-    const right = new THREE.Vector3(-fwd.z, 0, fwd.x)
-    const at = (dist: number, side: number) => new THREE.Vector3(-70, 0, 130).addScaledVector(fwd, dist).addScaledVector(right, side)
-    for (let i = 0; i < 26; i++) {
-      const r = 500 + rnd() * 700
-      const h = 300 + rnd() * 700
-      const peak = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), hillMat)
-      const p = at(7000 + rnd() * 2500, -6000 + i * 480 + rnd() * 200)
-      peak.position.set(p.x, h / 2 - 20, p.z)
-      peak.rotation.y = rnd() * Math.PI
-      scene.add(peak)
-      if (h > 820) {
-        const cap = new THREE.Mesh(new THREE.ConeGeometry(r * 0.22, h * 0.22, 6), snowMat)
-        cap.position.set(p.x, h - h * 0.11 - 20, p.z)
-        cap.rotation.y = peak.rotation.y
-        scene.add(cap)
-      }
-    }
-    const misti = new THREE.Group()
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(2300, 2200, 11, 1, true), hillMat)
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(560, 520, 11), snowMat)
-    cap.position.y = 1100 - 260
-    misti.add(cone, cap)
-    const mp = at(6200, -900)
-    misti.position.set(mp.x, 1080, mp.z)
-    scene.add(misti)
+    const andes = addAndes(scene, rnd, L)
 
     // stars: always there, shown at night and with altitude
-    const starGeo = new THREE.BufferGeometry()
-    const pts: number[] = []
-    for (let i = 0; i < 2000; i++) {
-      const a = rnd() * Math.PI * 2
-      const e = -0.2 + rnd() * 1.7
-      pts.push(Math.cos(a) * Math.cos(e) * 20000, Math.sin(e) * 20000, Math.sin(a) * Math.cos(e) * 20000)
-    }
-    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3))
-    const starMat = new THREE.PointsMaterial({ color: 0xe2e8f0, size: 2, sizeAttenuation: false, fog: false, transparent: true, opacity: L.stars })
-    scene.add(new THREE.Points(starGeo, starMat))
+    const starMat = addStars(scene, rnd, L.stars)
 
     // cloud deck around 650 m that the rocket climbs through
     const cloudTex = softTexture()
@@ -290,6 +224,75 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
     rocket.position.y = 4.8
     scene.add(rocket)
 
+    // the curved Earth, faded in above the atmosphere
+    const earth = makeEarth(rnd)
+    scene.add(earth.group)
+
+    // booster recovery (reusable launchers): a second small scene drawn in an inset — ocean, drone ship, returning booster
+    const recovery = isReusableLauncher(launcherId)
+      ? (() => {
+          const ls = new THREE.Scene()
+          ls.background = new THREE.Color(light === 'night' ? 0x0b1430 : light === 'day' ? 0x7fb2e8 : 0xb98aa8)
+          ls.fog = new THREE.Fog(ls.background as THREE.Color, 200, 900)
+          ls.add(new THREE.HemisphereLight(0xffffff, 0x223344, light === 'night' ? 0.8 : 1.4))
+          const key = new THREE.DirectionalLight(0xffffff, light === 'night' ? 0.9 : 2)
+          key.position.set(-60, 120, 160)
+          ls.add(key)
+          const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ color: light === 'night' ? 0x0d2547 : 0x1f5f99, roughness: 0.35, metalness: 0.1 }))
+          sea.rotation.x = -Math.PI / 2
+          ls.add(sea)
+          const ship = new THREE.Group()
+          const deck = new THREE.Mesh(new THREE.BoxGeometry(36, 2.4, 22), new THREE.MeshStandardMaterial({ color: 0x3f4652, roughness: 0.8 }))
+          deck.position.y = 1.2
+          const mark = new THREE.Mesh(new THREE.RingGeometry(5, 6.2, 32), new THREE.MeshBasicMaterial({ color: 0xfacc15 }))
+          mark.rotation.x = -Math.PI / 2
+          mark.position.y = 2.45
+          ship.add(deck, mark)
+          for (const z of [-11.5, 11.5]) {
+            const rail = new THREE.Mesh(new THREE.BoxGeometry(36, 1.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x9aa3ad }))
+            rail.position.set(0, 3, z)
+            ship.add(rail)
+          }
+          ls.add(ship)
+          const bh = h1
+          const b = new THREE.Group()
+          const tube = new THREE.Mesh(new THREE.CylinderGeometry(R, R, bh, 20), new THREE.MeshStandardMaterial({ color: 0xe6eaf0, roughness: 0.6 }))
+          tube.position.y = bh / 2
+          const top = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 1.2, 20), dark)
+          top.position.y = bh + 0.6
+          b.add(tube, top)
+          const legs = [0, 1, 2, 3].map((i) => {
+            const a = (i * Math.PI) / 2 + Math.PI / 4
+            const pivot = new THREE.Group()
+            pivot.position.set(Math.cos(a) * R, 6, Math.sin(a) * R)
+            pivot.rotation.y = -a
+            const leg = new THREE.Mesh(new THREE.BoxGeometry(0.4, 9, 0.4), dark)
+            leg.position.y = -4.5
+            pivot.add(leg)
+            b.add(pivot)
+            return pivot
+          })
+          for (let i = 0; i < 4; i++) {
+            const a = (i * Math.PI) / 2 + Math.PI / 4
+            const fin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.6, 1.8), dark)
+            fin.position.set(Math.cos(a) * (R + 0.9), bh - 3, Math.sin(a) * (R + 0.9))
+            fin.rotation.y = -a
+            b.add(fin)
+          }
+          const burn = new THREE.Mesh(new THREE.ConeGeometry(R * 0.7, 9, 14, 1, true), new THREE.MeshBasicMaterial({ map: softTexture('255,190,100'), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }))
+          burn.rotation.x = Math.PI
+          burn.position.y = -4.5
+          b.add(burn)
+          ls.add(b)
+          const blast = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTexture('255,150,60'), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false }))
+          ls.add(blast)
+          const cam = new THREE.PerspectiveCamera(32, 1 / LANDING_INSET.aspect, 1, 3000)
+          cam.position.set(-70, 22, 95)
+          cam.lookAt(0, 22, 0)
+          return { ls, b, legs, burn, blast, cam }
+        })()
+      : null
+
     // flame, vapour cone, staging flash, explosion
     const flameMat = new THREE.MeshBasicMaterial({ map: softTexture('255,190,100'), color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })
     const flame = new THREE.Mesh(new THREE.ConeGeometry(R * 0.9, 1, 16, 1, true), flameMat)
@@ -392,8 +395,9 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
       // "Skip animation" moves the clock much further than the wall clock did: settle instantly. Slow frames are not skips.
       const jumped = time - last > wall + 0.5
       last = time
-      const r = ascentAt(time, T)
       const exploded = failAt !== null && time >= failAt
+      // after a failure everything stays where it broke up (the camera does not keep climbing)
+      const r = ascentAt(exploded ? failAt! : time, T)
 
       rocket.position.set(r.down, 4.8 + r.alt, 0)
       rocket.rotation.z = -r.pitch
@@ -471,9 +475,10 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
       boom.visible = bk >= 0 && bk < 1.8
       if (boom.visible) {
         boom.position.copy(rocket.position).addScaledVector(up, RH * 0.5)
-        boom.scale.setScalar(10 + bk * 90)
+        const bf = r.stage === 2 ? 0.18 : 1 // the camera is close to the upper stage: a smaller blast fills the frame enough
+        boom.scale.setScalar((10 + bk * 90) * bf)
         ;(boom.material as THREE.SpriteMaterial).opacity = Math.max(0, 1 - bk / 1.6)
-        if (bk < 0.4) for (let i = 0; i < 6; i++) emit(boom.position.clone(), new THREE.Vector3((prand() - 0.5) * 60, (prand() - 0.5) * 40, (prand() - 0.5) * 60), 6 + prand() * 8, 2 + prand() * 2, 0.7, 0.8)
+        if (bk < 0.4) for (let i = 0; i < 6; i++) emit(boom.position.clone(), new THREE.Vector3((prand() - 0.5) * 60 * bf, (prand() - 0.5) * 40 * bf, (prand() - 0.5) * 60 * bf), (6 + prand() * 8) * bf, 2 + prand() * 2, 0.7, 0.8)
       }
 
       // smoke: exhaust trail, and big clouds pushed out of the flame trench near the pad
@@ -521,14 +526,14 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
       if (close > 0) {
         const near = rocket.position.clone().addScaledVector(up, h1 + h2 * 0.5)
         target.lerp(near, close)
-        want.lerp(near.clone().add(tmp.set(-17, -5, 28)), close)
+        want.lerp(near.clone().add(tmp.set(-17, 7, 28)), close) // slightly above, so the Earth's curve shows below
       }
       if (dk > 0) {
         // close-up on the spacecraft while it unfolds its arrays
         const cw = craft.getWorldPosition(new THREE.Vector3())
         const k = Math.min(1, dk * 1.6)
         target.lerp(cw, k)
-        want.lerp(cw.clone().add(tmp.set(-busM * 1.2, -busM * 1.4, busM * 8.5)), k)
+        want.lerp(cw.clone().add(tmp.set(-busM * 1.2, busM * 1.2, busM * 8.5)), k)
       }
       // smooth the framing (offset from the rocket), not the position: the rocket climbs too fast for a lagging camera
       const wantOff = want.sub(rocket.position)
@@ -549,7 +554,41 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
       sun.intensity = L.sunI + (2.6 - L.sunI) * r.space
       sun.position.lerpVectors(sunPad, sunSpace, r.space)
       sun.color.setHex(L.sunColor).lerp(white3, r.space)
+      // the Earth below the rocket once the sky turns black; the flat ground hides when it would show through
+      earth.group.position.set(rocket.position.x, rocket.position.y - 150 - EARTH_R, 0)
+      const earthK = Math.min(1, Math.max(0, (r.space - 0.35) / 0.45))
+      earth.setOpacity(earthK)
+      ground.visible = andes.visible = earthK < 0.3
       renderer.render(scene, camera)
+
+      // booster-recovery inset: from MECO + 0.4 s for 6 s
+      const lt = time - T.meco - 0.4
+      if (recovery && !exploded && lt >= 0 && lt < 6.1) {
+        const st = boosterLandingAt(lt, landed)
+        const { b, legs, burn, blast, cam, ls } = recovery
+        b.visible = !st.crashed
+        b.position.set(0, 2.4 + st.y, 0)
+        b.rotation.z = st.tilt
+        legs.forEach((p) => (p.rotation.z = st.legs * 0.55))
+        burn.visible = st.burning
+        burn.scale.y = 0.8 + 0.4 * Math.abs(Math.sin(time * 37))
+        const bk = lt - LANDING_TOUCH
+        blast.visible = st.crashed && bk < 1.6
+        blast.position.set(0, 4, 0)
+        blast.scale.setScalar(6 + bk * 40)
+        ;(blast.material as THREE.SpriteMaterial).opacity = Math.max(0, 1 - bk / 1.5)
+        cam.lookAt(0, 14 + Math.min(st.y, 60) * 0.5, 0)
+        const W = el.clientWidth
+        const w = Math.round(W * LANDING_INSET.widthFrac)
+        const h = Math.round(w * LANDING_INSET.aspect)
+        const x = W - w - LANDING_INSET.right
+        renderer.setScissorTest(true)
+        renderer.setScissor(x, LANDING_INSET.bottom, w, h)
+        renderer.setViewport(x, LANDING_INSET.bottom, w, h)
+        renderer.render(ls, cam)
+        renderer.setScissorTest(false)
+        renderer.setViewport(0, 0, el.clientWidth, el.clientHeight)
+      }
       raf = requestAnimationFrame(frame)
     }
     raf = requestAnimationFrame(frame)
@@ -564,9 +603,15 @@ export default function LaunchScene3D({ launcherId, light, T, tRef, failAt, visu
         else mat?.dispose?.()
       })
       sky.dispose()
+      earth.dispose()
+      recovery?.ls.traverse((o) => {
+        const m = o as THREE.Mesh
+        m.geometry?.dispose?.()
+        ;(m.material as THREE.Material | undefined)?.dispose?.()
+      })
       renderer.dispose()
       el.removeChild(renderer.domElement)
     }
-  }, [launcherId, light, T, tRef, failAt, visual])
+  }, [launcherId, light, T, tRef, failAt, visual, landed])
   return <div ref={host} className="absolute inset-0" />
 }

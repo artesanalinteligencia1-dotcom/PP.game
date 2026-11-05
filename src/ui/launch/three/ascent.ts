@@ -63,3 +63,29 @@ export function ascentAt(t: number, T: Timeline): AscentState {
   const space = clamp((alt - 500) / 2600)
   return { alt, down, pitch, thrust, stage, shake, vapor, arms, fairing, space }
 }
+
+/** Seconds from the start of the booster-landing inset to touchdown. */
+export const LANDING_TOUCH = 3.2
+
+export interface LandingState {
+  /** height of the booster's base above the drone-ship deck (m) */
+  y: number
+  /** landing legs deployed 0..1 */
+  legs: number
+  /** landing burn on */
+  burning: boolean
+  /** lean from vertical (rad): grows when the landing goes wrong */
+  tilt: number
+  /** the booster hit the deck too hard and was lost */
+  crashed: boolean
+}
+
+/** The reusable first stage coming down on the drone ship, `t` seconds after the inset opens (outcome from the mission roll). */
+export function boosterLandingAt(t: number, landed: boolean): LandingState {
+  const k = clamp(t / LANDING_TOUCH)
+  const y = 120 * (1 - k) ** 2
+  const legs = clamp((t - 2) / 0.8)
+  const burning = t > 1.4 && t < LANDING_TOUCH
+  const tilt = landed ? 0 : 0.5 * clamp((t - 2.2) / 1)
+  return { y, legs, burning, tilt, crashed: !landed && t >= LANDING_TOUCH }
+}

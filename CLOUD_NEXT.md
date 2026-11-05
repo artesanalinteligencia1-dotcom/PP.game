@@ -19,7 +19,7 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
 - `LaunchScenery.tsx`: three lights through `<SceneryLight style>` + `launchWindowStyle(target)`; `?pad=dawn|day|night` forces one.
 
 ## Local session status (2026-11-02, cloud chat out of credits — local does everything for now)
-User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final trailer (HyperFrames) ✅ · 4 Three.js launch (item 3 below): delivery 1 of 3 ✅.
+User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final trailer (HyperFrames) ✅ · 4 Three.js launch (item 3 below): all 3 deliveries ✅ (2026-11-05).
 - ✅ Soundtrack: `MUSIC` = home "Beneath the Misti", launch "Paulet's Fire", results "Lagrange" (ACE-Step 1.5, −16 LUFS);
   design/flight loops unchanged. Any new screen picks music through `useMusic(stage)` only.
 - ✅ Intro: final 31 s video (720p, 4.4 MB) with burned-in captions; never add a `<track>` to it. Rebuild from
@@ -39,6 +39,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 
 - Teaser (2nd trailer, 23 s): `C:\PPgame\teaser_paulet.mp4` from `C:\PPgame\trailer-test`. Owner's wishes for the definitive
   game (language choice, Rocket Engineer pad, Astrobiologist pad): `docs/PLAYBOOK.md` §6b.
+
+- ✅ Three.js delivery 3 (2026-11-05): 3D booster landing inset, Earth's curve, failure freeze, Paulet-1 prologue in 3D
+  (`SoundingScene3D`). The base game is complete; next is the definitive game (PLAYBOOK §6 and §6b).
 
 ## Next, in this order
 1. ✅ **DONE (cloud, 2026-11-03) — Offline build (the user's goal).** See PROGRESS step 10.

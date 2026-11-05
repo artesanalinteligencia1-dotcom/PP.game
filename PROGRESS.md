@@ -98,6 +98,21 @@
   overlay now only appears on the SVG fallback. Debug view: `?scene3d=<launcher>&pad=&t=&mission=&inst=&array=&area=`.
   Checked in headless Chrome (debug views + the real Earth Watch flow): 121 fps, no console errors. Tests 91 passing.
 
+- Local session (2026-11-05): **Three.js launch, delivery 3 done — the 3D launch is complete.**
+  - Booster recovery in 3D: a second small scene (ocean, drone ship, returning booster with legs, grid fins and landing burn)
+    drawn in an inset with scissor; landed or lost at sea from the mission roll (`boosterLandingAt`, tested); HTML labels
+    over the same box. The SVG inset stays for the fallback.
+  - The curved Earth above the atmosphere (`makeEarth` in `three/common.ts`: textured sphere + thin atmosphere, rotated so the
+    equator faces up); the flat ground and the Andes hide when it appears; the camera looks slightly down in space.
+  - Failure: the scene freezes where the rocket broke up (the camera no longer keeps climbing); smaller blast in close-ups.
+  - Paulet-1 prologue in 3D (`three/SoundingScene3D.tsx`, lazy): brass-and-copper rocket on an 1890s rail with a blockhouse,
+    smoke, gold 100 km ring, Earth's curve above 60 km, nose-down fall and parachute. Flight profile moved to
+    `src/ui/hub/soundingProfile.ts` (pure, tested) and shared with the SVG fallback.
+  - Shared 3D helpers in `three/common.ts`; WebGL check in `three/support.ts` (no three.js import, keeps the main bundle small).
+  - Checked in headless Chrome: debug views (`?scene3d=reusable_medium|reusable_heavy&landed=0|medium&fail=…|paulet[&fail=1]`)
+    and the real game (Earth Watch on L-1 and on R-2 with the landing inset, and with reduced motion → SVG): 119–121 fps,
+    no console errors. Tests 98 passing.
+
 ## Project log for the final storytelling (HANDOFF §19.7)
 1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
 2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).

@@ -1,7 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { audio, hasVoice, type Cue } from '../../audio/audio'
 import { SPACE_LINE_KM, type SoundingResult } from '../../engine/sounding'
+import { useReducedMotion } from '../../store/settings'
 import { AndesBackdrop, HighClouds, SceneryLight, SkyBackdrop, Stars } from '../launch/LaunchScenery'
+import { webglAvailable } from '../launch/three/support'
+import { soundingAltKm, soundingSpeedKms, soundingTimeline } from './soundingProfile'
+
+// The 3D prologue is a separate chunk; the SVG below stays as the fallback (reduced motion, no WebGL).
+const SoundingScene3D = lazy(() => import('../launch/three/SoundingScene3D'))
 
 const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 
@@ -9,12 +15,12 @@ const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 export function SoundingSequence({ result, running, onDone }: { result: SoundingResult; running: boolean; onDone: () => void }) {
   const voice = hasVoice('count_10') && hasVoice('ignition')
   const count = voice ? 10 : 3
-  const T = useMemo(() => {
-    const ignition = count
-    const liftoff = count + 1.2
-    return { ignition, liftoff, burnout: liftoff + 2.2, apogee: liftoff + 5.5, chute: liftoff + 8.5, end: liftoff + 10.5, fail: liftoff + 1.6 }
-  }, [count])
+  const T = useMemo(() => soundingTimeline(count), [count])
   const [t, setT] = useState(0)
+  const reduced = useReducedMotion()
+  const use3D = !reduced && webglAvailable()
+  const tRef = useRef(0)
+  tRef.current = t
   const start = useRef<number | null>(null)
   const done = useRef(false)
 
@@ -49,19 +55,9 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
     }
   }, [t, running, T, result.failed, onDone])
 
-  // Altitude profile (km): powered ease-in, ballistic coast, fall, parachute.
   const ap = result.apogeeKm
-  let alt = 0
-  if (t >= T.liftoff && t < T.burnout) alt = ap * 0.3 * ((t - T.liftoff) / (T.burnout - T.liftoff)) ** 2
-  else if (t >= T.burnout && t < T.apogee) {
-    const u = (t - T.burnout) / (T.apogee - T.burnout)
-    alt = ap * (0.3 + 0.7 * (1 - (1 - u) ** 2))
-  } else if (t >= T.apogee && t < T.chute) {
-    const u = (t - T.apogee) / (T.chute - T.apogee)
-    alt = ap * (1 - 0.95 * u * u)
-  } else if (t >= T.chute) alt = ap * 0.05 * clamp(1 - (t - T.chute) / (T.end - T.chute))
+  const alt = soundingAltKm(t, T, result)
   const exploded = result.failed && t >= T.fail
-  if (result.failed && t >= T.fail) alt = ap * 0.3 * ((T.fail - T.liftoff) / (T.burnout - T.liftoff)) ** 2
   const scaleMax = Math.max(130, ap * 1.1)
   const y = (km: number) => 430 - (km / scaleMax) * 360
   const space = clamp(alt / 100)
@@ -69,15 +65,7 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
   const chute = t >= T.chute && !result.failed
   const descending = t >= T.apogee
   const flicker = 0.85 + 0.3 * Math.abs(Math.sin(t * 40))
-  const speed = exploded
-    ? 0
-    : t < T.burnout
-      ? result.burnoutKms * clamp((t - T.liftoff) / (T.burnout - T.liftoff))
-      : t < T.apogee
-        ? result.burnoutKms * (1 - (t - T.burnout) / (T.apogee - T.burnout))
-        : t < T.chute
-          ? result.burnoutKms * 0.8 * ((t - T.apogee) / (T.chute - T.apogee))
-          : 0.01
+  const speed = soundingSpeedKms(t, T, result)
 
   const caption = exploded
     ? 'Engine failure: Paulet-1 broke apart. Early rockets failed often — every failure taught engineers something.'
@@ -96,8 +84,15 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
               : 'Parachute open. It falls back because orbit needs ~7.8 km/s sideways, not 1.5 km/s straight up.'
 
   return (
-    <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800">
+    <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+      {use3D && (
+        <Suspense fallback={null}>
+          <SoundingScene3D T={T} tRef={tRef} result={result} />
+        </Suspense>
+      )}
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Paulet-1 sounding flight">
+        {!use3D && (
+        <>
         <SceneryLight style="dawn">
         <SkyBackdrop space={space} />
         <Stars space={space} count={70} height={300} />
@@ -154,6 +149,8 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
             <circle r={14 + (t - T.fail) * 50} fill="#f97316" opacity={clamp(1 - (t - T.fail) / 1.4)} />
             <circle r={8 + (t - T.fail) * 30} fill="#fde68a" opacity={clamp(1 - (t - T.fail))} />
           </g>
+        )}
+        </>
         )}
         {running && t < T.ignition && (
           <text x="400" y="200" textAnchor="middle" fontSize="110" fontWeight="800" fill="#fff" style={{ fontFamily: 'var(--font-display)' }}>

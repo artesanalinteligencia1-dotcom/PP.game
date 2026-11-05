@@ -6,23 +6,12 @@ import { useReducedMotion } from '../../store/settings'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
 import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SceneryLight, SkyBackdrop, Stars, launchWindowStyle, useSceneryStyle } from './LaunchScenery'
-import { LAUNCHERS_3D } from './three/ascent'
+import { LANDING_TOUCH, LAUNCHERS_3D, boosterLandingAt } from './three/ascent'
+import { webglAvailable } from './three/support'
 
 // The Three.js scene is a separate chunk; the SVG scene below stays as the fallback (reduced motion, no WebGL,
 // and the side-booster rockets until they are modelled in 3D).
 const LaunchScene3D = lazy(() => import('./three/LaunchScene3D'))
-let webgl: boolean | null = null
-function webglAvailable() {
-  if (webgl === null) {
-    try {
-      const c = document.createElement('canvas')
-      webgl = Boolean(c.getContext('webgl2') ?? c.getContext('webgl'))
-    } catch {
-      webgl = false
-    }
-  }
-  return webgl
-}
 
 /** Timeline in seconds after pressing Launch. `count` = seconds of countdown before ignition (10 with the voice, 3 without). */
 export function makeTimeline(count: number) {
@@ -295,7 +284,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
       {use3D && (
         <Suspense fallback={null}>
-          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} visual={v} />
+          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} visual={v} landed={boosterLanded !== false} />
         </Suspense>
       )}
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Launch of the ${launcher.name}`}>
@@ -360,7 +349,11 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
         )}
       </svg>
       {launcher.landing && running && !exploded && t >= T.meco + 0.4 && t < T.meco + 6.5 && (
-        <BoosterLanding t={t - T.meco - 0.4} landed={boosterLanded !== false} />
+        use3D ? (
+          <BoosterLandingLabels t={t - T.meco - 0.4} landed={boosterLanded !== false} />
+        ) : (
+          <BoosterLanding t={t - T.meco - 0.4} landed={boosterLanded !== false} />
+        )
       )}
       {/* HUD */}
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-slate-950/70 px-3 py-2 font-mono text-[11px] leading-5 text-slate-200 backdrop-blur">
@@ -382,6 +375,18 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
           {caption}
         </div>
       )}
+    </div>
+  )
+}
+
+/** Labels over the 3D booster-recovery inset (the scene draws it in the same box: LANDING_INSET in LaunchScene3D). */
+function BoosterLandingLabels({ t, landed }: { t: number; landed: boolean }) {
+  const st = boosterLandingAt(t, landed)
+  const done = t >= LANDING_TOUCH
+  return (
+    <div className="pointer-events-none absolute bottom-16 right-3 flex w-[26%] flex-col justify-between rounded-lg border border-slate-600/80 p-1.5 text-[10px] text-slate-100" style={{ aspectRatio: '1 / 0.6' }}>
+      <span className="self-start rounded bg-slate-950/70 px-1.5 font-semibold text-sky-300">Booster recovery</span>
+      <span className="self-start rounded bg-slate-950/70 px-1.5">{!done ? (st.burning ? 'Landing burn…' : 'Falling back to the drone ship…') : landed ? '✔ The booster landed!' : '✘ Booster lost at sea'}</span>
     </div>
   )
 }
