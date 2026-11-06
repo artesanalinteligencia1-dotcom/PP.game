@@ -43,7 +43,16 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 - ✅ Three.js delivery 3 (2026-11-05): 3D booster landing inset, Earth's curve, failure freeze, Paulet-1 prologue in 3D
   (`SoundingScene3D`). The base game is complete; next is the definitive game (PLAYBOOK §6 and §6b).
 
-## Next, in this order
+## Definitive game — owner's queue (2026-11-06)
+1. Public link (Vercel, the owner's own Hobby account — the connector is now logged into it) ← **in progress**
+2. Language choice EN/ES (`src/i18n`, selector in Settings, voice + captions per language)
+3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view)
+4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
+5. Mars acts; asynchronous multiplayer (same seed)
+Also wanted (PLAYBOOK §6c): robot guide, one animated video per role, richer animation/design (postprocessing, GSAP, Motion,
+Theatre.js, Rive). Before each big task: quote the expected usage and propose it in deliveries.
+
+## Next, in this order (base game — all done)
 1. ✅ **DONE (cloud, 2026-11-03) — Offline build (the user's goal).** See PROGRESS step 10.
    - PWA: `vite-plugin-pwa`, precache everything (audio, video, fonts are already local — no external URLs in `src/`),
      manifest + icons, "installable" prompt. Done when the built game works with the network off after one visit.

@@ -119,3 +119,11 @@
   One source in `src/brand.ts`; plain text in index.html, vite.config.ts (PWA) and src-tauri. Tauri identifier
   `game.paulet.andestoorbit` (changed before any release). Save format id `ppgame-save` kept for compatibility. GitHub repo
   name unchanged (user's call). Trademark not checked (Indecopi) — recommended before publishing.
+
+## Definitive game — tools (2026-11-06)
+- Installed, not yet used (owner: "instala las herramientas de mejora"): `postprocessing` (bloom/tone mapping/god rays for
+  the Three.js scenes), `gsap` + `@gsap/react` (UI timelines; same engine as our HyperFrames videos), `motion` (React screen
+  transitions), `@theatre/core` (authored camera moves; `@theatre/studio` is dev-only — import it only behind
+  `import.meta.env.DEV` so it never ships), `@rive-app/react-canvas` (robot guide expressions; needs `.riv` files from the
+  Rive editor). Unused libraries add nothing to the bundle until imported. Production `npm audit`: 0 vulnerabilities.
+- Public link: Vercel, the owner's own Hobby account (non-commercial use only — move to Pro or Cloudflare Pages if the game is ever sold).
