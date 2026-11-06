@@ -44,8 +44,8 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
   (`SoundingScene3D`). The base game is complete; next is the definitive game (PLAYBOOK §6 and §6b).
 
 ## Definitive game — owner's queue (2026-11-06)
-1. Public link (Vercel, the owner's own Hobby account — the connector is now logged into it) ← **in progress**
-2. Language choice EN/ES (`src/i18n`, selector in Settings, voice + captions per language)
+1. ✅ Public link: https://paulet-andes-to-orbit.vercel.app/ (production = `main`; merge `cloud/fase-1` by PR to update it)
+2. **Next:** language choice EN/ES (`src/i18n`, selector in Settings, voice + captions per language)
 3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view)
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
 5. Mars acts; asynchronous multiplayer (same seed)

@@ -146,13 +146,15 @@ npm run build
 ```
 
 ## Deploy
-Postponed by the user (LOCAL_TODO §1).
+Public link (2026-11-06): https://paulet-andes-to-orbit.vercel.app/ — Vercel, owner's Hobby account, project
+`paulet-andes-to-orbit`, production branch `main` (PR #1 merged `cloud/fase-1`). Checked in headless Chrome: HTTP 200, no console
+errors, service worker active, 87 files precached, reload with the network cut still works. Pushes to `cloud/fase-1` only make
+preview deployments; the public link updates when `cloud/fase-1` is merged into `main` (PR).
 
 ## Open risks
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
 - Recharts bundle ~570 kB (warning only).
 - ElevenLabs licence for public/commercial use not verified (LOCAL_TODO) — now only design/flight loops, voice and SFX; the songs are ACE-Step (MIT).
-- Vercel deploy postponed by the user.
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
