@@ -1,29 +1,160 @@
 # PROGRESS
 
-**Current phase:** Phase 0 (scaffold) — DONE (local session, 2026-11-01). Next: Phase 1 (cloud).
+**Current phase:** Phase 3.5 Act 2 (Moon, Lagrange, three-body) — DONE (branch `cloud/fase-1`, 2026-11-02).
+**Next:** Phase 3.6 / Act 3 planning (Mars: launch windows + entry-descent-landing), or polish after local tasks (launch-pad art).
 
 ## Done
-- Repo cloned, `docs/HANDOFF.md` added (single source of truth for both sessions).
-- Vite 8 + React 19 + TypeScript + Tailwind 4 + Zustand + Recharts + Vitest.
-- Folder layout per HANDOFF §3 (`src/engine`, `ui`, `store`, `i18n`, `server`, `tests`).
-- Seed engine: `rng.ts` (mulberry32), `budget.ts` (`deltaV`); 4 passing tests.
-- CI: `.github/workflows/ci.yml` (typecheck, test, build).
-- `.gitignore` extended (env, node_modules, dist, refs/, videos).
+- Phase 0 (local): scaffold, CI.
+- Phase 1: pure design engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder, `docs/model.md`.
+- Phase 2:
+  - Engine: `simulate.ts` (weekly, seeded, events with role-owned decisions, bots), `score.ts` (0–1 000 + rank), `report.ts` (top-3 causes).
+  - UI: launch pad (seed, CSS/SVG launch animation with staging/explosion, skip, reduced-motion), mission control (play/speed,
+    live gauges, chart, log, decision dialog, per-role You/Bot delegation + bot personality), mission report (score breakdown,
+    causes + "what would you change", actual requirements, chart, redesign / fly again / new seed, local leaderboard).
+  - Roles renamed to Mission Director / Spacecraft Engineer / Astrophysicist / Astrobiologist; protagonist Dr. Pedro Goicochea in the briefing.
+  - Tests: 41 passing (determinism, replay with same decisions, 2 winning designs per scenario, launch failure, radiation death, bots, analysis).
+  - Verified in Chromium: full flow design → launch → 9 human decisions → report (983/1 000), no console errors; mobile 390 px no horizontal scroll.
+- Media tests (not in repo): 30 s intro test video (16:9, EN narration, word-by-word subtitles + .srt), 2 music tests. Script: `scripts/video/build_intro_test.py`.
+
+- Phase 3 (part 1):
+  - Procedural spacecraft drawing from the design, visible in the design sidebar, inside the fairing on the launch pad, at deployment and in flight (journey view: orbit, eclipse, transfer to the Moon with ion plume).
+  - New launch pad: rocket per launcher (Heavy with boosters), countdown, liftoff smoke, Max-Q, staging, fairing separation, orbit insertion, array deployment, HUD telemetry (T+, altitude, velocity, Δv), educational captions, seed-dependent failure moment.
+  - Audio: music per stage (A home, B launch), crossfade loops, mute toggle, unlock on first click; SFX hooks ready (files pending, LOCAL_TODO §5).
+  - Typography: Space Grotesk + Inter in game and video script; `docs/video-style.md`; `CREDITS.md`; HANDOFF §19.
+  - Tests: 46 passing (+ spacecraft visual mapping and launch timeline).
+
+- Phase 3 (part 2 — Act 1 vertical slice):
+  - Home hub (career, free mission, watch intro, learn, Paulet legacy, sandbox), profile (name, Dr./Eng., 3 levels), local save.
+  - Prologue "First Light": Paulet-1 sounding rocket, suborbital flight animation, honest history card.
+  - Career screen: contracts by act (Mars previews), investors with trust, funds/prestige, technology tree with real-world cards.
+  - New launchers (Paulet-1, rideshare, R-2 reusable) with locks in the designer; booster-landing inset; rideshare neighbours.
+  - New contracts: Andean Eye, Station Resupply (cargo), Storm Tracker (GEO); Sandbox.
+  - Lessons: Newton's cannon (orbit), budgets, rocket equation (sliders), Pedro Paulet facts. Intro video (test) with captions.
+  - Share link (design + seed). Tests: 66 passing. Browser: full career loop with no console errors; progress survives reload.
+
+- Local session (2026-11-02): generated audio downloaded from ElevenLabs and added (LOCAL_TODO §5 done):
+  voiced countdown (take B: `count_10…1`, `ignition`, `liftoff`), farewells (take B: `farewell_1…5`), music loops
+  `design-focus` / `flight-ambient`, and the 10 SFX (loudness-normalised). Take B chosen because take A's countdown merges
+  "one / ignition / liftoff" into one segment. `prepare_launch_audio.py`: farewell split uses 0.3 s pauses (0.6 s found none).
+  Tests 66 passing; build passes once `intro.mp4` is present (see Open risks). Not listened to by a human yet.
+
+- Cloud session (2026-11-02): `src/assets/video/intro.mp4` (720p, 30 s, 2.9 MB — the original encode) committed now that
+  `.gitignore` allows `src/assets/video/*.mp4`; clean-checkout `npm ci && npm run build` verified.
+
+- Audio pass (cloud): voiced countdown verified in Chromium (count_10…1 at 1 s steps, ignition at 10 s, liftoff + music B at 11.5 s,
+  farewell, staging/fairing/deploy/orbit SFX, design/flight loops, alert SFX; no 404s). Fixed overlaps: "T-minus ten" fitted to 1 s,
+  farewell after the liftoff call, clock T−0 = ignition.
+- Phase 3.5 (Act 2):
+  - Engine `threebody.ts`: CR3BP Earth–Moon, RK4 (deterministic arithmetic), Jacobi, L1/L2/L3, L2 Lyapunov orbit, butterfly experiment.
+  - Routes (direct / flyby / low-energy) for lunar orbit and L2, correction reserve slider, chaos-dependent corrections in flight,
+    halo drift events; new orbit "Earth–Moon L2 halo"; instruments IR telescope + low-frequency radio antennas.
+  - Scenario + contract **Lagrange Observatory** (Act 2, after Lunar Pathfinder); **R-3 Reusable Heavy** tech.
+  - UI: route cards + reserve slider + real L2 orbit view (Orbit tab), L2 journey view, **lesson 4 "Three bodies & chaos"**.
+  - Tests: 77 passing (Lagrange points, Jacobi, periodicity, determinism snapshot 1e-12, butterfly, Lagrange designs/outcomes).
+  - Browser: lesson 4 + full Lagrange mission (low-energy route, drift decisions) → 901/1 000, no console errors.
+
+- Local session (2026-11-02, after the user's playtest): audio engine on the Web Audio clock (scheduled, cancellable
+  cues; one music track; ducking) fixing the "countdown at random moments" and overlapping songs; the three launch lights
+  (dawn/day/night) chosen by the launch window. Tests 78 passing; browser: cue times checked (one count per second,
+  ignition/liftoff/farewell on time), full launch with no new console errors. Not listened to by a human yet.
+  Next steps for the cloud: `CLOUD_NEXT.md`.
+
+- Local session (2026-11-02, cloud out of credits — the local chat does everything for now): **soundtrack in the game.**
+  The user's favourite ACE-Step 1.5 songs (version A), loudness-normalised to −16 LUFS: "Beneath the Misti" → menu/home,
+  "Paulet's Fire" → launch, "Lagrange" → results (it had no music). Design and flight keep their loops. Old ElevenLabs
+  home/launch tests removed. `MUSIC` map only (engine logic untouched); CREDITS.md entry (ACE-Step 1.5 MIT, AI disclosed).
+  Tests 83 passing, build passes; browser: all five stage tracks load (200). Not listened to by a human yet.
+
+- Local session (2026-11-02): **final intro in the game.** `src/assets/video/intro.mp4` = `C:\PPgame\intro_paulet.mp4`
+  (style A "Painted cinema", HyperFrames source `C:\PPgame\intro-a`) re-encoded to 720p H.264 CRF 27 (4.4 MB, SSIM 0.965
+  vs the 1080p master). Its captions are burned in, so the `<track>` and `intro.en.vtt` were removed (no double captions).
+  Tests 83 passing, build passes; browser: Extras → Watch intro plays 1280×720, 31 s, no text tracks.
+
+- Local session (2026-11-02): **final trailer + manuals.** Trailer (54 s, style A) built in HyperFrames at
+  `C:\PPgame\trailer-final` (`build.mjs`: one scene per shot, camera moves, titles, satellite crossing): the user's 8 Gemini
+  stills in STORYBOARD order (upscaled ×4 with Real-ESRGAN), music "Beneath the Misti" cut to the song (first cut on the drum
+  entry at 10.85 s, bar-aligned jump to the song's real ending), launch SFX, logo "Paulet — Andes to Orbit". Output
+  `C:\PPgame\trailer_paulet.mp4` (1080p, −14 LUFS) + 720p. The rooftop ending (shot2 + animated satellite) was approved by the user and stays;
+  Gemini first/last-frame clips (v1–v7) will replace the stills later.
+  `docs/PLAYBOOK.md` written for the definitive game (stack, hard-won rules, media pipeline, NASA sources, order of work).
+  Also outside the repo: a Spanish learning manual for the owner (artifact) and `MEJORAS_DESDE_PAULET.md` for Goicochea Studio.
+
+- Local session (2026-11-03): **Three.js launch, delivery 1** (CLOUD_NEXT §3). `src/ui/launch/three/LaunchScene3D.tsx`
+  (lazy chunk, precached offline) driven by the game timeline through `ascent.ts` (pure, 8 tests): pad, lattice tower with
+  service arms, Andes + Misti on the horizon, cloud deck at ~650 m, stars, the three lights (dawn/day/night, same Settings
+  choice as the SVG), a two-stage rocket sized per launcher with flame, smoke, Max-Q vapour, stage separation, fairing halves,
+  failure explosion; the camera follows the rocket's framing and closes in on the upper stage after MECO. HUD, captions,
+  countdown digits, deployed spacecraft (2D), booster-landing inset and every sound stay in LaunchSequence. SVG scene kept
+  for reduced motion, no WebGL and the side-booster rockets (heavy, reusable_heavy). Checked in headless Chrome (real UI flow,
+  Earth Watch on L-1): 61–121 fps, no console errors. Tests 91 passing.
+  Trailer fixed after the owner's review: Gemini's end-of-clip jumps (v2, v4, v5) cut and cross-faded; music jump moved into
+  the song's quiet breath (40 s → 127.2 s, same passage) and ends on the song's own ending; 56 s.
+
+- Local session (2026-11-03): **Three.js launch, delivery 2 done.** All six launchers in 3D: side boosters on heavy and
+  reusable_heavy (drop just before MECO), legs + grid fins on reusables, and the player's **procedural spacecraft in 3D**
+  (`src/ui/launch/three/spacecraft3d.ts`, built from the same `spacecraftVisual(design)` as the 2D drawing: bus, body/deployable/
+  tracking arrays, antenna, radiator, thruster, every instrument shape). It rides in the fairing, pushes off at deployment and
+  unfolds its arrays while the camera closes in; above the atmosphere the Sun lights it from the camera side. The 2D spacecraft
+  overlay now only appears on the SVG fallback. Debug view: `?scene3d=<launcher>&pad=&t=&mission=&inst=&array=&area=`.
+  Checked in headless Chrome (debug views + the real Earth Watch flow): 121 fps, no console errors. Tests 91 passing.
+
+- Local session (2026-11-05): **Three.js launch, delivery 3 done — the 3D launch is complete.**
+  - Booster recovery in 3D: a second small scene (ocean, drone ship, returning booster with legs, grid fins and landing burn)
+    drawn in an inset with scissor; landed or lost at sea from the mission roll (`boosterLandingAt`, tested); HTML labels
+    over the same box. The SVG inset stays for the fallback.
+  - The curved Earth above the atmosphere (`makeEarth` in `three/common.ts`: textured sphere + thin atmosphere, rotated so the
+    equator faces up); the flat ground and the Andes hide when it appears; the camera looks slightly down in space.
+  - Failure: the scene freezes where the rocket broke up (the camera no longer keeps climbing); smaller blast in close-ups.
+  - Paulet-1 prologue in 3D (`three/SoundingScene3D.tsx`, lazy): brass-and-copper rocket on an 1890s rail with a blockhouse,
+    smoke, gold 100 km ring, Earth's curve above 60 km, nose-down fall and parachute. Flight profile moved to
+    `src/ui/hub/soundingProfile.ts` (pure, tested) and shared with the SVG fallback.
+  - Shared 3D helpers in `three/common.ts`; WebGL check in `three/support.ts` (no three.js import, keeps the main bundle small).
+  - Checked in headless Chrome: debug views (`?scene3d=reusable_medium|reusable_heavy&landed=0|medium&fail=…|paulet[&fail=1]`)
+    and the real game (Earth Watch on L-1 and on R-2 with the landing inset, and with reduced motion → SVG): 119–121 fps,
+    no console errors. Tests 98 passing.
+
+## Project log for the final storytelling (HANDOFF §19.7)
+1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
+2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
+3. Player-experience storytelling → user's vision (scientist vs society/economy, investors, roles, NASA data, music) → Pedro Goicochea, 4 roles, 3 difficulty levels.
+4. Media tests with ElevenLabs (music A/B, 30 s intro) → Phase 2 (seeded simulation, events, bots, score, report).
+5. User feedback (launch pad basic, typography, videos per format) → HANDOFF §19 → visual identity, spacecraft everywhere, new launch pad, per-stage audio.
+6. Movie-style voiced countdown with ignition phase and varying farewell line; design/flight music loops generated; evaluation of rockets (reusables), Mars projects and the rest of Phase 3.
+7. Paulet-1 as the starting rocket (the user's idea), rockets progression up to reusables, Act 1 career with investors, hub, lessons, share links; Mars planned for Acts 3–4.
+8. Audio landed from the local session; voiced-countdown pass; Act 2: real three-body physics, routes, chaos lesson, Lagrange Observatory.
+9. The local session delivered the illustrated launch scenery (dawn sky, Andes with the Misti, lattice tower, drone ship); the cloud
+   session merged it with Act 2 and checked it against the voiced countdown in the browser (no overlaps, no errors).
+10. Offline build (user's goal: "a game you download and play offline"): installable PWA that stores the whole game (code,
+    fonts, audio, intro video — 10 MB) on the first visit and was tested with the network cut; Tauri 2 desktop wrapper and a
+    GitHub Actions workflow (`Desktop build`) that produces the Windows installer (.exe/.msi, unsigned) as a downloadable
+    artifact; versioned save files with export/import (Settings → Career save).
+11. Game shell: fixed 16:9 stage (1440×810, zoomed to the window, letterboxed, no page scroll), "Press any key" boot screen
+    (also the audio unlock gesture), main menu over the launch site with arrow-key navigation, Settings (Esc) with volumes
+    per bus (music / effects / mission control), interface sounds, fullscreen (F11), launch light Auto/Dawn/Day/Night,
+    motion, save export/import and offline install; screen transitions. Three art-direction mock-ups (`?mock=1|2|3`) wait
+    for the user's choice.
+12. The user chose mock-up 3, "modern space-agency HUD". Applied to the whole game: the launch site blurred behind every
+    screen, glass panels with corner brackets, light titles, sky-blue labels, one orange call to action; main menu, design,
+    free-mission and settings rebuilt as in the mock-up, the rest restyled through a theme layer (`.hud` in `src/index.css`).
 
 ## How to run
 ```
 npm install
-npm run dev        # local dev
-npm test           # vitest
-npm run build      # typecheck + production build
+npm run dev
+npm test
+npm run build
 ```
 
 ## Deploy
-Not yet deployed. See LOCAL_TODO.md (Vercel login/import).
+Postponed by the user (LOCAL_TODO §1).
 
 ## Open risks
-- TypeScript 7 and Vite 8 are very new; if tooling breaks, pin to previous majors and log in DECISIONS.md.
+- Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
+- Recharts bundle ~570 kB (warning only).
+- ElevenLabs licence for public/commercial use not verified (LOCAL_TODO) — now only design/flight loops, voice and SFX; the songs are ACE-Step (MIT).
+- Vercel deploy postponed by the user.
 
 ## Next exact step
-Cloud session: `git pull`, read `docs/HANDOFF.md` + this file, branch `cloud/fase-1`, start Phase 1
-(catalog, `evaluateDesign`, resource dashboard, Design Review, scenarios 1 and 3).
+The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
+replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
+tests the Windows installer from GitHub Actions (Desktop build → Artifacts).

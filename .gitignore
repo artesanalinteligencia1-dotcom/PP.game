@@ -158,5 +158,7 @@ refs/
 credentials/
 *.mp4
 *.mov
+# Shipped game videos are part of the app (the rule above is for large working files)
+!src/assets/video/*.mp4
 *.vercel
 .vercel/

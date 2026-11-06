@@ -1,1 +1,124 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: #020617;
+  color: #e2e8f0;
+}
+
+@keyframes delta-flash {
+  0% { opacity: 0; transform: translateY(4px); }
+  15% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+.delta-flash {
+  animation: delta-flash 2.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delta-flash { animation: none; }
+}
+
+/* ---------- Journey view ---------- */
+@keyframes orbit-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="orbit-spin"] { animation: none !important; }
+}
+
+/* ---------- Game shell ---------- */
+.stage { contain: layout paint; }
+.stage-scroll { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+@keyframes screen-in { from { opacity: 0; transform: translateY(10px) scale(0.995); } to { opacity: 1; transform: none; } }
+.screen-in { animation: screen-in 0.32s ease-out both; }
+@keyframes boot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+.boot-pulse { animation: boot-pulse 1.6s ease-in-out infinite; }
+.reduce-motion .screen-in, .reduce-motion .boot-pulse { animation: none; }
+
+/* =====================================================================================
+ * Art direction: "modern space-agency HUD" (chosen by the user, mock-up 3).
+ * Glass panels over the blurred launch site, thin lines, corner brackets, light titles,
+ * sky-blue labels, one orange call to action. The `.hud` class on the stage switches it on.
+ * ===================================================================================== */
+@layer components {
+  .hud-panel {
+    position: relative;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    background-color: rgb(2 6 23 / 0.5);
+    backdrop-filter: blur(12px);
+    --b: rgb(125 211 252 / 0.75);
+    background-image:
+      linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b)),
+      linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b)),
+      linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b)),
+      linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b));
+    background-repeat: no-repeat;
+    background-size: 12px 1px, 1px 12px, 12px 1px, 1px 12px, 12px 1px, 1px 12px, 12px 1px, 1px 12px;
+    background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%;
+  }
+  .hud-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #7dd3fc;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #f97316;
+    color: white;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 2px;
+    box-shadow: 0 0 28px rgb(249 115 22 / 0.35);
+    transition: background-color 0.15s, box-shadow 0.15s;
+  }
+  .btn-primary:hover:not(:disabled) { background: #fb923c; box-shadow: 0 0 36px rgb(249 115 22 / 0.55); }
+  .btn-primary:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    background: rgb(2 6 23 / 0.4);
+    color: white;
+    border-radius: 2px;
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+  .btn-secondary:hover:not(:disabled) { border-color: #7dd3fc; background: rgb(14 165 233 / 0.12); }
+  .btn-primary:focus-visible, .btn-secondary:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
+}
+
+/* Theme layer over the existing screens (unlayered, so it wins over the Tailwind palette it restyles). */
+.hud h1, .hud h2 { font-weight: 300; letter-spacing: -0.01em; }
+.hud h1 b, .hud h2 b { font-weight: 700; }
+.hud .rounded-xl, .hud .rounded-2xl, .hud .rounded-lg { border-radius: 3px; }
+.hud .rounded-md { border-radius: 2px; }
+.hud .bg-slate-900\/70, .hud .bg-slate-900\/60, .hud .bg-slate-950\/60, .hud .bg-slate-900\/80 {
+  background-color: rgb(2 6 23 / 0.5);
+  backdrop-filter: blur(12px);
+}
+.hud .bg-slate-900, .hud .bg-slate-950 { background-color: rgb(2 6 23 / 0.72); backdrop-filter: blur(14px); }
+.hud .border-slate-800:not(:hover):not(:focus-visible) { border-color: rgb(255 255 255 / 0.1); }
+.hud .border-slate-700:not(:hover):not(:focus-visible) { border-color: rgb(255 255 255 / 0.16); }
+.hud .bg-slate-950\/95 { background-color: rgb(2 6 23 / 0.55); }
+.hud .text-sky-400 { color: #7dd3fc; }
+.hud .tabular, .hud .font-mono { font-variant-numeric: tabular-nums; }

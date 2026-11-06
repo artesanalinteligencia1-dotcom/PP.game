@@ -1,0 +1,175 @@
+import { defaultTcmReserve, getLauncher, getOrbit, getRoute, launchCapacityKg, launchers, maintenanceDvPerYear, orbits, routesFor } from '../../engine'
+import { CR3BPView, L2_ORBIT, routeSchematic } from '../threebody/CR3BPView'
+import type { Design, DesignReport } from '../../engine/types'
+import { fmt } from '../../i18n/en'
+import { useGame } from '../../store/game'
+import { OrbitDiagram } from '../OrbitDiagram'
+import { Grid, OptionCard, Pill, Section, Slider } from '../components'
+
+export function OrbitTab({ design, report }: { design: Design; report: DesignReport }) {
+  const update = useGame((s) => s.update)
+  const launcherAllowed = useGame((s) => s.launcherAllowed)
+  const setOrbit = useGame((s) => s.setOrbit)
+  const orbit = getOrbit(design.orbitId)
+  const [lo, hi] = orbit.altitudeKm
+  return (
+    <div>
+      <Section title="Orbit" hint="Where you fly decides eclipses, contact time, radiation, how much the launcher can carry and how much Δv you must bring.">
+        <Grid>
+          {orbits.map((o) => (
+            <OptionCard
+              key={o.id}
+              selected={design.orbitId === o.id}
+              onClick={() => setOrbit(o.id)}
+              title={o.name}
+              stats={[
+                o.altitudeKm[0] === o.altitudeKm[1] ? (o.body === 'sun' ? 'interplanetary' : `${fmt(o.altitudeKm[0])} km`) : `${o.altitudeKm[0]}–${o.altitudeKm[1]} km`,
+                o.insertionDv ? `+${o.insertionDv} m/s to arrive` : 'direct insertion',
+              ]}
+            >
+              {o.description}
+            </OptionCard>
+          ))}
+        </Grid>
+        <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+          <OrbitDiagram orbit={orbit} altitudeKm={design.altitudeKm} eclipseFraction={report.power.eclipseFraction} />
+          <div className="w-full flex-1 space-y-3 text-sm">
+            {lo !== hi && (
+              <Slider
+                label="Altitude"
+                value={design.altitudeKm}
+                min={lo}
+                max={hi}
+                step={10}
+                onChange={(v) => update({ altitudeKm: v })}
+                format={(v) => `${fmt(v)} km`}
+              />
+            )}
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+              <dt className="text-slate-400">Period (Kepler)</dt>
+              <dd className="font-mono">{orbit.body === 'sun' ? '—' : `${fmt(report.power.periodMin)} min`}</dd>
+              <dt className="text-slate-400">Eclipse per orbit</dt>
+              <dd className="font-mono">
+                {fmt(report.power.eclipseMin)} min ({fmt(report.power.eclipseFraction * 100)}%)
+              </dd>
+              <dt className="text-slate-400">Orbit keeping</dt>
+              <dd className="font-mono">{fmt(maintenanceDvPerYear(orbit, design.altitudeKm), 1)} m/s per year</dd>
+              <dt className="text-slate-400">Radiation</dt>
+              <dd className="font-mono">{orbit.radiationKradYr} krad/yr</dd>
+              <dt className="text-slate-400">Total Δv needed</dt>
+              <dd className="font-mono">{fmt(report.mass.totalDv)} m/s</dd>
+              {report.schedule.transferMonths > 0 && (
+                <>
+                  <dt className="text-slate-400">Transfer time</dt>
+                  <dd className="font-mono">{fmt(report.schedule.transferMonths, 1)} months</dd>
+                </>
+              )}
+            </dl>
+            {orbit.drag && (
+              <p className="text-xs text-slate-400">
+                Lower altitude = sharper images and shorter passes, but more air drag (more propellant to stay up).
+              </p>
+            )}
+          </div>
+        </div>
+      </Section>
+      {routesFor(orbit.id).length > 0 && (
+        <Section
+          title="Route — the three-body problem"
+          hint="Between the Earth and the Moon three bodies pull on your spacecraft. Faster routes cost propellant; slow “low-energy” routes let gravity do the work but cross chaotic regions where small errors grow."
+        >
+          <Grid>
+            {routesFor(orbit.id).map((r) => (
+              <OptionCard
+                key={r.id}
+                selected={getRoute(orbit.id, design.routeId)?.id === r.id}
+                onClick={() => update({ routeId: r.id, tcmReserveDv: undefined })}
+                title={r.name}
+                stats={[`arrival burn ${r.insertionDv} m/s`, `${fmt(r.transferMonths, 1)} months`, `corrections ~${r.tcmDv} m/s`]}
+              >
+                {r.description}
+              </OptionCard>
+            ))}
+          </Grid>
+          {(() => {
+            const route = getRoute(orbit.id, design.routeId)!
+            const reserve = design.tcmReserveDv ?? defaultTcmReserve(route)
+            return (
+              <div className="mt-3 space-y-3">
+                <Slider
+                  label="Trajectory-correction reserve (chaos insurance)"
+                  value={reserve}
+                  min={0}
+                  max={150}
+                  step={5}
+                  onChange={(v) => update({ tcmReserveDv: v })}
+                  format={(v) => `${fmt(v)} m/s (expected need ~${route.tcmDv}; what is left at arrival funds station-keeping)`}
+                />
+                <p className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-xs text-slate-300">
+                  <span className="font-semibold text-sky-300">In the real world: </span>
+                  {route.realWorld}
+                </p>
+                {orbit.id === 'em_l2_halo' && (
+                  <div className="overflow-hidden rounded-xl border border-slate-800">
+                    <CR3BPView label="Route to the L2 orbit">
+                      {({ path, px }) => (
+                        <g>
+                          <path d={routeSchematic(route.id, px)} fill="none" stroke="#38bdf8" strokeDasharray="5 5" />
+                          <path d={path(L2_ORBIT)} fill="none" stroke="#fbbf24" strokeWidth={2} />
+                          <text x={px(1.19, 0.12)[0]} y={px(1.19, 0.12)[1]} fill="#fbbf24" fontSize="11" textAnchor="middle">
+                            your orbit (~15-day loop)
+                          </text>
+                        </g>
+                      )}
+                    </CR3BPView>
+                    <p className="px-3 py-2 text-[11px] text-slate-500">Yellow: real periodic orbit computed in the game (planar version of a halo). Blue dashed: schematic route.</p>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+        </Section>
+      )}
+      <Section title="Launcher" hint="Capacity shown for your chosen orbit. Your fully fuelled spacecraft must fit.">
+        <Grid>
+          {launchers.map((l) => {
+            const cap = launchCapacityKg(l, orbit)
+            const fits = cap >= report.mass.wetKg
+            const allowed = launcherAllowed(l.id)
+            const priceM = l.costM + (l.costPerKgM ?? 0) * (Number.isFinite(report.mass.wetKg) ? report.mass.wetKg : 0)
+            return (
+              <OptionCard
+                key={l.id}
+                selected={design.launcherId === l.id}
+                disabled={!allowed}
+                onClick={() => update({ launcherId: l.id, ...(l.rideshare && design.altitudeKm > l.rideshare.maxAltitudeKm ? { altitudeKm: l.rideshare.maxAltitudeKm } : {}) })}
+                title={l.name}
+                stats={[
+                  l.suborbital ? `suborbital: ~${l.suborbital.apogeeKm} km, ${l.suborbital.payloadKg} kg` : cap > 0 ? `${fmt(cap)} kg to this orbit` : 'cannot reach this orbit',
+                  `$${fmt(priceM, 1)} M${l.costPerKgM ? ' (per kg)' : ''}`,
+                  `${fmt(l.reliability * 100)}% reliable`,
+                  l.kind === 'reusable' ? 'booster lands' : undefined,
+                ]}
+                badge={
+                  !allowed ? (
+                    <Pill tone="slate">locked</Pill>
+                  ) : cap > 0 ? (
+                    <Pill tone={fits ? 'emerald' : 'rose'}>{fits ? 'fits' : 'too heavy'}</Pill>
+                  ) : (
+                    <Pill tone="rose">no</Pill>
+                  )
+                }
+              >
+                {!allowed ? 'Unlock it in your career’s technology tree.' : null}
+              </OptionCard>
+            )
+          })}
+        </Grid>
+        <p className="mt-3 rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-xs text-slate-300">
+          <span className="font-semibold text-sky-300">In the real world: </span>
+          {getLauncher(design.launcherId).realWorld}
+        </p>
+      </Section>
+    </div>
+  )
+}
