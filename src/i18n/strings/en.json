@@ -339,5 +339,22 @@
   "orbitDiagram.eclipse": "red arc = eclipse (in shadow)",
   "orbitDiagram.noEclipse": "no eclipse: always in sunlight",
   "cr3bp.defaultAria": "Earth–Moon system, rotating frame",
-  "cr3bp.caption": "Rotating frame (Earth and Moon fixed) · physics: circular restricted three-body problem, RK4"
+  "cr3bp.caption": "Rotating frame (Earth and Moon fixed) · physics: circular restricted three-body problem, RK4",
+  "launch.backToDesign": "← Back to design",
+  "launch.seedRule": "Same design + same seed + same decisions = same mission",
+  "launch.title": "Launch pad — {name}",
+  "launch.fairingPayload": "Payload in the fairing",
+  "launch.wetMass": "Wet mass",
+  "launch.capacity": "Capacity",
+  "launch.target": "Target",
+  "launch.launcher": "Launcher",
+  "launch.reliability": "Reliability",
+  "launch.plannedLife": "Planned life",
+  "launch.missionSeed": "Mission seed",
+  "launch.randomSeed": "Random seed",
+  "launch.shareSeedHint": "Share it so friends can fly the exact same mission.",
+  "launch.launchBtn": "🚀 Launch",
+  "launch.skipAnimation": "Skip animation",
+  "launch.startMission": "Start mission ▶",
+  "launch.seeReport": "See mission report"
 }
