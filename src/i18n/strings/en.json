@@ -152,5 +152,17 @@
   "mission.team": "Your team says…",
   "mission.team.hint": "Playing solo? Your four advisors speak up when their resource is in trouble.",
   "mission.allGood": "“All good on my side.”",
-  "mission.teamQuote": "“{title}.”"
+  "mission.teamQuote": "“{title}.”",
+  "payload.pointing.coarse": "any ADCS",
+  "payload.pointing.fine": "needs wheels",
+  "payload.pointing.precise": "needs star tracker",
+  "payload.cargo": "Cargo",
+  "payload.cargo.hint": "Food, water, experiments and spare parts for the station crew. You are paid per kilogram delivered — but every kilogram must be launched.",
+  "payload.cargo.mass": "Cargo mass",
+  "payload.cargo.format": "{val} kg (required ≥ {req})",
+  "payload.instruments": "Instruments",
+  "payload.instruments.hint": "Pick what your mission carries. Each instrument adds mass, power, data and cost. Stars = how useful it is for this scenario. Duty cycle = share of the day it is switched on.",
+  "payload.relevance": "Relevance to this mission: {pct}%",
+  "payload.science": "science {val}",
+  "payload.dutyCycle": "Duty cycle"
 }
