@@ -164,5 +164,21 @@
   "payload.instruments.hint": "Pick what your mission carries. Each instrument adds mass, power, data and cost. Stars = how useful it is for this scenario. Duty cycle = share of the day it is switched on.",
   "payload.relevance": "Relevance to this mission: {pct}%",
   "payload.science": "science {val}",
-  "payload.dutyCycle": "Duty cycle"
+  "payload.dutyCycle": "Duty cycle",
+  "comms.band": "Radio band",
+  "comms.band.hint": "Higher bands carry more data but cost more power and money. Link rate here: {rate} Mbit/s (band × antenna gain × distance factor).",
+  "comms.band.rateNearEarth": "{rate} Mbit/s near Earth",
+  "comms.band.txPower": "{power} W transmitting",
+  "comms.antenna": "Antenna",
+  "comms.antenna.gain": "gain ×{gain}",
+  "comms.antenna.needsPointing": "needs pointing",
+  "comms.stations": "Ground stations",
+  "comms.stations.hint": "Contact: {contact} min/day → {downlink} GB/day. Each station adds a monthly fee. Polar orbits pass over high-latitude stations on almost every orbit.",
+  "comms.stations.continuous": "continuous view",
+  "comms.stations.contact": "{min} min/day",
+  "comms.stations.costYear": "${cost} M/yr",
+  "comms.stations.deepSpace": "deep space",
+  "comms.storage": "Storage on board: {storage} GB.",
+  "comms.storage.fillsIn": "At current rates it fills in {days} days.",
+  "comms.storage.keepsUp": "Downlink keeps up with production."
 }
