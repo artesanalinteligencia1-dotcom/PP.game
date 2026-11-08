@@ -88,5 +88,10 @@
   "sound.unmute": "Turn sound on",
   "sound.mute": "Mute sound",
   "sound.off": "Sound off",
-  "sound.on": "Sound on"
+  "sound.on": "Sound on",
+  "intro.back": "← Home",
+  "intro.title": "Watch intro",
+  "intro.duration": "31 s · English narration with captions.",
+  "intro.credits": "Pedro Goicochea is a fictional character inspired by the story of Pedro Paulet (1874–1945). Narration, music and illustrations generated with ElevenLabs for this project; animated in HyperFrames.",
+  "intro.start": "Start playing"
 }
