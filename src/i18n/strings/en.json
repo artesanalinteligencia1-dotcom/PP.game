@@ -119,5 +119,20 @@
   "select.step1": "Read the briefing: goal, budget, deadline and requirements.",
   "select.step2": "Pick instruments in Payload; watch the resource meters on the right react.",
   "select.step3": "Tune the spacecraft, orbit, launcher and ground stations until nothing is red.",
-  "select.step4": "Open Review: every warning explains why, and what you could change."
+  "select.step4": "Open Review: every warning explains why, and what you could change.",
+  "design.tab.mission": "Mission",
+  "design.tab.payload": "Payload",
+  "design.tab.spacecraft": "Spacecraft",
+  "design.tab.orbit": "Orbit & Launch",
+  "design.tab.comms": "Ground & Comms",
+  "design.tab.review": "Review",
+  "design.back.career": "← Career",
+  "design.back.missions": "← Missions",
+  "design.contract": "· Contract",
+  "design.steps": "Design steps",
+  "design.reset": "Reset",
+  "design.spacecraftBudgets": "Spacecraft & budgets",
+  "design.spacecraftTitle": "Your spacecraft: every part you choose appears here, on the launch pad and in flight.",
+  "design.spacecraftHeading": "Your spacecraft",
+  "design.spacecraftDesc": "Built from your choices: arrays, antenna, instruments (green = astrobiology, violet = astrophysics), thrusters and radiators."
 }
