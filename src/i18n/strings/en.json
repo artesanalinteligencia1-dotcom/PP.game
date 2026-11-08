@@ -333,5 +333,9 @@
   "journey.target.moon": "Moon",
   "journey.target.stars": "stars",
   "journey.target.earth": "Earth",
-  "journey.instrumentsPointing": "Instruments point down at the {target} (nadir); arrays face the Sun."
+  "journey.instrumentsPointing": "Instruments point down at the {target} (nadir); arrays face the Sun.",
+  "orbitDiagram.heliocentric": "Heliocentric trajectory schematic",
+  "orbitDiagram.schematic": "{name} schematic",
+  "orbitDiagram.eclipse": "red arc = eclipse (in shadow)",
+  "orbitDiagram.noEclipse": "no eclipse: always in sunlight"
 }
