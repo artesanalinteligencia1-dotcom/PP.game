@@ -84,5 +84,9 @@
   "settings.offline.available": "✓ Available offline",
   "settings.offline.browser": "Use your browser menu → Install app",
   "home.directorate": "Mission Directorate",
-  "home.director": "Mission Director"
+  "home.director": "Mission Director",
+  "sound.unmute": "Turn sound on",
+  "sound.mute": "Mute sound",
+  "sound.off": "Sound off",
+  "sound.on": "Sound on"
 }
