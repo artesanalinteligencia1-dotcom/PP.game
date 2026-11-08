@@ -45,7 +45,13 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 
 ## Definitive game — owner's queue (2026-11-06)
 1. ✅ Public link: https://paulet-andes-to-orbit.vercel.app/ (production = `main`; merge `cloud/fase-1` by PR to update it)
-2. **Next:** language choice EN/ES (`src/i18n`, selector in Settings, voice + captions per language)
+2. Language choice EN/ES — **delivery 1 done (2026-11-08)**: `t()`/`useT()`/`useTx()` in `src/i18n/index.ts`, tables
+   `src/i18n/strings/{en,es}.json`, first-boot picker (English default), selector in Settings, boot/menu/Settings translated,
+   `tests/i18n.test.ts`, `scripts/i18n/{export,import,find-hardcoded}.mjs`. **Delivery 2 (in progress, Gemini):** extraction
+   by Gemini Flash in Antigravity on branch `gemini/i18n` following `GEMINI.md`; Spanish by Gemini (chat) with
+   `docs/i18n/PROMPT_TRANSLATE.md` + `GLOSSARY.md`; Claude reviews the PR and refactors the engine's event sentences
+   (`simulate.ts`, `campaign.ts`, `score.ts`: code + params). **Delivery 3:** captions per language (owner: voices stay in
+   English; videos keep English audio with translated captions — intro needs a caption-free render + one track per language).
 3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view)
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
 5. Mars acts; asynchronous multiplayer (same seed)

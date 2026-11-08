@@ -156,6 +156,14 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
 - Recharts bundle ~570 kB (warning only).
 - ElevenLabs licence for public/commercial use not verified (LOCAL_TODO) — now only design/flight loops, voice and SFX; the songs are ACE-Step (MIT).
 
+## Definitive game
+13. Public link on Vercel (2026-11-06), animation libraries installed (postprocessing, GSAP, Motion, Theatre.js, Rive).
+14. Languages, delivery 1 (2026-11-08): English is the default; the first boot asks English / Español (both written in
+    themselves; keyboard and mouse), Settings switches it live, `<html lang>` follows. Boot, main menu and Settings are
+    translated; the rest of the game moves to the tables in delivery 2 (586 candidate strings left, see
+    `node scripts/i18n/find-hardcoded.mjs`). Checked in headless Chrome: picker → Spanish menu → Settings in Spanish →
+    back to English, no picker on the next boot, no console errors. 102 tests pass.
+
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
 replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat

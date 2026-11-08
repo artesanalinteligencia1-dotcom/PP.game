@@ -5,6 +5,9 @@ import '@fontsource-variable/space-grotesk'
 import './index.css'
 import { App } from './ui/App'
 import { setupOffline } from './platform/offline'
+import { useSettings } from './store/settings'
+
+document.documentElement.lang = useSettings.getState().language
 
 void setupOffline()
 

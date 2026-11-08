@@ -6,6 +6,7 @@ import { isDesktop, useOffline } from '../../platform/offline'
 import { useGame } from '../../store/game'
 import { parseSaveFile, saveFileName, toSaveFile } from '../../store/save'
 import { useSettings, type MotionPref, type PadLight } from '../../store/settings'
+import { LANGUAGES, translate, useT, type Lang, type StringKey } from '../../i18n'
 
 function Row({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -38,14 +39,16 @@ function Segmented<T extends string>({ value, options, onChange, label }: { valu
   )
 }
 
-const BUS_LABEL: Record<Bus, [string, string]> = {
-  music: ['Music', 'Soundtrack for each stage of the game'],
-  fx: ['Effects', 'Engines, alerts and interface sounds'],
-  voice: ['Mission control', 'Countdown and flight calls'],
+const BUS_LABEL: Record<Bus, [StringKey, StringKey]> = {
+  music: ['settings.bus.music', 'settings.bus.music.hint'],
+  fx: ['settings.bus.fx', 'settings.bus.fx.hint'],
+  voice: ['settings.bus.voice', 'settings.bus.voice.hint'],
 }
 
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const s = useSettings()
+  const t = useT()
+  const onOff: ['on' | 'off', string][] = [['on', t('settings.on')], ['off', t('settings.off')]]
   const volumes = useVolumes()
   const muted = useMuted()
   const campaign = useGame((g) => g.campaign)
@@ -69,14 +72,14 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     a.download = saveFileName(campaign)
     a.click()
     URL.revokeObjectURL(a.href)
-    setSaveMsg(`Saved ${a.download}`)
+    setSaveMsg(t('settings.saved', { file: a.download }))
   }
   const importSave = async (file: File) => {
     try {
       const c = parseSaveFile(await file.text())
-      if (campaign && !window.confirm(`Replace the current career of ${campaign.profile.title} ${campaign.profile.name} with ${c.profile.title} ${c.profile.name}'s?`)) return
+      if (campaign && !window.confirm(t('settings.replaceConfirm', { current: `${campaign.profile.title} ${campaign.profile.name}`, incoming: `${c.profile.title} ${c.profile.name}` }))) return
       loadCampaignState(c)
-      setSaveMsg(`Loaded the career of ${c.profile.title} ${c.profile.name}.`)
+      setSaveMsg(t('settings.loaded', { name: `${c.profile.title} ${c.profile.name}` }))
     } catch (e) {
       setSaveMsg((e as Error).message)
     }
@@ -87,19 +90,19 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
       <div ref={panelRef} className="hud-panel max-h-[760px] w-[720px] overflow-y-auto p-6 shadow-2xl">
         <div className="flex items-center">
           <h2 id="settings-title" className="text-2xl font-bold">
-            Settings
+            {t('settings.title')}
           </h2>
           <button type="button" data-sound="back" onClick={onClose} className="ml-auto rounded-lg border border-slate-700 px-3 py-1 text-sm hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
-            Close <kbd className="ml-1 text-xs text-slate-500">Esc</kbd>
+            {t('settings.close')} <kbd className="ml-1 text-xs text-slate-500">Esc</kbd>
           </button>
         </div>
 
-        <h3 className="hud-label mt-5">Sound</h3>
-        <Row label="Sound">
-          <Segmented label="Sound" value={muted ? 'off' : 'on'} options={[['on', 'On'], ['off', 'Off']]} onChange={(v) => audio.setMuted(v === 'off')} />
+        <h3 className="hud-label mt-5">{t('settings.sound')}</h3>
+        <Row label={t('settings.sound')}>
+          <Segmented label={t('settings.sound')} value={muted ? 'off' : 'on'} options={onOff} onChange={(v) => audio.setMuted(v === 'off')} />
         </Row>
         {(Object.keys(BUS_LABEL) as Bus[]).map((bus) => (
-          <Row key={bus} label={BUS_LABEL[bus][0]} hint={BUS_LABEL[bus][1]}>
+          <Row key={bus} label={t(BUS_LABEL[bus][0])} hint={t(BUS_LABEL[bus][1])}>
             <div className="flex items-center gap-3">
               <input
                 type="range"
@@ -108,7 +111,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                 value={Math.round(volumes[bus] * 100)}
                 onChange={(e) => audio.setBusVolume(bus, Number(e.target.value) / 100)}
                 onPointerUp={() => bus !== 'music' && audio.ui('click')}
-                aria-label={`${BUS_LABEL[bus][0]} volume`}
+                aria-label={t('settings.volume', { bus: t(BUS_LABEL[bus][0]) })}
                 className="w-72 accent-sky-500"
                 disabled={muted}
               />
@@ -116,32 +119,33 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             </div>
           </Row>
         ))}
-        <Row label="Interface sounds" hint="Soft clicks on menus and buttons">
-          <Segmented label="Interface sounds" value={s.uiSounds ? 'on' : 'off'} options={[['on', 'On'], ['off', 'Off']]} onChange={(v) => s.set('uiSounds', v === 'on')} />
+        <Row label={t('settings.uiSounds')} hint={t('settings.uiSounds.hint')}>
+          <Segmented label={t('settings.uiSounds')} value={s.uiSounds ? 'on' : 'off'} options={onOff} onChange={(v) => s.set('uiSounds', v === 'on')} />
         </Row>
 
-        <h3 className="hud-label mt-5">Display</h3>
-        <Row label="Fullscreen" hint="Also F11">
-          <Segmented label="Fullscreen" value={full ? 'on' : 'off'} options={[['on', 'On'], ['off', 'Off']]} onChange={() => toggleFullscreen().then(setFull)} />
+        <h3 className="hud-label mt-5">{t('settings.display')}</h3>
+        <Row label={t('settings.fullscreen')} hint={t('settings.fullscreen.hint')}>
+          <Segmented label={t('settings.fullscreen')} value={full ? 'on' : 'off'} options={onOff} onChange={() => toggleFullscreen().then(setFull)} />
         </Row>
-        <Row label="Launch light" hint="Auto: the launch window sets dawn, day or night">
-          <Segmented<PadLight> label="Launch light" value={s.padLight} options={[['auto', 'Auto'], ['dawn', 'Dawn'], ['day', 'Day'], ['night', 'Night']]} onChange={(v) => s.set('padLight', v)} />
+        <Row label={t('settings.launchLight')} hint={t('settings.launchLight.hint')}>
+          <Segmented<PadLight> label={t('settings.launchLight')} value={s.padLight} options={(['auto', 'dawn', 'day', 'night'] as const).map((v) => [v, t(`settings.light.${v}`)])} onChange={(v) => s.set('padLight', v)} />
         </Row>
-        <Row label="Motion" hint="Reduced: launches start at the report, fewer animations">
-          <Segmented<MotionPref> label="Motion" value={s.motion} options={[['system', 'System'], ['full', 'Full'], ['reduced', 'Reduced']]} onChange={(v) => s.set('motion', v)} />
+        <Row label={t('settings.motion')} hint={t('settings.motion.hint')}>
+          <Segmented<MotionPref> label={t('settings.motion')} value={s.motion} options={(['system', 'full', 'reduced'] as const).map((v) => [v, t(`settings.motion.${v}`)])} onChange={(v) => s.set('motion', v)} />
         </Row>
-        <Row label="Language" hint="Spanish is planned">
-          <Segmented label="Language" value={s.language} options={[['en', 'English']]} onChange={() => undefined} />
+        <Row label={t('settings.language')} hint={t('settings.language.hint')}>
+          {/* Each language is written in itself, so a player can always find their own. */}
+          <Segmented<Lang> label={t('settings.language')} value={s.language} options={LANGUAGES.map((l) => [l, translate(l, `lang.${l}`)])} onChange={(v) => s.set('language', v)} />
         </Row>
 
-        <h3 className="hud-label mt-5">Save &amp; offline</h3>
-        <Row label="Career save" hint="Back up your career to a file, or load one">
+        <h3 className="hud-label mt-5">{t('settings.saveOffline')}</h3>
+        <Row label={t('settings.careerSave')} hint={t('settings.careerSave.hint')}>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={exportSave} disabled={!campaign} className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm hover:bg-slate-600 disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
-              Export save
+              {t('settings.export')}
             </button>
             <button type="button" onClick={() => fileRef.current?.click()} className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm hover:bg-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
-              Import save…
+              {t('settings.import')}
             </button>
             <input
               ref={fileRef}
@@ -158,13 +162,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           {saveMsg && <p className="mt-1 text-xs text-slate-400" role="status">{saveMsg}</p>}
         </Row>
         {!isDesktop && (
-          <Row label="Play offline" hint={offline.offlineReady ? 'Ready: the whole game is stored on this device' : 'The game stores itself for offline play after loading'}>
+          <Row label={t('settings.offline')} hint={offline.offlineReady ? t('settings.offline.ready') : t('settings.offline.pending')}>
             {offline.canInstall ? (
               <button type="button" onClick={offline.install} className="btn-primary px-3 py-1.5 text-sm  focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
-                Install {GAME_NAME}
+                {t('settings.install', { game: GAME_NAME })}
               </button>
             ) : (
-              <span className="text-sm text-slate-400">{offline.offlineReady ? '✓ Available offline' : 'Use your browser menu → Install app'}</span>
+              <span className="text-sm text-slate-400">{offline.offlineReady ? t('settings.offline.available') : t('settings.offline.browser')}</span>
             )}
           </Row>
         )}

@@ -4,6 +4,7 @@ import { useMusic } from '../../audio/audio'
 import { GAME_NAME, GAME_SUBTITLE } from '../../brand'
 import { getScenario } from '../../engine/catalog'
 import { PROTAGONIST } from '../../i18n/en'
+import { useT } from '../../i18n'
 import { canQuit, quitGame } from '../../platform/desktop'
 import { useGame } from '../../store/game'
 import { AndesBackdrop, LaunchPad, SceneryLight, SkyBackdrop, Stars } from '../launch/LaunchScenery'
@@ -56,6 +57,7 @@ export function HomeScreen() {
   const [newCareer, setNewCareer] = useState(false)
   const [extras, setExtras] = useState(false)
   const navRef = useRef<HTMLElement>(null)
+  const t = useT()
   useMusic('home')
   const who = campaign ? `${campaign.profile.title} ${campaign.profile.name}` : `${PROTAGONIST.title} ${PROTAGONIST.name}`
 
@@ -81,44 +83,44 @@ export function HomeScreen() {
       <MenuBackdrop />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
       <div className="absolute inset-x-12 top-8 flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-white/60">
-        <span>{GAME_NAME} · Mission Directorate</span>
-        <span>Arequipa launch site · 16.4° S · dawn</span>
+        <span>{GAME_NAME} · {t('home.directorate')}</span>
+        <span>{t('home.site')}</span>
       </div>
       <div className="absolute left-16 top-[130px] w-[520px]">
-        <p className="hud-label text-sm">Space mission design</p>
+        <p className="hud-label text-sm">{t('home.tagline')}</p>
         <h1 className="mt-2 text-[104px] leading-none tracking-tight">
           {GAME_NAME}
         </h1>
         <p className="mt-2 text-2xl uppercase tracking-[0.35em] text-orange-400">{GAME_SUBTITLE}</p>
-        <nav ref={navRef} onKeyDown={onKey} className="mt-10 border-t border-white/15" aria-label="Main menu">
+        <nav ref={navRef} onKeyDown={onKey} className="mt-10 border-t border-white/15" aria-label={t('home.menuLabel')}>
           {!extras ? (
             <>
-              {campaign ? item('Continue career', () => go('campaign'), `${campaign.profile.title} ${campaign.profile.name}`, true) : item('New career', () => setNewCareer(true), 'Start with Paulet-1', true)}
-              {campaign && item('New career', () => setNewCareer(true), 'Replaces the current career')}
-              {item('Free mission', () => go('free'), 'No career progress')}
-              {item('Learn', () => openLearn('orbit'), 'Orbits, rockets, chaos')}
-              {item('Extras', () => setExtras(true), 'Intro, Paulet, sandbox')}
-              {item('Settings', () => openSettings(true), 'Sound, display, saves')}
-              {canQuit && item('Quit', () => void quitGame())}
+              {campaign ? item(t('home.continue'), () => go('campaign'), `${campaign.profile.title} ${campaign.profile.name}`, true) : item(t('home.newCareer'), () => setNewCareer(true), t('home.newCareer.first'), true)}
+              {campaign && item(t('home.newCareer'), () => setNewCareer(true), t('home.newCareer.replace'))}
+              {item(t('home.free'), () => go('free'), t('home.free.hint'))}
+              {item(t('home.learn'), () => openLearn('orbit'), t('home.learn.hint'))}
+              {item(t('home.extras'), () => setExtras(true), t('home.extras.hint'))}
+              {item(t('home.settings'), () => openSettings(true), t('home.settings.hint'))}
+              {canQuit && item(t('home.quit'), () => void quitGame())}
             </>
           ) : (
             <>
-              {item('Watch intro', () => go('intro'), '90 s story')}
-              {item('Legacy: Paulet', () => openLearn('paulet'), 'Facts vs. legend')}
-              {item('Sandbox', () => startScenario('sandbox'), 'Just physics')}
-              {item('Back', () => setExtras(false))}
+              {item(t('home.intro'), () => go('intro'), t('home.intro.hint'))}
+              {item(t('home.legacy'), () => openLearn('paulet'), t('home.legacy.hint'))}
+              {item(t('home.sandbox'), () => startScenario('sandbox'), t('home.sandbox.hint'))}
+              {item(t('home.back'), () => setExtras(false))}
             </>
           )}
         </nav>
       </div>
       <div className="hud-panel absolute bottom-20 right-12 w-[420px] p-5">
-        <p className="hud-label mb-3">{campaign ? 'Program status' : 'Your program'}</p>
+        <p className="hud-label mb-3">{campaign ? t('home.status') : t('home.yourProgram')}</p>
         {campaign ? (
           <div className="grid grid-cols-3 gap-4">
             {[
-              ['Funds', `$${campaign.fundsM} M`],
-              ['Prestige', String(campaign.prestige)],
-              ['Contracts', String(Object.keys(campaign.completed).length)],
+              [t('home.funds'), `$${campaign.fundsM} M`],
+              [t('home.prestige'), String(campaign.prestige)],
+              [t('home.contracts'), String(Object.keys(campaign.completed).length)],
             ].map(([k, v]) => (
               <div key={k}>
                 <p className="text-[11px] uppercase tracking-widest text-white/50">{k}</p>
@@ -127,16 +129,16 @@ export function HomeScreen() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-white/75">A small institute in Arequipa, one home-built rocket and a lot of ambition. Investors are watching.</p>
+          <p className="text-sm text-white/75">{t('home.pitch')}</p>
         )}
-        <p className="mt-4 text-xs text-white/60">{who} · Mission Director</p>
-        <p className="mt-1 text-[11px] text-white/40">Fictional character inspired by Pedro Paulet (1874–1945).</p>
+        <p className="mt-4 text-xs text-white/60">{who} · {t('home.director')}</p>
+        <p className="mt-1 text-[11px] text-white/40">{t('home.fictional')}</p>
       </div>
-      <p className="absolute bottom-6 left-16 text-[11px] text-white/40">Simplified educational model — game values, not real engineering data.</p>
+      <p className="absolute bottom-6 left-16 text-[11px] text-white/40">{t('home.disclaimer')}</p>
       {newCareer && (
         <ProfileDialog
-          title="New career"
-          confirm="Start career"
+          title={t('home.newCareer')}
+          confirm={t('home.newCareer.confirm')}
           initial={{ name: PROTAGONIST.name, title: 'Dr.', level: 'cadet' }}
           onCancel={() => setNewCareer(false)}
           onConfirm={(p) => {

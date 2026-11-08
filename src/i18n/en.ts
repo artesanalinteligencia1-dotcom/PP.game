@@ -1,11 +1,12 @@
 // English UI strings and Design Review explanations. Engine returns codes + params; text lives here.
 import type { ResourceKey, ReviewItem, Role } from '../engine/types'
+import { LOCALE, currentLang } from './index'
 
 export const fmt = (n: number | string | undefined, digits = 0): string => {
   if (typeof n === 'string') return n
   if (n === undefined || Number.isNaN(n)) return '—'
   if (!Number.isFinite(n)) return '∞'
-  return n.toLocaleString('en-US', { maximumFractionDigits: digits, minimumFractionDigits: digits })
+  return n.toLocaleString(LOCALE[currentLang()], { maximumFractionDigits: digits, minimumFractionDigits: digits })
 }
 
 export const ROLE_LABEL: Record<Role, string> = {
