@@ -93,5 +93,16 @@
   "intro.title": "Watch intro",
   "intro.duration": "31 s · English narration with captions.",
   "intro.credits": "Pedro Goicochea is a fictional character inspired by the story of Pedro Paulet (1874–1945). Narration, music and illustrations generated with ElevenLabs for this project; animated in HyperFrames.",
-  "intro.start": "Start playing"
+  "intro.start": "Start playing",
+  "profile.level.cadet": "Cadet",
+  "profile.level.cadet.hint": "Gentle events, more hints. Learn the ropes.",
+  "profile.level.researcher": "Researcher",
+  "profile.level.researcher.hint": "Normal events and investor pressure.",
+  "profile.level.director": "Program Director",
+  "profile.level.director.hint": "Frequent events, tougher launches. For experts.",
+  "profile.subtitle": "You play the director of a small space institute. Default: Dr. Pedro Goicochea (fictional).",
+  "profile.name": "Your name",
+  "profile.title.dr": "Dr. (scientist)",
+  "profile.title.eng": "Eng. (engineer)",
+  "profile.cancel": "Cancel"
 }
