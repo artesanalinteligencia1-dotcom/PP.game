@@ -180,5 +180,14 @@
   "comms.stations.deepSpace": "deep space",
   "comms.storage": "Storage on board: {storage} GB.",
   "comms.storage.fillsIn": "At current rates it fills in {days} days.",
-  "comms.storage.keepsUp": "Downlink keeps up with production."
+  "comms.storage.keepsUp": "Downlink keeps up with production.",
+  "review.title": "Design review",
+  "review.hint": "Automatic checklist. Red = blocking (cannot launch). Amber = allowed but risky or costly. Green = healthy. Each item explains why and what you can change.",
+  "review.blocking": "blocking",
+  "review.requirements": "Requirements (predicted)",
+  "review.fixBlocking.one": "Fix {count} blocking issue to launch",
+  "review.fixBlocking.other": "Fix {count} blocking issues to launch",
+  "review.goToLaunchPad": "Go to the launch pad 🚀",
+  "review.status.errors": "Red items would make the mission impossible.",
+  "review.status.warnings": "Amber items are allowed — but the mission will feel them."
 }
