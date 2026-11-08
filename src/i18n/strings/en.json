@@ -337,5 +337,7 @@
   "orbitDiagram.heliocentric": "Heliocentric trajectory schematic",
   "orbitDiagram.schematic": "{name} schematic",
   "orbitDiagram.eclipse": "red arc = eclipse (in shadow)",
-  "orbitDiagram.noEclipse": "no eclipse: always in sunlight"
+  "orbitDiagram.noEclipse": "no eclipse: always in sunlight",
+  "cr3bp.defaultAria": "Earth–Moon system, rotating frame",
+  "cr3bp.caption": "Rotating frame (Earth and Moon fixed) · physics: circular restricted three-body problem, RK4"
 }

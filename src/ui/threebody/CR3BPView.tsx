@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { L2_LYAPUNOV, L2_LYAPUNOV_STATE, MU_EM, lagrangeX, propagate, type State } from '../../engine/threebody'
+import { useT } from '../../i18n'
 
 export interface Viewport {
   xMin: number
@@ -33,6 +34,7 @@ export function CR3BPView({
   label?: string
   className?: string
 }) {
+  const t = useT()
   const W = 600
   const H = Math.round((W * 2 * vp.yMax) / (vp.xMax - vp.xMin))
   const sx = W / (vp.xMax - vp.xMin)
@@ -43,18 +45,18 @@ export function CR3BPView({
   const [l1x] = px(L1, 0)
   const [l2x] = px(L2, 0)
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className={className} role="img" aria-label={label ?? 'Earth–Moon system, rotating frame'}>
+    <svg viewBox={`0 0 ${W} ${H}`} className={className} role="img" aria-label={label ?? t('cr3bp.defaultAria')}>
       <rect width={W} height={H} fill="#020617" />
       {Array.from({ length: 40 }, (_, i) => (
         <circle key={i} cx={(i * 151) % W} cy={(i * 89) % H} r={0.7} fill="#334155" />
       ))}
       <circle cx={ex} cy={ey} r={9} fill="#1d4ed8" />
       <text x={ex} y={ey + 22} textAnchor="middle" fill="#94a3b8" fontSize="11">
-        Earth
+        {t('journey.body.earth')}
       </text>
       <circle cx={mx} cy={my} r={4.5} fill="#9ca3af" />
       <text x={mx} y={my + 18} textAnchor="middle" fill="#94a3b8" fontSize="11">
-        Moon
+        {t('journey.body.moon')}
       </text>
       {[
         [l1x, 'L1'],
@@ -70,7 +72,7 @@ export function CR3BPView({
       ))}
       {children?.({ path: (s) => toPath(s, vp, W, H), px })}
       <text x={8} y={H - 8} fill="#64748b" fontSize="10">
-        Rotating frame (Earth and Moon fixed) · physics: circular restricted three-body problem, RK4
+        {t('cr3bp.caption')}
       </text>
     </svg>
   )
