@@ -104,5 +104,20 @@
   "profile.name": "Your name",
   "profile.title.dr": "Dr. (scientist)",
   "profile.title.eng": "Eng. (engineer)",
-  "profile.cancel": "Cancel"
+  "profile.cancel": "Cancel",
+  "difficulty.beginner": "beginner",
+  "difficulty.engineer": "engineer",
+  "difficulty.expert": "expert",
+  "difficulty.sandbox": "sandbox",
+  "select.back": "← Main menu",
+  "select.title": "Free mission",
+  "select.subtitle": "Any scenario, no career progress. Every choice moves mass, power, data, budget, schedule and lifetime — and there is never just one right answer.",
+  "select.budget": "${budget} M",
+  "select.devMonths": "{months} months to launch",
+  "select.lifeYears": "{years} yr mission",
+  "select.howToPlay": "How to play (60 seconds)",
+  "select.step1": "Read the briefing: goal, budget, deadline and requirements.",
+  "select.step2": "Pick instruments in Payload; watch the resource meters on the right react.",
+  "select.step3": "Tune the spacecraft, orbit, launcher and ground stations until nothing is red.",
+  "select.step4": "Open Review: every warning explains why, and what you could change."
 }
