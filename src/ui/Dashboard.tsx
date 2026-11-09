@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DesignReport, Severity } from '../engine/types'
 import { fmt } from '../i18n/en'
 import { SEV_BG, SEV_TEXT } from './components'
+import { useT, type StringKey } from '../i18n'
 
 type DeltaKey = 'mass' | 'power' | 'data' | 'cost' | 'schedule' | 'life' | 'science'
 
@@ -80,6 +81,8 @@ function Meter({
 export function Dashboard({ report, designKey }: { report: DesignReport; designKey: string }) {
   const prev = useRef<Record<DeltaKey, number> | null>(null)
   const [deltas, setDeltas] = useState<Partial<Record<DeltaKey, number>>>({})
+  const t = useT()
+
   useEffect(() => {
     const now = snapshot(report)
     if (prev.current) {
@@ -96,79 +99,89 @@ export function Dashboard({ report, designKey }: { report: DesignReport; designK
   const warns = report.review.filter((r) => r.severity === 'warn').length
   const powerNeed = power.avgLoadW * (1 - power.eclipseFraction + power.eclipseFraction / 0.9)
 
+  const factorKey: StringKey = `dashboard.life.factor.${life.limitingFactor}` as StringKey
+  const factorText = t(factorKey)
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="hud-label">Resources</h2>
+        <h2 className="hud-label">{t('dashboard.resources')}</h2>
         <span className={`text-xs font-semibold ${errors ? 'text-rose-400' : warns ? 'text-amber-400' : 'text-emerald-400'}`}>
-          {errors ? `${errors} blocking` : 'Launchable'}
-          {warns ? ` · ${warns} warnings` : ''}
+          {errors
+            ? t(errors === 1 ? 'dashboard.status.blocking.one' : 'dashboard.status.blocking.other', { count: errors })
+            : t('dashboard.status.launchable')}
+          {warns
+            ? t(warns === 1 ? 'dashboard.status.warnings.one' : 'dashboard.status.warnings.other', { count: warns })
+            : ''}
         </span>
       </div>
       <Meter
-        label="Mass (wet / launcher)"
+        label={t('dashboard.mass.label')}
         value={`${fmt(mass.wetKg)} / ${fmt(mass.capacityKg)} kg`}
         fill={mass.capacityKg > 0 ? mass.wetKg / mass.capacityKg : 1}
         severity={worst(report, (_c, r) => r === 'mass')}
-        tip="Wet mass = parts + 22% structure + 20% design margin + tanks + propellant (rocket equation). Must fit the launcher's capacity to this orbit."
+        tip={t('dashboard.mass.tip')}
         delta={deltas.mass}
         deltaKey="mass"
       />
       <Meter
-        label="Power (need / generated EOL)"
+        label={t('dashboard.power.label')}
         value={`${fmt(powerNeed)} / ${fmt(power.avgGenEolW)} W`}
         fill={power.avgGenEolW > 0 ? powerNeed / power.avgGenEolW : 1}
         severity={worst(report, (c, r) => r === 'power' && !c.startsWith('BATTERY') && !c.startsWith('LONG'))}
-        tip="Orbit-average generation P = A·η·1361 W/m²·cosθ·(1−eclipse), degraded each year. Need = average load incl. battery recharge losses."
+        tip={t('dashboard.power.tip')}
         delta={deltas.power}
         deltaKey="power"
       />
       <Meter
-        label="Battery depth of discharge"
-        value={`${fmt(power.dodNominal * 100)}% (max ${fmt(power.dodLimit * 100)}%)`}
+        label={t('dashboard.dod.label')}
+        value={t('dashboard.dod.value', {
+          nominal: fmt(power.dodNominal * 100),
+          max: fmt(power.dodLimit * 100),
+        })}
         fill={power.dodNominal / power.dodLimit}
         severity={worst(report, (c) => c.startsWith('BATTERY') || c.startsWith('LONG'))}
-        tip="Share of the battery used in each eclipse. Many deep cycles per year wear the battery out."
+        tip={t('dashboard.dod.tip')}
       />
       <Meter
-        label="Data (produced / downlink per day)"
+        label={t('dashboard.data.label')}
         value={`${fmt(data.generatedGbDay, 1)} / ${fmt(data.downlinkGbDay, 1)} GB`}
         fill={data.downlinkGbDay > 0 ? data.generatedGbDay / data.downlinkGbDay : data.generatedGbDay > 0 ? 1 : 0}
         severity={worst(report, (_c, r) => r === 'data')}
-        tip="Produced = Σ rate × duty cycle ÷ compression. Downlink = contact minutes × link rate × 70% efficiency."
+        tip={t('dashboard.data.tip')}
         delta={deltas.data}
         deltaKey="data"
       />
       <Meter
-        label="Budget"
+        label={t('dashboard.budget.label')}
         value={`$${fmt(cost.totalM, 1)} / ${fmt(cost.budgetM)} M`}
         fill={cost.totalM / cost.budgetM}
         severity={worst(report, (_c, r) => r === 'cost')}
-        tip="Instruments (× TRL factor) + bus + integration + launcher + operations, plus 15% contingency."
+        tip={t('dashboard.budget.tip')}
         delta={deltas.cost}
         deltaKey="cost"
       />
       <Meter
-        label="Development time"
+        label={t('dashboard.schedule.label')}
         value={`${fmt(schedule.devMonths, 1)} / ${fmt(schedule.deadlineMonths)} mo`}
         fill={schedule.devMonths / schedule.deadlineMonths}
         severity={worst(report, (_c, r) => r === 'schedule')}
-        tip="18 months base + extra for low-TRL items + 1.5 per extra instrument + 1 per 100 kg."
+        tip={t('dashboard.schedule.tip')}
         delta={deltas.schedule}
         deltaKey="schedule"
       />
       <Meter
-        label={`Lifetime (limit: ${life.limitingFactor})`}
+        label={t('dashboard.life.label', { factor: factorText })}
         value={`${fmt(life.lifeYears, 1)} / ${fmt(life.requiredYears, 1)} yr`}
         fill={Math.min(1, life.lifeYears / life.requiredYears)}
         severity={worst(report, (_c, r) => r === 'life')}
-        tip="Life = min(battery, panels, propellant/plan, radiation, orbit). The smallest one ends the mission."
+        tip={t('dashboard.life.tip')}
         delta={deltas.life}
         deltaKey="life"
       />
       <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-        <div className="rounded border border-slate-800 p-2" title="Expected science points per year (value × relevance × data actually delivered).">
-          <div className="text-slate-400">Science / year</div>
+        <div className="rounded border border-slate-800 p-2" title={t('dashboard.science.tip')}>
+          <div className="text-slate-400">{t('dashboard.science.label')}</div>
           <div className="font-mono text-lg text-violet-300">
             {fmt(science.perYear)}
             {deltas.science !== undefined && Math.abs(deltas.science) >= 0.5 && (
@@ -179,8 +192,8 @@ export function Dashboard({ report, designKey }: { report: DesignReport; designK
             )}
           </div>
         </div>
-        <div className="rounded border border-slate-800 p-2" title="Launcher reliability × bus × instruments (by TRL) × environmental risks.">
-          <div className="text-slate-400">Success chance</div>
+        <div className="rounded border border-slate-800 p-2" title={t('dashboard.risk.tip')}>
+          <div className="text-slate-400">{t('dashboard.risk.label')}</div>
           <div className="font-mono text-lg text-sky-300">{fmt(risk.successProbability * 100)}%</div>
         </div>
       </div>

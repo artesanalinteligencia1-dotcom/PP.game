@@ -146,13 +146,30 @@ npm run build
 ```
 
 ## Deploy
-Postponed by the user (LOCAL_TODO §1).
+Public link (2026-11-06): https://paulet-andes-to-orbit.vercel.app/ — Vercel, owner's Hobby account, project
+`paulet-andes-to-orbit`, production branch `main` (PR #1 merged `cloud/fase-1`). Checked in headless Chrome: HTTP 200, no console
+errors, service worker active, 87 files precached, reload with the network cut still works. Pushes to `cloud/fase-1` only make
+preview deployments; the public link updates when `cloud/fase-1` is merged into `main` (PR).
 
 ## Open risks
 - Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
 - Recharts bundle ~570 kB (warning only).
 - ElevenLabs licence for public/commercial use not verified (LOCAL_TODO) — now only design/flight loops, voice and SFX; the songs are ACE-Step (MIT).
-- Vercel deploy postponed by the user.
+
+## Definitive game
+13. Public link on Vercel (2026-11-06), animation libraries installed (postprocessing, GSAP, Motion, Theatre.js, Rive).
+14. Languages, delivery 1 (2026-11-08): English is the default; the first boot asks English / Español (both written in
+    themselves; keyboard and mouse), Settings switches it live, `<html lang>` follows. Boot, main menu and Settings are
+    translated; the rest of the game moves to the tables in delivery 2 (586 candidate strings left, see
+    `node scripts/i18n/find-hardcoded.mjs`). Checked in headless Chrome: picker → Spanish menu → Settings in Spanish →
+    back to English, no picker on the next boot, no console errors. 102 tests pass.
+
+15. Languages finished (2026-11-08): every screen, lesson, review message, catalog item, flight event and report line in Spanish
+    (Gemini extracted the UI; Claude moved the engine sentences to key + params, translated all 1 187 strings and fixed two
+    Gemini bugs: route ids and the id `none` collided between categories). Intro re-rendered without burned-in captions; the
+    game draws them word by word per language. Checked in headless Chrome, both languages: menu, free mission, 5 lessons, intro
+    captions, career, prologue, all design tabs of two scenarios, launch pad, launch captions, flight decisions and report: no
+    console errors, no raw keys, no horizontal scroll. 106 tests pass.
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner

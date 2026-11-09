@@ -22,8 +22,8 @@ When an item is done, mark it here and move the details to PROGRESS.md. Items fo
 User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final trailer (HyperFrames) ✅ · 4 Three.js launch (item 3 below): all 3 deliveries ✅ (2026-11-05).
 - ✅ Soundtrack: `MUSIC` = home "Beneath the Misti", launch "Paulet's Fire", results "Lagrange" (ACE-Step 1.5, −16 LUFS);
   design/flight loops unchanged. Any new screen picks music through `useMusic(stage)` only.
-- ✅ Intro: final 31 s video (720p, 4.4 MB) with burned-in captions; never add a `<track>` to it. Rebuild from
-  `C:\PPgame\intro-a` (`node build.mjs`, then HyperFrames render) and re-encode to 720p if the narration changes.
+- ✅ Intro: final 31 s video (720p, 5 MB) without burned-in captions; the game draws them in the player's language. Rebuild from
+  `C:\PPgame\intro-a` (`node build.mjs --no-captions`, then HyperFrames render) and re-encode to 720p if the narration changes.
 - ✅ Trailer: `C:\PPgame\trailer_paulet.mp4` (54 s) from `C:\PPgame\trailer-final` (see its README). The rooftop ending with the animated
   satellite is approved and stays. Next for the trailer: the user's 7 Gemini first/last-frame clips (v1–v7, 8 s each) replace
   the stills; prompts in `C:\PPgame\trailer\PROMPTS_GEMINI.md`.
@@ -44,8 +44,12 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
   (`SoundingScene3D`). The base game is complete; next is the definitive game (PLAYBOOK §6 and §6b).
 
 ## Definitive game — owner's queue (2026-11-06)
-1. Public link (Vercel, the owner's own Hobby account — the connector is now logged into it) ← **in progress**
-2. Language choice EN/ES (`src/i18n`, selector in Settings, voice + captions per language)
+1. ✅ Public link: https://paulet-andes-to-orbit.vercel.app/ (production = `main`; merge `cloud/fase-1` by PR to update it)
+2. ✅ Language choice EN/ES (2026-11-08): the whole game is in `src/i18n/strings/{en,es}.json` (1 187 keys each). English is the
+   default; first-boot picker and Settings switch. The engine emits messages (`src/engine/text.ts`: key + params, rendered by
+   `useMsg()`), so new event sentences go in en.json + es.json, never inline. Catalog English stays in the engine and a test keeps
+   it identical to en.json. Intro: caption-free video, captions drawn by the game per language (`src/i18n/introCaptions.ts`).
+   Adding a language: `node scripts/i18n/export.mjs <lang>`, translate with `docs/i18n/PROMPT_TRANSLATE.md`, `import.mjs`.
 3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view)
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
 5. Mars acts; asynchronous multiplayer (same seed)

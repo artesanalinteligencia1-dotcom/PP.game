@@ -127,3 +127,17 @@
   `import.meta.env.DEV` so it never ships), `@rive-app/react-canvas` (robot guide expressions; needs `.riv` files from the
   Rive editor). Unused libraries add nothing to the bundle until imported. Production `npm audit`: 0 vulnerabilities.
 - Public link: Vercel, the owner's own Hobby account (non-commercial use only — move to Pro or Cloudflare Pages if the game is ever sold).
+
+## Languages (2026-11-08)
+- **Tables are JSON** (`src/i18n/strings/<lang>.json`), keys typed from en.json: a chat model can translate a chunk
+  and `scripts/i18n/import.mjs` validates it (unknown keys, broken `{placeholders}`). Missing keys fall back to English.
+- **English default, chosen on the first boot, changeable in Settings; no browser auto-detect** (owner). The picker writes
+  both languages because the player cannot read the other one yet; each language name is written in itself.
+- **Voices stay in English; videos get translated captions only** (owner). No build date or dated version in the game (owner).
+- **The engine stays pure and English**: catalog text stays in `src/engine/catalog` as the fallback and is mirrored in
+  en.json (`useTx(key, fallback)`). Event sentences are messages, key + params (`src/engine/text.ts`), which also keeps the
+  game's seeded determinism untouched: the same mission reads the same in any language.
+- **Intro captions are drawn by the game, not burned in**, so one 5 MB video serves every language (fullscreen goes on the frame
+  so the captions stay visible).
+- **Work split to save tokens** (owner has Gemini): extraction by Gemini Flash (Antigravity, `GEMINI.md`), translation
+  by Gemini in the chat (`docs/i18n/PROMPT_TRANSLATE.md`), review and engine refactor by Claude.

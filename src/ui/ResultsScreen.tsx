@@ -1,3 +1,4 @@
+import { useMsg } from '../i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { audio, useMusic } from '../audio/audio'
 import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
@@ -5,10 +6,11 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'rec
 import { getScenario } from '../engine/catalog'
 import { analyseMission } from '../engine/report'
 import { scoreMission, type Rank } from '../engine/score'
-import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt } from '../i18n/en'
+import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt, localName } from '../i18n/en'
 import { useGame } from '../store/game'
 import { shareUrl } from '../store/share'
 import { Disclaimer, Pill } from './components'
+import { useT, useTx, type StringKey } from '../i18n'
 
 const RANK_STYLE: Record<Rank, string> = {
   Fail: 'text-rose-400 border-rose-500/50',
@@ -41,6 +43,9 @@ export function ResultsScreen() {
   const mode = useGame((s) => s.mode)
   const collectReward = useGame((s) => s.collectReward)
   const [copied, setCopied] = useState(false)
+  const t = useT()
+  const msg = useMsg()
+  const tx = useTx()
   const scenario = getScenario(mission.scenarioId)
   const score = useMemo(() => scoreMission(mission, scenario), [mission, scenario])
   const analysis = useMemo(() => analyseMission(mission, score, scenario), [mission, score, scenario])
@@ -70,8 +75,10 @@ export function ResultsScreen() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">Mission report — {scenario.name}</h1>
-        <Pill tone="slate">seed {mission.seed}</Pill>
+        <h1 className="text-2xl font-semibold">
+          {t('results.title', { name: tx(`scenario.${scenario.id}.name`, scenario.name) })}
+        </h1>
+        <Pill tone="slate">{t('results.seed', { seed: mission.seed })}</Pill>
         <Pill tone={mission.endReason === 'completed' ? 'emerald' : 'rose'}>{END_REASON_LABEL[mission.endReason ?? 'completed']}</Pill>
       </div>
 
@@ -81,13 +88,13 @@ export function ResultsScreen() {
             <SpacecraftSprite design={mission.design} size={84} />
           </div>
           <div className="font-display text-6xl font-black">{score.total}</div>
-          <div className="text-sm text-slate-400">of 1 000 points</div>
-          <div className="mt-2 text-2xl font-bold">{score.rank}</div>
+          <div className="text-sm text-slate-400">{t('results.ofPoints')}</div>
+          <div className="mt-2 text-2xl font-bold">{t(`results.rank.${score.rank}` as StringKey)}</div>
           <ul className="mt-5 space-y-2 text-left text-xs">
             {score.lines.map((l) => (
               <li key={l.key}>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">{l.label}</span>
+                  <span className="text-slate-300">{msg(l.labelMsg)}</span>
                   <span className="font-mono text-slate-100">
                     {fmt(l.points)} / {fmt(l.max)}
                   </span>
@@ -95,16 +102,16 @@ export function ResultsScreen() {
                 <div className="mt-0.5 h-1.5 overflow-hidden rounded bg-slate-800">
                   <div className="h-full bg-sky-500" style={{ width: `${(l.points / l.max) * 100}%` }} />
                 </div>
-                <div className="mt-0.5 text-[11px] text-slate-500">{l.detail}</div>
+                <div className="mt-0.5 text-[11px] text-slate-500">{msg(l.detail)}</div>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[11px] text-slate-500">Solo play: the collaboration share is redistributed across the other categories.</p>
+          <p className="mt-3 text-[11px] text-slate-500">{t('results.soloHint')}</p>
         </section>
 
         <section className="min-w-0 space-y-5">
           <div>
-            <h2 className="hud-label">Why it went this way</h2>
+            <h2 className="hud-label">{t('results.whyTitle')}</h2>
             <ol className="mt-2 space-y-2">
               {analysis.causes.map((c) => {
                 const m = CAUSE_TEXT[c.code]?.(c.params) ?? { title: c.code, why: '' }
@@ -115,7 +122,7 @@ export function ResultsScreen() {
                       <span className="font-medium">{m.title}</span>
                     </div>
                     <p className="mt-1 text-sm text-slate-300">{m.why}</p>
-                    {m.change && <p className="mt-1 text-xs text-sky-300">What would you change? {m.change}</p>}
+                    {m.change && <p className="mt-1 text-xs text-sky-300">{t('results.whatChange', { change: m.change })}</p>}
                   </li>
                 )
               })}
@@ -123,13 +130,13 @@ export function ResultsScreen() {
           </div>
 
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
-            <div className="mb-1 text-xs text-slate-400">Over the mission: science (violet), battery health % (blue), data backlog GB (pink)</div>
+            <div className="mb-1 text-xs text-slate-400">{t('results.chartLegend')}</div>
             <div className="h-48">
               <ResponsiveContainer>
                 <LineChart data={mission.series.slice()} margin={{ top: 5, right: 8, bottom: 0, left: -18 }}>
                   <XAxis dataKey="week" tick={{ fill: '#94a3b8', fontSize: 10 }} />
                   <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', fontSize: 12 }} labelFormatter={(w) => `week ${w}`} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', fontSize: 12 }} labelFormatter={(w) => t('results.chartWeek', { week: String(w) })} />
                   <Line isAnimationActive={false} type="monotone" dataKey="science" stroke="#a78bfa" dot={false} strokeWidth={2} />
                   <Line isAnimationActive={false} type="monotone" dataKey="battery" stroke="#38bdf8" dot={false} />
                   <Line isAnimationActive={false} type="monotone" dataKey="backlogGb" stroke="#f472b6" dot={false} />
@@ -139,15 +146,15 @@ export function ResultsScreen() {
           </div>
 
           <div>
-            <h2 className="hud-label">Requirements (actual)</h2>
+            <h2 className="hud-label">{t('results.requirements')}</h2>
             <ul className="mt-2 space-y-1 text-sm">
               {score.requirements.map((q) => (
                 <li key={q.id} className="flex gap-2">
                   <span className={q.met ? 'text-emerald-400' : q.optional ? 'text-slate-500' : 'text-rose-400'}>{q.met ? '✔' : q.optional ? '○' : '✘'}</span>
                   <span>
-                    {q.optional && <Pill tone="violet">bonus</Pill>} {REQUIREMENT_LABEL[q.kind]}{' '}
-                    {typeof q.target === 'number' ? fmt(q.target, 1) : q.target}
-                    {typeof q.actual === 'number' && <span className="text-slate-500"> (got {fmt(q.actual, 1)})</span>}
+                    {q.optional && <Pill tone="violet">{t('mission.bonus')}</Pill>} {REQUIREMENT_LABEL[q.kind]}{' '}
+                    {typeof q.target === 'number' ? fmt(q.target, 1) : localName(String(q.target))}
+                    {typeof q.actual === 'number' && <span className="text-slate-500">{t('results.gotActual', { actual: fmt(q.actual, 1) })}</span>}
                   </span>
                 </li>
               ))}
@@ -157,7 +164,7 @@ export function ResultsScreen() {
           <div className="flex flex-wrap gap-2">
             {mode === 'campaign' && (
               <button type="button" onClick={collectReward} className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500">
-                💰 Report to investors &amp; return to career
+                {t('results.reportToInvestors')}
               </button>
             )}
             <button
@@ -166,32 +173,34 @@ export function ResultsScreen() {
                 const url = shareUrl(mission.design, mission.seed)
                 navigator.clipboard?.writeText(url).then(
                   () => setCopied(true),
-                  () => window.prompt('Copy this link:', url),
+                  () => window.prompt(t('results.copyPrompt'), url),
                 )
               }}
               className="rounded-lg border border-slate-600 px-4 py-2 hover:border-slate-300"
             >
-              🔗 {copied ? 'Link copied!' : 'Share this mission'}
+              🔗 {copied ? t('results.copied') : t('results.share')}
             </button>
             <button type="button" onClick={backToDesign} className="btn-primary px-4 py-2 ">
-              ✎ Redesign
+              {t('results.redesign')}
             </button>
             <button type="button" onClick={() => flyAgain(true)} className="rounded-lg border border-slate-600 px-4 py-2 hover:border-slate-300">
-              ↻ Fly again (same seed)
+              {t('results.flyAgain')}
             </button>
             <button type="button" onClick={() => flyAgain(false)} className="rounded-lg border border-slate-600 px-4 py-2 hover:border-slate-300">
-              🎲 New seed
+              {t('results.newSeed')}
             </button>
           </div>
 
           <div>
-            <h2 className="hud-label">Your best {scenario.name} missions (this browser)</h2>
+            <h2 className="hud-label">
+              {t('results.bestMissions', { name: tx(`scenario.${scenario.id}.name`, scenario.name) })}
+            </h2>
             <ol className="mt-2 space-y-1 text-xs">
               {board.map((e, i) => (
                 <li key={`${e.seed}-${e.score}-${i}`} className="flex flex-wrap gap-x-3 text-slate-300">
                   <span className="font-mono text-slate-100">{e.score}</span>
-                  <span>{e.rank}</span>
-                  <span className="text-slate-500">seed {e.seed}</span>
+                  <span>{t(`results.rank.${e.rank}` as StringKey)}</span>
+                  <span className="text-slate-500">{t('results.seed', { seed: e.seed })}</span>
                   <span className="text-slate-500">{e.summary}</span>
                 </li>
               ))}

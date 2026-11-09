@@ -1,3 +1,4 @@
+import { rich } from '../rich'
 import { useCallback, useMemo, useState } from 'react'
 import { audio, useMusic } from '../../audio/audio'
 import { getInstrument, getLauncher } from '../../engine/catalog'
@@ -6,6 +7,7 @@ import { fmt } from '../../i18n/en'
 import { randomSeed, useGame } from '../../store/game'
 import { Disclaimer, Pill } from '../components'
 import { SoundingSequence } from './SoundingSequence'
+import { useT, useTx } from '../../i18n'
 
 const OPTIONS = ['magnetometer', 'particle_detector']
 
@@ -13,6 +15,8 @@ export function FirstLightScreen() {
   const campaign = useGame((s) => s.campaign)
   const finishSounding = useGame((s) => s.finishSounding)
   const go = useGame((s) => s.go)
+  const t = useT()
+  const tx = useTx()
   const [picked, setPicked] = useState<string[]>(['magnetometer'])
   const [seed, setSeed] = useState(randomSeed())
   const [phase, setPhase] = useState<'ready' | 'flying' | 'done'>('ready')
@@ -21,23 +25,24 @@ export function FirstLightScreen() {
   const result = useMemo(() => flySounding(picked, seed), [picked, seed])
   useMusic(phase === 'ready' ? 'design' : phase === 'done' && result.reachedSpace ? 'launch' : 'none')
   const onDone = useCallback(() => setPhase('done'), [])
-  const mass = picked.reduce((t, id) => t + getInstrument(id).massKg, 0)
+  const mass = picked.reduce((acc, id) => acc + getInstrument(id).massKg, 0)
+
+  const director = campaign ? `${campaign.profile.title} ${campaign.profile.name}` : t('firstLight.defaultDirector')
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
       <button type="button" onClick={() => go(campaign ? 'campaign' : 'home')} className="text-sm text-slate-400 hover:text-slate-100" disabled={phase === 'flying'}>
-        ← Back
+        {t('firstLight.back')}
       </button>
-      <h1 className="mt-2 text-2xl font-semibold">Prologue — First Light</h1>
+      <h1 className="mt-2 text-2xl font-semibold">{t('firstLight.title')}</h1>
       <p className="mt-1 max-w-3xl text-sm text-slate-300">
-        In a workshop in Arequipa, {campaign ? `${campaign.profile.title} ${campaign.profile.name}` : 'Dr. Pedro Goicochea'} rebuilt the liquid-propellant
-        rocket described in Pedro Paulet’s notebooks. Investors will only listen once it reaches space — the 100 km line — with a real experiment on board.
+        {t('firstLight.desc', { director })}
       </p>
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <SoundingSequence result={result} running={phase !== 'ready'} onDone={onDone} />
         <aside className="space-y-4">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm">
-            <h2 className="text-sm font-semibold">Experiment (max {limit} kg)</h2>
+            <h2 className="text-sm font-semibold">{t('firstLight.experimentTitle', { limit })}</h2>
             <ul className="mt-2 space-y-2">
               {OPTIONS.map((id) => {
                 const inst = getInstrument(id)
@@ -52,10 +57,10 @@ export function FirstLightScreen() {
                       aria-pressed={on}
                     >
                       <div className="font-medium">
-                        {on ? '☑' : '☐'} {inst.name}
+                        {on ? '☑' : '☐'} {tx(`component.${inst.id}.name`, inst.name)}
                       </div>
                       <div className="text-xs text-slate-400">
-                        {inst.massKg} kg · {inst.description}
+                        {inst.massKg} kg · {tx(`component.${inst.id}.description`, inst.description)}
                       </div>
                     </button>
                   </li>
@@ -63,17 +68,17 @@ export function FirstLightScreen() {
               })}
             </ul>
             <div className="mt-2 text-xs">
-              Payload {mass} / {limit} kg {mass > limit && <span className="text-rose-300">— too heavy! A small rocket cannot carry both.</span>}
+              {t('firstLight.payload', { mass, limit })} {mass > limit && <span className="text-rose-300">{t('firstLight.tooHeavy')}</span>}
             </div>
           </div>
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-slate-300">
-            <span className="font-semibold text-amber-200">History, honestly: </span>
-            {rocket.realWorld}
+            <span className="font-semibold text-amber-200">{t('firstLight.history')}</span>
+            {tx(`component.${rocket.id}.realWorld`, rocket.realWorld)}
           </div>
           {phase === 'ready' && (
             <>
               <label className="block text-xs text-slate-400">
-                Seed
+                {t('firstLight.seed')}
                 <input
                   type="number"
                   value={seed}
@@ -90,27 +95,33 @@ export function FirstLightScreen() {
                 }}
                 className="font-display w-full btn-primary px-4 py-4 text-lg  disabled:cursor-not-allowed disabled:bg-slate-700"
               >
-                🔥 Launch Paulet-1
+                {t('firstLight.launchBtn')}
               </button>
             </>
           )}
           {phase === 'done' && (
             <div className="rounded-xl border border-slate-700 bg-slate-900/70 p-4 text-sm">
-              <h2 className="font-display text-lg font-semibold">{result.reachedSpace ? 'You reached space!' : result.failed ? 'Paulet-1 failed' : 'Not quite space'}</h2>
+              <h2 className="font-display text-lg font-semibold">
+                {result.reachedSpace
+                  ? t('firstLight.result.space')
+                  : result.failed
+                  ? t('firstLight.result.failed')
+                  : t('firstLight.result.notQuite')}
+              </h2>
               <dl className="mt-2 grid grid-cols-2 gap-y-1 text-xs">
-                <dt className="text-slate-400">Apogee</dt>
+                <dt className="text-slate-400">{t('firstLight.apogee')}</dt>
                 <dd>{fmt(result.apogeeKm)} km</dd>
-                <dt className="text-slate-400">Burnout speed</dt>
+                <dt className="text-slate-400">{t('firstLight.burnout')}</dt>
                 <dd>{fmt(result.burnoutKms, 2)} km/s</dd>
-                <dt className="text-slate-400">Time in space</dt>
+                <dt className="text-slate-400">{t('firstLight.timeInSpace')}</dt>
                 <dd>{fmt(result.secondsInSpace)} s</dd>
-                <dt className="text-slate-400">Payload recovered</dt>
-                <dd>{result.recovered ? 'yes (parachute)' : 'no'}</dd>
-                <dt className="text-slate-400">Science</dt>
-                <dd>{fmt(result.science, 1)} pts</dd>
+                <dt className="text-slate-400">{t('firstLight.payloadRecovered')}</dt>
+                <dd>{result.recovered ? t('firstLight.recovered.yes') : t('firstLight.recovered.no')}</dd>
+                <dt className="text-slate-400">{t('firstLight.science')}</dt>
+                <dd>{t('firstLight.sciencePts', { pts: fmt(result.science, 1) })}</dd>
               </dl>
               <p className="mt-2 text-xs text-slate-400">
-                Lesson: reaching space is about going <b>up</b> 100 km; staying there is about going <b>sideways</b> at ~7.8 km/s — about five times faster than Paulet-1.
+                {rich(t('firstLight.lesson'))}
               </p>
               {campaign ? (
                 <button
@@ -118,15 +129,15 @@ export function FirstLightScreen() {
                   onClick={() => finishSounding(result, seed)}
                   className="mt-3 w-full rounded-lg bg-emerald-600 px-3 py-2 font-semibold text-white hover:bg-emerald-500"
                 >
-                  {result.reachedSpace ? 'Report to investors →' : 'Back to the workshop (−$1.5 M)'}
+                  {result.reachedSpace ? t('firstLight.reportToInvestors') : t('firstLight.backToWorkshop')}
                 </button>
               ) : (
                 <button type="button" onClick={() => go('home')} className="mt-3 w-full rounded-lg bg-slate-700 px-3 py-2 text-white">
-                  Back home
+                  {t('firstLight.backHome')}
                 </button>
               )}
               <div className="mt-2">
-                <Pill tone="slate">seed {seed}</Pill>
+                <Pill tone="slate">{t('results.seed', { seed })}</Pill>
               </div>
             </div>
           )}

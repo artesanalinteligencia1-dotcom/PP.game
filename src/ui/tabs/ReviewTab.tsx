@@ -3,17 +3,19 @@ import { RESOURCE_LABEL, ROLE_LABEL, message } from '../../i18n/en'
 import { Pill, SEV_BORDER, SEV_TEXT, Section } from '../components'
 import { RequirementsList } from './MissionTab'
 import { useGame } from '../../store/game'
+import { useT } from '../../i18n'
 
 const ICON = { ok: '●', warn: '▲', error: '■' } as const
 
 export function ReviewTab({ report }: { report: DesignReport }) {
   const errors = report.review.filter((r) => r.blocking)
   const goToLaunchPad = useGame((s) => s.goToLaunchPad)
+  const t = useT()
   return (
     <div>
       <Section
-        title="Design review"
-        hint="Automatic checklist. Red = blocking (cannot launch). Amber = allowed but risky or costly. Green = healthy. Each item explains why and what you can change."
+        title={t('review.title')}
+        hint={t('review.hint')}
       >
         <ul className="space-y-2">
           {report.review.map((item, i) => {
@@ -27,7 +29,7 @@ export function ReviewTab({ report }: { report: DesignReport }) {
                   <span className="font-medium">{m.title}</span>
                   <Pill>{RESOURCE_LABEL[item.resource]}</Pill>
                   {item.severity !== 'ok' && <Pill tone="violet">{ROLE_LABEL[item.role]}</Pill>}
-                  {item.blocking && <Pill tone="rose">blocking</Pill>}
+                  {item.blocking && <Pill tone="rose">{t('review.blocking')}</Pill>}
                 </div>
                 {item.severity !== 'ok' && <p className="mt-1 text-sm text-slate-300">{m.why}</p>}
                 {item.severity === 'ok' && <p className="mt-1 text-xs text-slate-400">{m.why}</p>}
@@ -43,7 +45,7 @@ export function ReviewTab({ report }: { report: DesignReport }) {
           })}
         </ul>
       </Section>
-      <Section title="Requirements (predicted)">
+      <Section title={t('review.requirements')}>
         <RequirementsList report={report} />
       </Section>
       <div className="rounded-lg border border-slate-700 bg-slate-900/60 p-4">
@@ -55,10 +57,12 @@ export function ReviewTab({ report }: { report: DesignReport }) {
             errors.length ? 'cursor-not-allowed bg-slate-800 text-slate-500' : 'btn-primary'
           }`}
         >
-          {errors.length ? `Fix ${errors.length} blocking issue${errors.length > 1 ? 's' : ''} to launch` : 'Go to the launch pad 🚀'}
+          {errors.length
+            ? t(errors.length === 1 ? 'review.fixBlocking.one' : 'review.fixBlocking.other', { count: errors.length })
+            : t('review.goToLaunchPad')}
         </button>
         <p className="mt-2 text-center text-xs text-slate-500">
-          {errors.length ? 'Red items would make the mission impossible.' : 'Amber items are allowed — but the mission will feel them.'}
+          {errors.length ? t('review.status.errors') : t('review.status.warnings')}
         </p>
       </div>
     </div>

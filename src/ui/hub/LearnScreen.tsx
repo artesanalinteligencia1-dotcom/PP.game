@@ -3,16 +3,16 @@ import { useMusic } from '../../audio/audio'
 import { G0, deltaV } from '../../engine/budget'
 import { L2_LYAPUNOV, VU_KMS, butterfly } from '../../engine/threebody'
 import { CR3BPView, VIEW_WIDE } from '../threebody/CR3BPView'
-import { getLauncher } from '../../engine/catalog'
 import { useGame } from '../../store/game'
 import { Disclaimer, Slider } from '../components'
+import { useT, type StringKey } from '../../i18n'
 
-const TABS = [
-  { id: 'orbit', label: '1 · What is an orbit?' },
-  { id: 'budgets', label: '2 · Mass, power, data' },
-  { id: 'rocket', label: '3 · The rocket equation' },
-  { id: 'chaos', label: '4 · Three bodies & chaos' },
-  { id: 'paulet', label: '5 · Pedro Paulet' },
+const TABS: { id: string; labelKey: StringKey }[] = [
+  { id: 'orbit', labelKey: 'learn.tab.orbit' },
+  { id: 'budgets', labelKey: 'learn.tab.budgets' },
+  { id: 'rocket', labelKey: 'learn.tab.rocket' },
+  { id: 'chaos', labelKey: 'learn.tab.chaos' },
+  { id: 'paulet', labelKey: 'learn.tab.paulet' },
 ]
 
 /** Newton's cannon: fire horizontally from 200 km up and integrate the two-body motion. */
@@ -48,34 +48,34 @@ function cannonPath(vKms: number) {
 }
 
 function OrbitLesson() {
+  const t = useT()
   const [v, setV] = useState(7.8)
   const { pts, outcome } = useMemo(() => cannonPath(v), [v])
   const s = 170 / (6371 * 2.2)
   const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${(200 + x * s).toFixed(1)} ${(210 - y * s).toFixed(1)}`).join(' ')
   const text =
     outcome === 'falls'
-      ? 'Too slow: the ground curves away less than you fall, so you hit the Earth.'
+      ? t('learn.orbit.falls')
       : outcome === 'escape'
-        ? 'Faster than ~11.2 km/s: you escape Earth’s gravity for good.'
+        ? t('learn.orbit.escape')
         : v < 8.2
-          ? 'About 7.8 km/s: you fall around the Earth forever — that is an orbit!'
-          : 'Between orbital and escape speed: a stretched orbit (an ellipse).'
+          ? t('learn.orbit.orbit')
+          : t('learn.orbit.stretched')
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px]">
-      <svg viewBox="0 0 400 420" className="w-full rounded-xl border border-slate-800 bg-slate-950" role="img" aria-label="Newton's cannon">
+      <svg viewBox="0 0 400 420" className="w-full rounded-xl border border-slate-800 bg-slate-950" role="img" aria-label={t('learn.orbit.aria')}>
         <circle cx="200" cy="210" r={6371 * s} fill="#1d4ed8" />
         <path d={d} fill="none" stroke="#fbbf24" strokeWidth="2" />
         <circle cx="200" cy={210 - (6371 + 200) * s} r="4" fill="#f97316" />
         <text x="12" y="20" fill="#94a3b8" fontSize="12">
-          Newton’s cannon (to scale): fired sideways from 200 km
+          {t('learn.orbit.diagram')}
         </text>
       </svg>
       <div className="space-y-3 text-sm">
-        <Slider label="Sideways speed" value={v} min={2} max={12} step={0.1} onChange={setV} format={(x) => `${x.toFixed(1)} km/s`} />
+        <Slider label={t('learn.orbit.speed')} value={v} min={2} max={12} step={0.1} onChange={setV} format={(x) => `${x.toFixed(1)} km/s`} />
         <p className="text-slate-200">{text}</p>
         <p className="text-slate-400">
-          An orbit is not “floating”: the spacecraft is always falling, but moving sideways so fast that the Earth curves away beneath it. Lower orbits are
-          faster (~7.7 km/s at 400 km); geostationary satellites move at ~3.1 km/s and take 24 h per lap.
+          {t('learn.orbit.explanation')}
         </p>
       </div>
     </div>
@@ -83,39 +83,38 @@ function OrbitLesson() {
 }
 
 function RocketLesson() {
+  const t = useT()
   const [isp, setIsp] = useState(300)
   const [ratio, setRatio] = useState(8)
   const dv = deltaV(isp, ratio, 1) / 1000
   const marks = [
-    { label: 'Paulet-1 to 110 km', kms: 1.5 },
-    { label: 'Low Earth orbit (incl. ~1.5 km/s gravity & drag losses)', kms: 9.4 },
-    { label: 'LEO → Moon transfer (approx.)', kms: 9.4 + 3.2 },
-    { label: 'LEO → Mars transfer (approx.)', kms: 9.4 + 3.6 },
+    { label: t('learn.rocket.mark.paulet'), kms: 1.5 },
+    { label: t('learn.rocket.mark.leo'), kms: 9.4 },
+    { label: t('learn.rocket.mark.moon'), kms: 9.4 + 3.2 },
+    { label: t('learn.rocket.mark.mars'), kms: 9.4 + 3.6 },
   ]
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px]">
       <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950 p-4">
         <div className="font-display text-3xl">
-          Δv = Isp · g₀ · ln(m<sub>full</sub>/m<sub>empty</sub>) = <span className="text-amber-300">{dv.toFixed(2)} km/s</span>
+          Δv = Isp · g₀ · ln(m<sub>{t('learn.rocket.subFull')}</sub>/m<sub>{t('learn.rocket.subEmpty')}</sub>) = <span className="text-amber-300">{dv.toFixed(2)} km/s</span>
         </div>
         <div className="text-xs text-slate-400">
           = {isp} s × {G0} m/s² × ln({ratio.toFixed(1)})
         </div>
         <ul className="mt-2 space-y-1 text-sm">
           {marks.map((m) => (
-            <li key={m.label} className={dv >= m.kms ? 'text-emerald-300' : 'text-slate-500'}>
+            <li key={m.kms} className={dv >= m.kms ? 'text-emerald-300' : 'text-slate-500'}>
               {dv >= m.kms ? '✔' : '○'} {m.label}: {m.kms.toFixed(1)} km/s
             </li>
           ))}
         </ul>
       </div>
       <div className="space-y-3 text-sm">
-        <Slider label="Engine efficiency (Isp)" value={isp} min={60} max={1500} step={10} onChange={setIsp} format={(x) => `${x} s`} />
-        <Slider label="Full mass ÷ empty mass" value={ratio} min={1.1} max={20} step={0.1} onChange={setRatio} format={(x) => `${x.toFixed(1)}×`} />
+        <Slider label={t('learn.rocket.isp')} value={isp} min={60} max={1500} step={10} onChange={setIsp} format={(x) => `${x} s`} />
+        <Slider label={t('learn.rocket.ratio')} value={ratio} min={1.1} max={20} step={0.1} onChange={setRatio} format={(x) => `${x.toFixed(1)}×`} />
         <p className="text-slate-400">
-          Δv grows only with the <i>logarithm</i> of the mass ratio: doubling the propellant does not double your speed. That is why rockets drop empty
-          stages (staging), why efficient engines matter, and why landing a booster for reuse costs payload — the landing propellant is mass you could have
-          used to go faster.
+          {t('learn.rocket.explanation')}
         </p>
       </div>
     </div>
@@ -130,6 +129,7 @@ const PERTURBATIONS: [number, string][] = [
 ]
 
 function ChaosLesson() {
+  const t = useT()
   const [rel, setRel] = useState(1e-4)
   const [days, setDays] = useState(40)
   const b = useMemo(() => butterfly(rel, days), [rel, days])
@@ -145,7 +145,7 @@ function ChaosLesson() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="text-slate-300">Change in the starting speed of the second spacecraft:</span>
+        <span className="text-slate-300">{t('learn.chaos.changeSpeed')}</span>
         {PERTURBATIONS.map(([v, l]) => (
           <button
             key={l}
@@ -158,9 +158,9 @@ function ChaosLesson() {
         ))}
         <span className="text-xs text-slate-400">≈ {cmPerS < 1 ? cmPerS.toFixed(2) : cmPerS.toFixed(1)} cm/s</span>
       </div>
-      <Slider label="Days simulated" value={days} min={10} max={60} step={5} onChange={setDays} format={(v) => `${v} days`} />
+      <Slider label={t('learn.chaos.daysSim')} value={days} min={10} max={60} step={5} onChange={setDays} format={(v) => t('learn.chaos.daysFormat', { days: String(v) })} />
       <div className="overflow-hidden rounded-xl border border-slate-800">
-        <CR3BPView vp={VIEW_WIDE} className="h-64 w-full" label="Two almost identical spacecraft near L2">
+        <CR3BPView vp={VIEW_WIDE} className="h-64 w-full" label={t('learn.chaos.viewLabel')}>
           {({ path }) => (
             <g>
               <path d={path(b.a.states)} fill="none" stroke="#fbbf24" strokeWidth={1.6} />
@@ -170,8 +170,8 @@ function ChaosLesson() {
         </CR3BPView>
       </div>
       <div className="rounded-xl border border-slate-800 bg-slate-950 p-3">
-        <div className="mb-1 text-xs text-slate-400">Distance between the two spacecraft (log scale: 1 km → 1 000 000 km)</div>
-        <svg viewBox={`0 0 ${W} ${H}`} className="h-36 w-full" role="img" aria-label="Divergence over time">
+        <div className="mb-1 text-xs text-slate-400">{t('learn.chaos.distTitle')}</div>
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-36 w-full" role="img" aria-label={t('learn.chaos.divergenceAria')}>
           {[0, 1, 2, 3, 4, 5, 6].map((k) => (
             <g key={k}>
               <line x1="0" x2={W} y1={H - (k / 6) * H} y2={H - (k / 6) * H} stroke="#1e293b" />
@@ -185,23 +185,20 @@ function ChaosLesson() {
       </div>
       <p className="text-sm text-slate-200">
         {b.daysTo1000km !== null
-          ? `After ${Math.round(b.daysTo1000km)} days the two spacecraft are already 1 000 km apart — although their speeds differed by about ${cmPerS < 1 ? cmPerS.toFixed(2) : cmPerS.toFixed(1)} cm/s at the start.`
-          : 'In this time they stay close… try more days or a bigger change.'}
+          ? t('learn.chaos.diverged', { days: String(Math.round(b.daysTo1000km)), diff: cmPerS < 1 ? cmPerS.toFixed(2) : cmPerS.toFixed(1) })
+          : t('learn.chaos.stayClose')}
       </p>
       <div className="space-y-2 text-sm text-slate-400">
         <p>
-          <b className="text-slate-200">This is chaos.</b> The motion is perfectly deterministic — the same starting numbers give exactly the same path, every
-          time, in every browser (the game guarantees it). But near the Lagrange points tiny differences grow exponentially, so any small navigation error
-          soon becomes a big one. Henri Poincaré found this behaviour while studying the three-body problem around 1890. Look at the yellow
-          “perfect” orbit too: after a few loops even it slides away — the orbit is unstable, and the tiniest rounding error is enough.
+          <b className="text-slate-200">{t('learn.chaos.p1.title')}</b>{' '}
+          {t('learn.chaos.p1.body')}
         </p>
         <p>
-          <b className="text-slate-200">Why it matters:</b> spacecraft on halo orbits make small, regular correction burns — cheap if done early, expensive if
-          you wait. The same chaos is also a gift: low-energy routes use it to reach the Moon or L2 with very little propellant.
+          <b className="text-slate-200">{t('learn.chaos.p2.title')}</b>{' '}
+          {t('learn.chaos.p2.body')}
         </p>
         <p className="text-xs">
-          In the game: Cadets watch this lesson, Researchers choose between precomputed routes, Program Directors also size the correction reserve and decide
-          when to correct.
+          {t('learn.chaos.p3')}
         </p>
       </div>
     </div>
@@ -209,14 +206,15 @@ function ChaosLesson() {
 }
 
 function BudgetsLesson() {
+  const t = useT()
   const cards = [
     {
-      t: 'Mass',
-      d: 'Every kilogram must be lifted. Parts + ~22% structure + a 20% safety margin + propellant from the rocket equation must fit the launcher.',
+      t: t('learn.budgets.mass.title'),
+      d: t('learn.budgets.mass.desc'),
     },
-    { t: 'Power', d: 'Solar panels only work in sunlight. During eclipses the battery carries the load — and every deep discharge ages it.' },
-    { t: 'Data', d: 'Instruments produce more data than radios can send. Ground passes last minutes; more stations or faster bands open the bottleneck.' },
-    { t: 'Money & time', d: 'Immature (low-TRL) technology costs more and takes longer. Investors fund results, not dreams.' },
+    { t: t('learn.budgets.power.title'), d: t('learn.budgets.power.desc') },
+    { t: t('learn.budgets.data.title'), d: t('learn.budgets.data.desc') },
+    { t: t('learn.budgets.money.title'), d: t('learn.budgets.money.desc') },
   ]
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -227,28 +225,30 @@ function BudgetsLesson() {
         </div>
       ))}
       <p className="text-sm text-slate-400 sm:col-span-2">
-        In the game, change any part and watch all four budgets move at once — that coupling is what spacecraft engineers call a trade-off.
+        {t('learn.budgets.tradeoff')}
       </p>
     </div>
   )
 }
 
 function PauletLesson() {
+  const t = useT()
   const go = useGame((s) => s.go)
   const campaign = useGame((s) => s.campaign)
+  const director = campaign ? `${campaign.profile.title} ${campaign.profile.name}` : t('firstLight.defaultDirector')
   const facts: [string, string][] = [
-    ['Documented', 'Pedro Paulet was born in Arequipa, Peru, in 1874 and died in Buenos Aires in 1945. He studied in Paris and worked as an engineer.'],
-    ['His own account', 'In a letter published in the Lima newspaper El Comercio in 1927, he said that around 1895–1897 in Paris he had tested a rocket engine burning liquid propellants.'],
-    ['Disputed', 'No independent record of those tests has been found; later historians could not verify them. Treat them as his claim, not established fact.'],
-    ['For comparison', 'The first verified flight of a liquid-propellant rocket was Robert Goddard’s, in Massachusetts, in 1926.'],
-    ['In this game', `${campaign ? `${campaign.profile.title} ${campaign.profile.name}` : 'Dr. Pedro Goicochea'} (fictional) builds Paulet-1 from those ideas. ${getLauncher('paulet').suborbital ? 'It reaches space but cannot reach orbit.' : ''}`],
+    [t('learn.paulet.tag.documented'), t('learn.paulet.fact.documented')],
+    [t('learn.paulet.tag.account'), t('learn.paulet.fact.account')],
+    [t('learn.paulet.tag.disputed'), t('learn.paulet.fact.disputed')],
+    [t('learn.paulet.tag.comparison'), t('learn.paulet.fact.comparison')],
+    [t('learn.paulet.tag.inGame'), t('learn.paulet.fact.inGame', { director })],
   ]
   return (
     <div className="space-y-3">
       <ol className="space-y-2">
         {facts.map(([tag, text]) => (
           <li key={tag} className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-sm">
-            <span className={`mr-2 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${tag === 'Disputed' ? 'bg-rose-500/20 text-rose-300' : tag === 'His own account' ? 'bg-amber-500/20 text-amber-300' : 'bg-sky-500/20 text-sky-300'}`}>
+            <span className={`mr-2 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${tag === t('learn.paulet.tag.disputed') ? 'bg-rose-500/20 text-rose-300' : tag === t('learn.paulet.tag.account') ? 'bg-amber-500/20 text-amber-300' : 'bg-sky-500/20 text-sky-300'}`}>
               {tag}
             </span>
             {text}
@@ -256,13 +256,14 @@ function PauletLesson() {
         ))}
       </ol>
       <button type="button" onClick={() => go('firstlight')} className="btn-primary px-4 py-2 ">
-        🔥 Fly Paulet-1 ({campaign ? 'from your career' : 'practice flight'})
+        {campaign ? t('learn.paulet.flyCareer') : t('learn.paulet.flyPractice')}
       </button>
     </div>
   )
 }
 
 export function LearnScreen() {
+  const t = useT()
   const go = useGame((s) => s.go)
   const tab = useGame((s) => s.learnTab)
   const openLearn = useGame((s) => s.openLearn)
@@ -270,19 +271,19 @@ export function LearnScreen() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
       <button type="button" onClick={() => go('home')} className="text-sm text-slate-400 hover:text-slate-100">
-        ← Home
+        {t('learn.back')}
       </button>
-      <h1 className="mt-2 text-2xl font-semibold">Learn</h1>
-      <nav className="mt-3 flex flex-wrap gap-1" aria-label="Lessons">
-        {TABS.map((t) => (
+      <h1 className="mt-2 text-2xl font-semibold">{t('learn.title')}</h1>
+      <nav className="mt-3 flex flex-wrap gap-1" aria-label={t('learn.lessons')}>
+        {TABS.map((tabItem) => (
           <button
-            key={t.id}
+            key={tabItem.id}
             type="button"
-            onClick={() => openLearn(t.id)}
-            aria-current={tab === t.id ? 'page' : undefined}
-            className={`rounded-lg px-3 py-1.5 text-sm ${tab === t.id ? 'bg-sky-500/20 text-sky-200' : 'text-slate-400 hover:text-slate-100'}`}
+            onClick={() => openLearn(tabItem.id)}
+            aria-current={tab === tabItem.id ? 'page' : undefined}
+            className={`rounded-lg px-3 py-1.5 text-sm ${tab === tabItem.id ? 'bg-sky-500/20 text-sky-200' : 'text-slate-400 hover:text-slate-100'}`}
           >
-            {t.label}
+            {t(tabItem.labelKey)}
           </button>
         ))}
       </nav>
@@ -293,7 +294,7 @@ export function LearnScreen() {
         {tab === 'chaos' && <ChaosLesson />}
         {tab === 'paulet' && <PauletLesson />}
       </div>
-      <p className="mt-6 text-xs text-slate-500">Numbers are rounded, educational values.</p>
+      <p className="mt-6 text-xs text-slate-500">{t('learn.educational')}</p>
       <div className="mt-2">
         <Disclaimer />
       </div>

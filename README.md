@@ -19,7 +19,7 @@ Inspired by the engineering spirit of Pedro Paulet and by chaos in orbital mecha
 | 3.5 | Act 2: real Earth–Moon three-body physics, transfer routes, chaos lesson, Lagrange Observatory, reusable heavy | ✅ (branch `cloud/fase-1`) |
 | 3+ | Campaign with investors, player name, difficulty levels, save/share, hub + intro video, lessons, 3-body module, Paulet legacy, polish | planned |
 
-Live demo: _pending deploy_.
+Live demo: **https://paulet-andes-to-orbit.vercel.app/** (installable, plays offline after the first visit).
 
 ## How to play
 **Career:** start a new career, fly **Paulet-1** — the sounding rocket built from Pedro Paulet's notebooks — past 100 km, then take contracts from

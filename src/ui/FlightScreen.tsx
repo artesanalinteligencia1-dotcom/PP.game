@@ -1,3 +1,5 @@
+import { useMsg } from '../i18n'
+import { rich } from './rich'
 import { useEffect, useRef } from 'react'
 import { audio, useMusic } from '../audio/audio'
 import { JourneyView } from './JourneyView'
@@ -9,11 +11,12 @@ import { ROLE_BLURB, ROLE_LABEL, fmt } from '../i18n/en'
 import { ALL_ROLES, useGame } from '../store/game'
 import { Disclaimer, Pill } from './components'
 import { ROLE_ICON } from './tabs/MissionTab'
+import { useT, useTx, type StringKey } from '../i18n'
 
-const SPEEDS: [number, string][] = [
-  [4, '1 month/s'],
-  [13, '1 quarter/s'],
-  [52, '1 year/s'],
+const SPEEDS: [number, StringKey][] = [
+  [4, 'flight.speed.month'],
+  [13, 'flight.speed.quarter'],
+  [52, 'flight.speed.year'],
 ]
 
 const LOG_COLOR = { info: 'text-slate-300', good: 'text-emerald-300', warn: 'text-amber-300', bad: 'text-rose-300' } as const
@@ -47,6 +50,9 @@ export function FlightScreen() {
   const setPersonality = useGame((s) => s.setPersonality)
   const choose = useGame((s) => s.choose)
   const showResults = useGame((s) => s.showResults)
+  const t = useT()
+  const msg = useMsg()
+  const tx = useTx()
   const scenario = getScenario(mission.scenarioId)
   const r = mission.report
   const acc = useRef(0)
@@ -82,14 +88,21 @@ export function FlightScreen() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-4">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <h1 className="text-xl font-semibold">{scenario.name} — mission control</h1>
-        <Pill tone={mission.phase === 'transfer' ? 'violet' : mission.phase === 'operations' ? 'sky' : 'slate'}>{mission.phase}</Pill>
+        <h1 className="text-xl font-semibold">
+          {t('flight.title', { name: tx(`scenario.${scenario.id}.name`, scenario.name) })}
+        </h1>
+        <Pill tone={mission.phase === 'transfer' ? 'violet' : mission.phase === 'operations' ? 'sky' : 'slate'}>
+          {t(`flight.phase.${mission.phase}` as StringKey)}
+        </Pill>
         <span className="font-mono text-sm text-slate-300">
           {mission.phase === 'transfer'
-            ? `transfer week ${mission.week}/${mission.transferWeeks}`
-            : `year ${fmt(years, 2)} of ${fmt(mission.plannedOpsWeeks / SIM_WEEKS_PER_YEAR, 1)}`}
+            ? t('flight.transferWeek', { week: mission.week, total: mission.transferWeeks })
+            : t('flight.opsYear', {
+                year: fmt(years, 2),
+                total: fmt(mission.plannedOpsWeeks / SIM_WEEKS_PER_YEAR, 1),
+              })}
         </span>
-        <span className="text-xs text-slate-500">seed {mission.seed}</span>
+        <span className="text-xs text-slate-500">{t('results.seed', { seed: mission.seed })}</span>
         <div className="ml-auto flex items-center gap-1">
           {!ended && (
             <button
@@ -98,17 +111,17 @@ export function FlightScreen() {
               disabled={waitingForYou}
               className="rounded border border-slate-700 px-3 py-1 text-sm hover:border-slate-400 disabled:opacity-40"
             >
-              {playing ? '❚❚ Pause' : '▶ Play'}
+              {playing ? t('flight.pause') : t('flight.play')}
             </button>
           )}
-          {SPEEDS.map(([v, label]) => (
+          {SPEEDS.map(([v, labelKey]) => (
             <button
               key={v}
               type="button"
               onClick={() => setSpeed(v)}
               className={`rounded px-2 py-1 text-xs ${speed === v ? 'bg-sky-500/20 text-sky-300' : 'text-slate-400 hover:text-slate-200'}`}
             >
-              {label}
+              {t(labelKey)}
             </button>
           ))}
         </div>
@@ -117,8 +130,8 @@ export function FlightScreen() {
       <div className="mt-4 grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)_320px]">
         {/* Team */}
         <section className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="hud-label">Your team</h2>
-          <p className="mt-1 text-xs text-slate-400">Take a role yourself or hand it to a bot. Advisors always explain the call.</p>
+          <h2 className="hud-label">{t('flight.team.title')}</h2>
+          <p className="mt-1 text-xs text-slate-400">{t('flight.team.hint')}</p>
           <ul className="mt-3 space-y-2">
             {ALL_ROLES.map((role: Role) => (
               <li key={role} className="flex items-center justify-between gap-2 rounded border border-slate-800 px-2 py-1.5" title={ROLE_BLURB[role]}>
@@ -131,21 +144,21 @@ export function FlightScreen() {
                   className={`rounded px-2 py-0.5 text-xs font-semibold ${delegated[role] ? 'bg-violet-500/20 text-violet-300' : 'bg-sky-500/20 text-sky-300'}`}
                   aria-pressed={!delegated[role]}
                 >
-                  {delegated[role] ? 'Bot' : 'You'}
+                  {delegated[role] ? t('flight.team.bot') : t('flight.team.you')}
                 </button>
               </li>
             ))}
           </ul>
           <label className="mt-3 block text-xs text-slate-400">
-            Bot personality
+            {t('flight.personality.label')}
             <select
               value={personality}
               onChange={(e) => setPersonality(e.target.value as Personality)}
               className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-slate-200"
             >
-              <option value="prudent">Prudent — always the safest option</option>
-              <option value="balanced">Balanced — the option that fits the situation</option>
-              <option value="bold">Bold — more science, more risk</option>
+              <option value="prudent">{t('flight.personality.prudent')}</option>
+              <option value="balanced">{t('flight.personality.balanced')}</option>
+              <option value="bold">{t('flight.personality.bold')}</option>
             </select>
           </label>
         </section>
@@ -157,31 +170,31 @@ export function FlightScreen() {
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
             <div className="mb-1 flex justify-between text-xs text-slate-400">
-              <span>Science points (violet) · battery health % (blue) · power vs need % (amber)</span>
+              <span>{t('flight.chartLegend')}</span>
             </div>
             <div className="h-56">
               <ResponsiveContainer>
                 <LineChart data={mission.series.slice()} margin={{ top: 5, right: 8, bottom: 0, left: -18 }}>
                   <XAxis dataKey="week" tick={{ fill: '#94a3b8', fontSize: 10 }} />
                   <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', fontSize: 12 }} labelFormatter={(w) => `week ${w}`} />
-                  <Line isAnimationActive={false} type="monotone" dataKey="science" name="Science" stroke="#a78bfa" dot={false} strokeWidth={2} />
-                  <Line isAnimationActive={false} type="monotone" dataKey="battery" name="Battery %" stroke="#38bdf8" dot={false} />
-                  <Line isAnimationActive={false} type="monotone" dataKey="power" name="Power %" stroke="#fbbf24" dot={false} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #334155', fontSize: 12 }} labelFormatter={(w) => t('results.chartWeek', { week: String(w) })} />
+                  <Line isAnimationActive={false} type="monotone" dataKey="science" name={t('flight.chart.science')} stroke="#a78bfa" dot={false} strokeWidth={2} />
+                  <Line isAnimationActive={false} type="monotone" dataKey="battery" name={t('flight.chart.battery')} stroke="#38bdf8" dot={false} />
+                  <Line isAnimationActive={false} type="monotone" dataKey="power" name={t('flight.chart.power')} stroke="#fbbf24" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-            <h2 className="hud-label">Mission log</h2>
+            <h2 className="hud-label">{t('flight.log.title')}</h2>
             <ul className="mt-2 max-h-64 space-y-1 overflow-y-auto pr-1 text-sm" aria-live="polite">
               {logs.map((l, i) => (
                 <li key={`${l.week}-${i}`} className={LOG_COLOR[l.severity]}>
-                  <span className="mr-2 font-mono text-[11px] text-slate-500">w{l.week}</span>
+                  <span className="mr-2 font-mono text-[11px] text-slate-500">{t('flight.log.week', { week: l.week })}</span>
                   <span className="mr-1" title={ROLE_LABEL[l.role]}>
                     {ROLE_ICON[l.role]}
                   </span>
-                  {l.text}
+                  {msg(l.msg)}
                 </li>
               ))}
             </ul>
@@ -190,65 +203,70 @@ export function FlightScreen() {
 
         {/* Gauges */}
         <section className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="hud-label">Spacecraft status</h2>
+          <h2 className="hud-label">{t('flight.status.title')}</h2>
           <Gauge
-            label="Science"
+            label={t('flight.gauge.science')}
             value={`${fmt(mission.science)} / ${scenario.scienceTarget}`}
             fill={mission.science / scenario.scienceTarget}
             tone="ok"
-            tip="Science points collected so far vs the scenario target."
+            tip={t('flight.gauge.science.tip')}
           />
           <Gauge
-            label="Battery health"
+            label={t('flight.gauge.battery')}
             value={`${fmt(batteryHealth * 100)}%`}
             fill={batteryHealth}
             tone={mission.batteryWear > 0.8 ? 'bad' : mission.batteryWear > 0.5 ? 'warn' : 'ok'}
-            tip="Every eclipse uses a charge cycle; deep cycles wear the battery faster."
+            tip={t('flight.gauge.battery.tip')}
           />
           <Gauge
-            label="Power vs need"
+            label={t('flight.gauge.power')}
             value={`${fmt(powerRatio * 100)}%`}
             fill={powerRatio / 2}
             tone={powerRatio < 1 ? 'bad' : powerRatio < 1.1 ? 'warn' : 'ok'}
-            tip="Solar arrays lose a few % per year (and to impacts)."
+            tip={t('flight.gauge.power.tip')}
           />
           <Gauge
-            label="Radiation dose"
+            label={t('flight.gauge.radiation')}
             value={`${fmt(mission.doseKrad, 1)} / ${obc.radToleranceKrad} krad`}
             fill={mission.doseKrad / obc.radToleranceKrad}
             tone={mission.doseKrad / obc.radToleranceKrad > 0.8 ? 'bad' : mission.doseKrad / obc.radToleranceKrad > 0.5 ? 'warn' : 'ok'}
-            tip="When the dose exceeds what the computer tolerates, it fails."
+            tip={t('flight.gauge.radiation.tip')}
           />
           <Gauge
-            label="On-board data backlog"
+            label={t('flight.gauge.backlog')}
             value={`${fmt(mission.backlogGb, 1)} / ${r.data.storageGb} GB`}
             fill={mission.backlogGb / r.data.storageGb}
             tone={mission.backlogGb / r.data.storageGb > 0.9 ? 'bad' : mission.backlogGb > 0.5 * r.data.storageGb ? 'warn' : 'ok'}
-            tip="Data waiting for a ground pass. When memory is full, new data is lost."
+            tip={t('flight.gauge.backlog.tip')}
           />
           <Gauge
-            label="Budget reserve"
+            label={t('flight.gauge.budget')}
             value={`$${fmt(mission.reserveM, 1)} M`}
             fill={mission.reserveM / Math.max(1, r.cost.contingencyM + Math.max(0, scenario.budgetM - r.cost.totalM))}
             tone={mission.reserveM < 1 ? 'bad' : mission.reserveM < 5 ? 'warn' : 'ok'}
-            tip="Contingency plus unspent budget. Cuts and rentals come out of here; at zero, investors stop operations."
+            tip={t('flight.gauge.budget.tip')}
           />
           {r.mass.ispS > 0 && (
             <Gauge
-              label="Orbit-keeping Δv left"
+              label={t('flight.gauge.dv')}
               value={`${fmt(mission.dvRemaining, 1)} m/s`}
               fill={mission.dvRemaining / Math.max(1, r.mass.totalDv)}
               tone={mission.dvRemaining < 2 ? 'warn' : 'ok'}
-              tip="Propellant budget for station-keeping and avoidance manoeuvres."
+              tip={t('flight.gauge.dv.tip')}
             />
           )}
           <div className="text-xs text-slate-400">
-            Data delivered: <span className="font-mono text-slate-200">{fmt(mission.dataDeliveredGb)} GB</span> · lost:{' '}
-            <span className="font-mono text-slate-200">{fmt(mission.dataLostGb)} GB</span>
+            {rich(
+              t('flight.dataDelivered', {
+                delivered: fmt(mission.dataDeliveredGb),
+                lost: fmt(mission.dataLostGb),
+              }),
+              'font-mono text-slate-200',
+            )}
           </div>
           {ended && (
             <button type="button" onClick={showResults} className="mt-2 w-full btn-primary px-4 py-3 ">
-              Mission report →
+              {t('flight.seeReport')}
             </button>
           )}
         </section>
@@ -258,12 +276,12 @@ export function FlightScreen() {
         <div className="fixed inset-0 z-30 grid place-items-center bg-slate-950/70 p-4" role="dialog" aria-modal="true" aria-labelledby="decision-title">
           <div className="w-full max-w-lg rounded-2xl border border-amber-400/50 bg-slate-900 p-5 shadow-2xl">
             <div className="text-xs font-semibold uppercase tracking-wide text-amber-300">
-              {ROLE_ICON[pending.role]} {ROLE_LABEL[pending.role]} needs a decision · week {pending.week}
+              {ROLE_ICON[pending.role]} {t('flight.decision.header', { role: ROLE_LABEL[pending.role], week: pending.week })}
             </div>
             <h2 id="decision-title" className="mt-1 text-xl font-semibold">
-              {pending.title}
+              {msg(pending.title)}
             </h2>
-            <p className="mt-2 text-sm text-slate-300">{pending.text}</p>
+            <p className="mt-2 text-sm text-slate-300">{msg(pending.text)}</p>
             <div className="mt-4 space-y-2">
               {pending.options.map((o) => (
                 <button
@@ -272,13 +290,15 @@ export function FlightScreen() {
                   onClick={() => choose(o.id)}
                   className="w-full rounded-lg border border-slate-700 p-3 text-left hover:border-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 >
-                  <div className="font-medium">{o.label}</div>
-                  <div className="text-xs text-slate-400">{o.hint}</div>
+                  <div className="font-medium">{msg(o.label)}</div>
+                  <div className="text-xs text-slate-400">{msg(o.hint)}</div>
                 </button>
               ))}
             </div>
             <button type="button" onClick={() => choose('', true)} className="mt-3 text-xs text-violet-300 hover:text-violet-200">
-              Let the {personality} bot decide this one
+              {t('flight.decision.delegateBot', {
+                personality: t(`flight.personality.name.${personality}` as StringKey),
+              })}
             </button>
           </div>
         </div>

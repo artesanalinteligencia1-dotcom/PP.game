@@ -1,4 +1,5 @@
 // Campaign ("career"): contracts, investors, Funds + Prestige, technology unlocks. Pure functions over a serialisable state.
+import { M, type Msg } from './text'
 import { getLauncher } from './catalog/components'
 import type { MissionScore, Rank } from './score'
 import type { MissionState } from './simulate'
@@ -236,7 +237,7 @@ export interface Reward {
   prestige: number
   trust: Partial<Record<InvestorId, number>>
   unlocked: string[]
-  notes: string[]
+  notes: Msg[]
 }
 
 function clampTrust(x: number) {
@@ -250,18 +251,18 @@ export function applyOrbitalResult(state: CampaignState, contractId: string, sco
   const factor = score.rank === 'Fail' ? 0 : score.rank === 'Partial' ? 0.4 : 0.7 + (0.3 * score.total) / 1000
   const client = c.client === 'self' ? null : c.client
   const pay = c.paymentM * factor * (client ? trustMultiplier(state.trust[client]) : 1) * (first ? 1 : 0.25)
-  const notes: string[] = []
+  const notes: Msg[] = []
   let fundsM = pay
   if (mission.boosterLanded === false) {
     fundsM -= 8
-    notes.push('Lost booster: −$8 M to replace it.')
+    notes.push(M('campaign.note.boosterLost'))
   }
-  if (mission.boosterLanded === true) notes.push('Booster recovered: it will fly again.')
+  if (mission.boosterLanded === true) notes.push(M('campaign.note.boosterRecovered'))
   const better = !prev || score.total > prev.best
   let prestige = first ? RANK_PRESTIGE[score.rank] + (isSuccess(score.rank) ? 20 : 0) : better ? Math.round(RANK_PRESTIGE[score.rank] / 3) : 0
   if (first && isSuccess(score.rank) && mission.boosterLanded === true && state.boostersLanded === 0) {
     prestige += 30
-    notes.push('First booster landing of your program: +30 prestige!')
+    notes.push(M('campaign.note.firstLanding'))
   }
   const trust: Partial<Record<InvestorId, number>> = {}
   for (const id of Object.keys(INVESTORS) as InvestorId[]) {
@@ -292,7 +293,7 @@ export function applyOrbitalResult(state: CampaignState, contractId: string, sco
 export function applySoundingResult(state: CampaignState, result: SoundingResult, seed: number): { state: CampaignState; reward: Reward } {
   const rocketCost = getLauncher('paulet').costM
   const first = !state.completed.first_light
-  const notes: string[] = []
+  const notes: Msg[] = []
   let fundsM = -rocketCost
   let prestige = 0
   const unlocked: string[] = []
@@ -301,9 +302,9 @@ export function applySoundingResult(state: CampaignState, result: SoundingResult
       fundsM += 10
       prestige += 25
       unlocked.push('commercial_launchers')
-      notes.push('Investors are convinced: you can now buy rides on commercial orbital launchers.')
+      notes.push(M('campaign.note.investorsConvinced'))
     } else prestige += 2
-  } else notes.push('Paulet-1 did not reach space. Build another one and try again.')
+  } else notes.push(M('campaign.note.noSpace'))
   const rank: Rank = result.reachedSpace ? (result.recovered ? 'Outstanding' : 'Success') : result.failed ? 'Fail' : 'Partial'
   const scoreTotal = Math.round(result.science * 10)
   const next: CampaignState = {
@@ -319,12 +320,12 @@ export function applySoundingResult(state: CampaignState, result: SoundingResult
   return { state: next, reward: { fundsM, prestige, trust: {}, unlocked, notes } }
 }
 
-export function canBuyTech(state: CampaignState, tech: TechDef): { ok: boolean; why?: string } {
-  if (!tech.available) return { ok: false, why: `Coming in Act ${tech.act}` }
-  if (state.unlocked.includes(tech.id)) return { ok: false, why: 'Already unlocked' }
-  if (tech.requires?.some((c) => !isSuccess(state.completed[c]?.rank))) return { ok: false, why: 'Complete the required contract first' }
-  if (state.prestige < tech.prestige) return { ok: false, why: `Needs ${tech.prestige} prestige` }
-  if (state.fundsM < tech.costM) return { ok: false, why: `Needs $${tech.costM} M` }
+export function canBuyTech(state: CampaignState, tech: TechDef): { ok: boolean; why?: Msg } {
+  if (!tech.available) return { ok: false, why: M('campaign.why.comingAct', { act: tech.act }) }
+  if (state.unlocked.includes(tech.id)) return { ok: false, why: M('campaign.why.unlocked') }
+  if (tech.requires?.some((c) => !isSuccess(state.completed[c]?.rank))) return { ok: false, why: M('campaign.why.contract') }
+  if (state.prestige < tech.prestige) return { ok: false, why: M('campaign.why.prestige', { prestige: tech.prestige }) }
+  if (state.fundsM < tech.costM) return { ok: false, why: M('campaign.why.funds', { cost: tech.costM }) }
   return { ok: true }
 }
 

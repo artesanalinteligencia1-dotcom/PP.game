@@ -3,17 +3,19 @@ import { create } from 'zustand'
 
 export type PadLight = 'auto' | 'dawn' | 'day' | 'night'
 export type MotionPref = 'system' | 'reduced' | 'full'
-export type Language = 'en'
+export type Language = 'en' | 'es'
 
 export interface Settings {
   padLight: PadLight
   motion: MotionPref
   language: Language
+  /** False until the player picks a language on the first boot (English is the default). */
+  languageChosen: boolean
   uiSounds: boolean
 }
 
 const KEY = 'ppgame.settings.v1'
-export const DEFAULT_SETTINGS: Settings = { padLight: 'auto', motion: 'system', language: 'en', uiSounds: true }
+export const DEFAULT_SETTINGS: Settings = { padLight: 'auto', motion: 'system', language: 'en', languageChosen: false, uiSounds: true }
 
 function read(): Settings {
   try {
@@ -22,7 +24,8 @@ function read(): Settings {
     return {
       padLight: ['auto', 'dawn', 'day', 'night'].includes(v.padLight as string) ? v.padLight! : 'auto',
       motion: ['system', 'reduced', 'full'].includes(v.motion as string) ? v.motion! : 'system',
-      language: 'en',
+      language: v.language === 'es' ? 'es' : 'en',
+      languageChosen: v.languageChosen === true,
       uiSounds: v.uiSounds !== false,
     }
   } catch {
@@ -38,12 +41,13 @@ export const useSettings = create<SettingsStore>((set, get) => ({
   ...(typeof window !== 'undefined' ? read() : DEFAULT_SETTINGS),
   set: (key, value) => {
     set({ [key]: value } as Partial<SettingsStore>)
-    const { padLight, motion, language, uiSounds } = get()
+    const { padLight, motion, language, languageChosen, uiSounds } = get()
     try {
-      localStorage.setItem(KEY, JSON.stringify({ padLight, motion, language, uiSounds }))
+      localStorage.setItem(KEY, JSON.stringify({ padLight, motion, language, languageChosen, uiSounds }))
     } catch {
       /* ignore */
     }
+    if (key === 'language' && typeof document !== 'undefined') document.documentElement.lang = String(value)
   },
 }))
 

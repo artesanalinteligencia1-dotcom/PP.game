@@ -8,9 +8,9 @@ import { randomSeed, useGame } from '../store/game'
 import { Disclaimer } from './components'
 import { LaunchSequence, type LaunchOutcome } from './launch/LaunchSequence'
 import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
+import { useT, useTx } from '../i18n'
 
 type Phase = 'ready' | 'flying' | 'success' | 'failure'
-
 
 export function LaunchScreen() {
   const design = useGame((s) => s.design)!
@@ -21,6 +21,8 @@ export function LaunchScreen() {
   const showResults = useGame((s) => s.showResults)
   const backToDesign = useGame((s) => s.backToDesign)
   const mission = useGame((s) => s.mission)
+  const t = useT()
+  const tx = useTx()
   const scenario = getScenario(design.scenarioId)
   const report = useMemo(() => evaluateDesign(design, scenario), [design, scenario])
   const launcher = getLauncher(design.launcherId)
@@ -43,42 +45,44 @@ export function LaunchScreen() {
     <main className="mx-auto max-w-6xl px-4 py-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <button type="button" onClick={backToDesign} className="text-sm text-slate-400 hover:text-slate-100" disabled={phase === 'flying'}>
-          ← Back to design
+          {t('launch.backToDesign')}
         </button>
-        <span className="text-xs text-slate-500">Same design + same seed + same decisions = same mission</span>
+        <span className="text-xs text-slate-500">{t('launch.seedRule')}</span>
       </div>
-      <h1 className="mt-3 text-2xl font-semibold">Launch pad — {scenario.name}</h1>
+      <h1 className="mt-3 text-2xl font-semibold">
+        {t('launch.title', { name: tx(`scenario.${scenario.id}.name`, scenario.name) })}
+      </h1>
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <LaunchSequence design={design} running={phase !== 'ready'} failed={failed} seed={seed} onDone={onDone} skipTo={skip} boosterLanded={mission?.boosterLanded ?? null} />
         <aside className="space-y-4">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm">
-            <h2 className="text-sm font-semibold">Payload in the fairing</h2>
+            <h2 className="text-sm font-semibold">{t('launch.fairingPayload')}</h2>
             <div className="mt-2 flex items-center gap-3">
               <div className="rounded-lg bg-slate-950/70 p-1">
                 <SpacecraftSprite design={design} size={96} deployed={false} />
               </div>
               <dl className="grid flex-1 grid-cols-2 gap-y-1 text-xs">
-                <dt className="text-slate-400">Wet mass</dt>
+                <dt className="text-slate-400">{t('launch.wetMass')}</dt>
                 <dd>{fmt(report.mass.wetKg)} kg</dd>
-                <dt className="text-slate-400">Capacity</dt>
+                <dt className="text-slate-400">{t('launch.capacity')}</dt>
                 <dd>{fmt(report.mass.capacityKg)} kg</dd>
-                <dt className="text-slate-400">Target</dt>
-                <dd>{orbit.name}</dd>
+                <dt className="text-slate-400">{t('launch.target')}</dt>
+                <dd>{tx(`component.${orbit.id}.name`, orbit.name)}</dd>
               </dl>
             </div>
             <dl className="mt-3 grid grid-cols-2 gap-y-1 text-xs">
-              <dt className="text-slate-400">Launcher</dt>
-              <dd>{launcher.name}</dd>
-              <dt className="text-slate-400">Reliability</dt>
+              <dt className="text-slate-400">{t('launch.launcher')}</dt>
+              <dd>{tx(`component.${launcher.id}.name`, launcher.name)}</dd>
+              <dt className="text-slate-400">{t('launch.reliability')}</dt>
               <dd>{fmt(launcher.reliability * 100)}%</dd>
-              <dt className="text-slate-400">Success chance</dt>
+              <dt className="text-slate-400">{t('dashboard.risk.label')}</dt>
               <dd>{fmt(report.risk.successProbability * 100)}%</dd>
-              <dt className="text-slate-400">Planned life</dt>
+              <dt className="text-slate-400">{t('launch.plannedLife')}</dt>
               <dd>{fmt(design.designLifeYears, 1)} yr</dd>
             </dl>
           </div>
           <label className="block rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm">
-            <span className="font-semibold">Mission seed</span>
+            <span className="font-semibold">{t('launch.missionSeed')}</span>
             <div className="mt-2 flex gap-2">
               <input
                 type="number"
@@ -92,12 +96,12 @@ export function LaunchScreen() {
                 className="rounded border border-slate-700 px-2 text-xs hover:border-slate-400"
                 disabled={phase !== 'ready'}
                 onClick={() => setSeed(randomSeed())}
-                aria-label="Random seed"
+                aria-label={t('launch.randomSeed')}
               >
                 🎲
               </button>
             </div>
-            <span className="mt-1 block text-[11px] text-slate-500">Share it so friends can fly the exact same mission.</span>
+            <span className="mt-1 block text-[11px] text-slate-500">{t('launch.shareSeedHint')}</span>
           </label>
           {phase === 'ready' && (
             <button
@@ -105,12 +109,12 @@ export function LaunchScreen() {
               onClick={go}
               className="font-display w-full btn-primary px-4 py-4 text-lg "
             >
-              🚀 Launch
+              {t('launch.launchBtn')}
             </button>
           )}
           {phase === 'flying' && (
             <button type="button" onClick={() => setSkip(true)} className="w-full rounded-xl border border-slate-700 px-4 py-3 text-sm text-slate-300">
-              Skip animation
+              {t('launch.skipAnimation')}
             </button>
           )}
           {phase === 'success' && (
@@ -119,12 +123,12 @@ export function LaunchScreen() {
               onClick={startFlight}
               className="font-display w-full rounded-xl bg-emerald-600 px-4 py-4 text-lg font-bold text-white hover:bg-emerald-500"
             >
-              Start mission ▶
+              {t('launch.startMission')}
             </button>
           )}
           {phase === 'failure' && (
             <button type="button" onClick={showResults} className="w-full rounded-xl bg-slate-700 px-4 py-4 font-semibold text-white hover:bg-slate-600">
-              See mission report
+              {t('launch.seeReport')}
             </button>
           )}
         </aside>
