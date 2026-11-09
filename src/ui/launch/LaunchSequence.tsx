@@ -8,6 +8,7 @@ import { spacecraftVisual } from '../spacecraft/visual'
 import { AndesBackdrop, CloudDeck, EarthLimb, HighClouds, LaunchPad, OceanWithShip, SceneryLight, SkyBackdrop, Stars, launchWindowStyle, useSceneryStyle } from './LaunchScenery'
 import { LANDING_TOUCH, LAUNCHERS_3D, boosterLandingAt } from './three/ascent'
 import { webglAvailable } from './three/support'
+import { useT, useTx, t, type StringKey } from '../../i18n'
 
 // The Three.js scene is a separate chunk; the SVG scene below stays as the fallback (reduced motion, no WebGL,
 // and the side-booster rockets until they are modelled in 3D).
@@ -34,12 +35,12 @@ export function makeTimeline(count: number) {
 export type Timeline = ReturnType<typeof makeTimeline>
 
 /** Farewell lines from mission control (English); one is chosen per mission from the seed. */
-export const FAREWELLS = [
-  'Good luck, traveler.',
-  'Godspeed, explorer.',
-  'Fly safe, and bring us back some science.',
-  'The sky is not the limit anymore.',
-  'Good luck out there. We are with you.',
+export const FAREWELLS: StringKey[] = [
+  'launch.farewell.0',
+  'launch.farewell.1',
+  'launch.farewell.2',
+  'launch.farewell.3',
+  'launch.farewell.4',
 ]
 export const farewellIndex = (seed: number) => (seed >>> 0) % FAREWELLS.length
 const MET_FACTOR = 60 // 1 s of animation ≈ 1 min of real ascent
@@ -65,9 +66,9 @@ function clamp(x: number, a = 0, b = 1) {
 
 export function failureTime(seed: number, T: Timeline): { at: number; text: string } {
   const k = seed % 3
-  if (k === 0) return { at: T.liftoff + 1.9, text: 'Engine anomaly on the first stage. The flight termination system was triggered.' }
-  if (k === 1) return { at: T.meco, text: 'Stage separation failed: the stages collided.' }
-  return { at: T.liftoff + 6.3, text: 'The upper-stage engine shut down early. The spacecraft never reached orbital speed.' }
+  if (k === 0) return { at: T.liftoff + 1.9, text: t('launch.fail.engineAnomaly') }
+  if (k === 1) return { at: T.meco, text: t('launch.fail.stageSeparation') }
+  return { at: T.liftoff + 6.3, text: t('launch.fail.secoEarly') }
 }
 
 export const rocketHeight = (id: string) => (id === 'light' ? 150 : id === 'heavy' ? 230 : 200)
@@ -161,7 +162,10 @@ export function Rocket({ launcherId, t, failAt, v, T }: { launcherId: string; t:
 }
 
 export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, boosterLanded }: Props) {
+  const tText = useT()
+  const tx = useTx()
   const launcher = getLauncher(design.launcherId)
+  const launcherName = tx(`component.${launcher.id}.name`, launcher.name)
   const orbit = getOrbit(design.orbitId)
   const v = useMemo(() => spacecraftVisual(design), [design])
   const [t, setT] = useState(0)
@@ -249,29 +253,35 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const scTopY = rocketY - H * 0.9
   const deployK = clamp((t - T.deploy) / 1.2)
   const exploded = fail !== null && t >= fail.at
-  const stage = t < T.liftoff ? 'Pre-launch' : t < T.meco ? 'Stage 1' : t < T.seco ? 'Stage 2' : 'Orbit'
+  const stage = t < T.liftoff
+    ? tText('launch.stage.preLaunch')
+    : t < T.meco
+      ? tText('launch.stage.stage1')
+      : t < T.seco
+        ? tText('launch.stage.stage2')
+        : tText('launch.stage.orbit')
 
   const caption = (() => {
     if (exploded) return fail!.text
-    if (t < Math.min(4, T.ignition)) return T.count > 3 ? 'Launch director: all stations report GO for launch.' : 'Final countdown. All systems go.'
-    if (t < T.ignition) return 'Final countdown.'
-    if (t < T.liftoff) return 'Ignition! The engines build up to full thrust while clamps hold the rocket down.'
-    if (t < T.maxQ) return 'Liftoff! Thrust must be greater than the rocket’s weight.'
+    if (t < Math.min(4, T.ignition)) return T.count > 3 ? tText('launch.caption.go') : tText('launch.caption.countdownAllGo')
+    if (t < T.ignition) return tText('launch.caption.countdown')
+    if (t < T.liftoff) return tText('launch.caption.ignition')
+    if (t < T.maxQ) return tText('launch.caption.liftoff')
     if (t < (design.launcherId === 'heavy' ? T.boosterSep : T.meco))
-      return 'Max-Q: maximum aerodynamic pressure. The engines throttle down so the air does not crush the rocket.'
-    if (design.launcherId === 'heavy' && t < T.meco) return 'Side boosters separate: dropping empty tanks saves mass (rocket equation).'
-    if (t < T.fairing) return 'Main engine cut-off and stage separation: the empty first stage falls away.'
-    if (launcher.landing && t < T.meco + 4.5) return 'Stage separation. The first stage flips around and heads back to land on a drone ship — reusable rockets cut the cost of every launch.'
+      return tText('launch.caption.maxQ')
+    if (design.launcherId === 'heavy' && t < T.meco) return tText('launch.caption.boosters')
+    if (t < T.fairing) return tText('launch.caption.meco')
+    if (launcher.landing && t < T.meco + 4.5) return tText('launch.caption.landingSep')
     if (t < T.seco)
       return launcher.rideshare
-        ? 'Fairing separation: meet your spacecraft — and your rideshare neighbours, small satellites sharing the trip and the cost.'
-        : 'Fairing separation: above the atmosphere the nose cover is dead weight. Meet your spacecraft!'
+        ? tText('launch.caption.fairingRideshare')
+        : tText('launch.caption.fairingStandard')
     if (t < T.deploy) {
-      if (orbit.launchTarget === 'tli') return `Parking orbit at ${Math.round(parking)} km. Next: the burn that sends you away from Earth.`
-      if (orbit.launchTarget === 'gto') return `Parking orbit at ${Math.round(parking)} km. Next: the transfer burn towards the high orbit.`
-      return `Orbit insertion: ${Math.round(parking)} km at ${vOrbit.toFixed(1)} km/s — fast enough to keep falling around Earth.`
+      if (orbit.launchTarget === 'tli') return tText('launch.caption.tli', { parking: String(Math.round(parking)) })
+      if (orbit.launchTarget === 'gto') return tText('launch.caption.gto', { parking: String(Math.round(parking)) })
+      return tText('launch.caption.orbitInsertion', { parking: String(Math.round(parking)), speed: vOrbit.toFixed(1) })
     }
-    return 'Spacecraft separation and solar-array deployment. Hello, space!'
+    return tText('launch.caption.separation')
   })()
 
   const fmtMet = (s: number) => {
@@ -287,7 +297,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
           <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} visual={v} landed={boosterLanded !== false} />
         </Suspense>
       )}
-      <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Launch of the ${launcher.name}`}>
+      <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={tText('launch.aria', { launcher: launcherName })}>
         {!use3D && (
         <>
         <SceneryLight style={launchWindowStyle(orbit.launchTarget)}>
@@ -344,7 +354,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
         )}
         {running && t >= T.ignition && t < T.liftoff && (
           <text x="400" y="190" textAnchor="middle" fontSize="64" fontWeight="800" fill="#fbbf24" letterSpacing="6" style={{ fontFamily: 'var(--font-display)' }}>
-            IGNITION
+            {tText('launch.ignition')}
           </text>
         )}
       </svg>
@@ -357,17 +367,17 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
       )}
       {/* HUD */}
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-slate-950/70 px-3 py-2 font-mono text-[11px] leading-5 text-slate-200 backdrop-blur">
-        <div className="font-display text-xs font-semibold text-sky-300">{launcher.name}</div>
+        <div className="font-display text-xs font-semibold text-sky-300">{launcherName}</div>
         <div>{running ? fmtMet(met) : fmtMet(-T.ignition)}</div>
-        <div>ALT {altKm.toFixed(0)} km</div>
-        <div>VEL {velKms.toFixed(2)} km/s</div>
-        <div>Δv {dvSpent.toFixed(2)} km/s</div>
+        <div>{tText('launch.hud.alt', { alt: altKm.toFixed(0) })}</div>
+        <div>{tText('launch.hud.vel', { vel: velKms.toFixed(2) })}</div>
+        <div>{tText('launch.hud.dv', { dv: dvSpent.toFixed(2) })}</div>
         <div className="text-slate-400">{stage}</div>
       </div>
       {running && !exploded && t >= T.farewell && t < T.farewell + 3.2 && (
         <div className="absolute inset-x-0 top-20 text-center" aria-live="polite">
-          <span className="rounded-lg bg-slate-950/70 px-4 py-2 font-display text-xl font-semibold text-amber-200 shadow-lg">“{farewell}”</span>
-          <div className="mt-1 text-xs text-slate-300">— Mission Control</div>
+          <span className="rounded-lg bg-slate-950/70 px-4 py-2 font-display text-xl font-semibold text-amber-200 shadow-lg">“{tText(farewell)}”</span>
+          <div className="mt-1 text-xs text-slate-300">{tText('launch.hud.missionControl')}</div>
         </div>
       )}
       {running && (
@@ -381,18 +391,20 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
 
 /** Labels over the 3D booster-recovery inset (the scene draws it in the same box: LANDING_INSET in LaunchScene3D). */
 function BoosterLandingLabels({ t, landed }: { t: number; landed: boolean }) {
+  const tText = useT()
   const st = boosterLandingAt(t, landed)
   const done = t >= LANDING_TOUCH
   return (
     <div className="pointer-events-none absolute bottom-16 right-3 flex w-[26%] flex-col justify-between rounded-lg border border-slate-600/80 p-1.5 text-[10px] text-slate-100" style={{ aspectRatio: '1 / 0.6' }}>
-      <span className="self-start rounded bg-slate-950/70 px-1.5 font-semibold text-sky-300">Booster recovery</span>
-      <span className="self-start rounded bg-slate-950/70 px-1.5">{!done ? (st.burning ? 'Landing burn…' : 'Falling back to the drone ship…') : landed ? '✔ The booster landed!' : '✘ Booster lost at sea'}</span>
+      <span className="self-start rounded bg-slate-950/70 px-1.5 font-semibold text-sky-300">{tText('launch.booster.title')}</span>
+      <span className="self-start rounded bg-slate-950/70 px-1.5">{!done ? (st.burning ? tText('launch.booster.burning') : tText('launch.booster.falling')) : landed ? tText('launch.booster.landed') : tText('launch.booster.crashed')}</span>
     </div>
   )
 }
 
 /** Inset: the reusable first stage returning to a drone ship (outcome from the mission's seeded roll). */
 function BoosterLanding({ t, landed }: { t: number; landed: boolean }) {
+  const tText = useT()
   const touch = 3.2
   const k = Math.min(1, t / touch)
   const y = 20 + 78 * (1 - (1 - k) ** 2)
@@ -400,7 +412,7 @@ function BoosterLanding({ t, landed }: { t: number; landed: boolean }) {
   const crashed = !landed && t >= touch
   return (
     <div className="absolute bottom-16 right-3 w-44 overflow-hidden rounded-lg border border-slate-700 bg-slate-950/85 p-1 text-[10px] text-slate-300">
-      <div className="px-1 font-semibold text-sky-300">Booster recovery</div>
+      <div className="px-1 font-semibold text-sky-300">{tText('launch.booster.title')}</div>
       <svg viewBox="0 0 160 120" className="h-28 w-full">
         <OceanWithShip />
         {!crashed && (
@@ -417,7 +429,7 @@ function BoosterLanding({ t, landed }: { t: number; landed: boolean }) {
         )}
         {crashed && <circle cx="80" cy="98" r={6 + (t - touch) * 14} fill="#f97316" opacity={Math.max(0, 1 - (t - touch) / 1.5)} />}
       </svg>
-      <div className="px-1 pb-1">{t < touch ? 'Landing burn…' : landed ? '✔ The booster landed!' : '✘ Booster lost at sea'}</div>
+      <div className="px-1 pb-1">{t < touch ? tText('launch.booster.burning') : landed ? tText('launch.booster.landed') : tText('launch.booster.crashed')}</div>
     </div>
   )
 }
