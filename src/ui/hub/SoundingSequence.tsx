@@ -5,6 +5,7 @@ import { useReducedMotion } from '../../store/settings'
 import { AndesBackdrop, HighClouds, SceneryLight, SkyBackdrop, Stars } from '../launch/LaunchScenery'
 import { webglAvailable } from '../launch/three/support'
 import { soundingAltKm, soundingSpeedKms, soundingTimeline } from './soundingProfile'
+import { useT } from '../../i18n'
 
 // The 3D prologue is a separate chunk; the SVG below stays as the fallback (reduced motion, no WebGL).
 const SoundingScene3D = lazy(() => import('../launch/three/SoundingScene3D'))
@@ -13,6 +14,7 @@ const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 
 /** Paulet-1: countdown → ignition → powered ascent → coast to apogee → fall → parachute. */
 export function SoundingSequence({ result, running, onDone }: { result: SoundingResult; running: boolean; onDone: () => void }) {
+  const tText = useT()
   const voice = hasVoice('count_10') && hasVoice('ignition')
   const count = voice ? 10 : 3
   const T = useMemo(() => soundingTimeline(count), [count])
@@ -68,20 +70,20 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
   const speed = soundingSpeedKms(t, T, result)
 
   const caption = exploded
-    ? 'Engine failure: Paulet-1 broke apart. Early rockets failed often — every failure taught engineers something.'
+    ? tText('sounding.caption.fail')
     : t < T.ignition
-      ? 'Paulet-1 on its rail: a liquid-propellant rocket built from Pedro Paulet’s notebooks.'
+      ? tText('sounding.caption.rail')
       : t < T.liftoff
-        ? 'Ignition! Liquid propellants burn in the chamber — the idea Paulet said he tested in Paris in the 1890s.'
+        ? tText('sounding.caption.ignition')
         : t < T.burnout
-          ? 'Powered flight: the engine burns for about a minute, then the tanks are empty.'
+          ? tText('sounding.caption.burn')
           : t < T.apogee
-            ? `Coasting upwards. Burnout speed ≈ ${result.burnoutKms.toFixed(1)} km/s.`
+            ? tText('sounding.caption.coast', { speed: result.burnoutKms.toFixed(1) })
             : t < T.chute
               ? result.reachedSpace
-                ? `Apogee ${ap.toFixed(0)} km — above the 100 km line: space, for ${Math.round(result.secondsInSpace)} seconds!`
-                : `Apogee ${ap.toFixed(0)} km — below the 100 km line.`
-              : 'Parachute open. It falls back because orbit needs ~7.8 km/s sideways, not 1.5 km/s straight up.'
+                ? tText('sounding.caption.apogeeSpace', { ap: ap.toFixed(0), seconds: String(Math.round(result.secondsInSpace)) })
+                : tText('sounding.caption.apogeeSub', { ap: ap.toFixed(0) })
+              : tText('sounding.caption.chute')
 
   return (
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
@@ -90,7 +92,7 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
           <SoundingScene3D T={T} tRef={tRef} result={result} />
         </Suspense>
       )}
-      <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Paulet-1 sounding flight">
+      <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={tText('sounding.aria')}>
         {!use3D && (
         <>
         <SceneryLight style="dawn">
@@ -105,7 +107,7 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
             <line x1="60" x2="740" y1={y(km)} y2={y(km)} stroke={km === SPACE_LINE_KM ? '#fbbf24' : '#94a3b8'} strokeDasharray="6 6" opacity={km === 0 ? 0 : 0.6} />
             {km > 0 && (
               <text x="742" y={y(km) + 4} fill={km === SPACE_LINE_KM ? '#fbbf24' : '#cbd5e1'} fontSize="12">
-                {km === SPACE_LINE_KM ? '100 km — space' : `${km} km`}
+                {km === SPACE_LINE_KM ? tText('sounding.ladder.space') : tText('sounding.ladder.km', { km: String(km) })}
               </text>
             )}
           </g>
@@ -159,15 +161,15 @@ export function SoundingSequence({ result, running, onDone }: { result: Sounding
         )}
         {running && t >= T.ignition && t < T.liftoff && (
           <text x="400" y="200" textAnchor="middle" fontSize="64" fontWeight="800" fill="#fbbf24" letterSpacing="6" style={{ fontFamily: 'var(--font-display)' }}>
-            IGNITION
+            {tText('launch.ignition')}
           </text>
         )}
       </svg>
       <div className="pointer-events-none absolute left-3 top-3 rounded-lg bg-slate-950/70 px-3 py-2 font-mono text-[11px] leading-5 text-slate-200">
         <div className="font-display text-xs font-semibold text-amber-300">Paulet-1</div>
-        <div>ALT {alt.toFixed(0)} km</div>
-        <div>VEL {speed.toFixed(2)} km/s</div>
-        <div className="text-slate-400">orbit needs 7.8 km/s</div>
+        <div>{tText('launch.hud.alt', { alt: alt.toFixed(0) })}</div>
+        <div>{tText('launch.hud.vel', { vel: speed.toFixed(2) })}</div>
+        <div className="text-slate-400">{tText('sounding.hud.orbitNeeds')}</div>
       </div>
       {running && (
         <div className="absolute inset-x-3 bottom-3 rounded-lg bg-slate-950/75 px-3 py-2 text-sm text-slate-100" aria-live="polite">
