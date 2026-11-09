@@ -135,6 +135,9 @@
   both languages because the player cannot read the other one yet; each language name is written in itself.
 - **Voices stay in English; videos get translated captions only** (owner). No build date or dated version in the game (owner).
 - **The engine stays pure and English**: catalog text stays in `src/engine/catalog` as the fallback and is mirrored in
-  en.json (`useTx(key, fallback)`); event sentences will become code + params (Claude, delivery 2).
+  en.json (`useTx(key, fallback)`). Event sentences are messages, key + params (`src/engine/text.ts`), which also keeps the
+  game's seeded determinism untouched: the same mission reads the same in any language.
+- **Intro captions are drawn by the game, not burned in**, so one 5 MB video serves every language (fullscreen goes on the frame
+  so the captions stay visible).
 - **Work split to save tokens** (owner has Gemini): extraction by Gemini Flash (Antigravity, `GEMINI.md`), translation
   by Gemini in the chat (`docs/i18n/PROMPT_TRANSLATE.md`), review and engine refactor by Claude.

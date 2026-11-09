@@ -1,3 +1,5 @@
+import { useMsg } from '../i18n'
+import { rich } from './rich'
 import { useEffect, useRef } from 'react'
 import { audio, useMusic } from '../audio/audio'
 import { JourneyView } from './JourneyView'
@@ -49,6 +51,7 @@ export function FlightScreen() {
   const choose = useGame((s) => s.choose)
   const showResults = useGame((s) => s.showResults)
   const t = useT()
+  const msg = useMsg()
   const tx = useTx()
   const scenario = getScenario(mission.scenarioId)
   const r = mission.report
@@ -187,11 +190,11 @@ export function FlightScreen() {
             <ul className="mt-2 max-h-64 space-y-1 overflow-y-auto pr-1 text-sm" aria-live="polite">
               {logs.map((l, i) => (
                 <li key={`${l.week}-${i}`} className={LOG_COLOR[l.severity]}>
-                  <span className="mr-2 font-mono text-[11px] text-slate-500">w{l.week}</span>
+                  <span className="mr-2 font-mono text-[11px] text-slate-500">{t('flight.log.week', { week: l.week })}</span>
                   <span className="mr-1" title={ROLE_LABEL[l.role]}>
                     {ROLE_ICON[l.role]}
                   </span>
-                  {l.text}
+                  {msg(l.msg)}
                 </li>
               ))}
             </ul>
@@ -253,10 +256,13 @@ export function FlightScreen() {
             />
           )}
           <div className="text-xs text-slate-400">
-            {t('flight.dataDelivered', {
-              delivered: fmt(mission.dataDeliveredGb),
-              lost: fmt(mission.dataLostGb),
-            })}
+            {rich(
+              t('flight.dataDelivered', {
+                delivered: fmt(mission.dataDeliveredGb),
+                lost: fmt(mission.dataLostGb),
+              }),
+              'font-mono text-slate-200',
+            )}
           </div>
           {ended && (
             <button type="button" onClick={showResults} className="mt-2 w-full btn-primary px-4 py-3 ">
@@ -273,9 +279,9 @@ export function FlightScreen() {
               {ROLE_ICON[pending.role]} {t('flight.decision.header', { role: ROLE_LABEL[pending.role], week: pending.week })}
             </div>
             <h2 id="decision-title" className="mt-1 text-xl font-semibold">
-              {pending.title}
+              {msg(pending.title)}
             </h2>
-            <p className="mt-2 text-sm text-slate-300">{pending.text}</p>
+            <p className="mt-2 text-sm text-slate-300">{msg(pending.text)}</p>
             <div className="mt-4 space-y-2">
               {pending.options.map((o) => (
                 <button
@@ -284,8 +290,8 @@ export function FlightScreen() {
                   onClick={() => choose(o.id)}
                   className="w-full rounded-lg border border-slate-700 p-3 text-left hover:border-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 >
-                  <div className="font-medium">{o.label}</div>
-                  <div className="text-xs text-slate-400">{o.hint}</div>
+                  <div className="font-medium">{msg(o.label)}</div>
+                  <div className="text-xs text-slate-400">{msg(o.hint)}</div>
                 </button>
               ))}
             </div>

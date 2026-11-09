@@ -162,16 +162,17 @@ describe('outcomes', () => {
 
 describe('bots and analysis', () => {
   it('bot personalities pick safe / best / bold options', () => {
+    const M = { key: 'sim.who.you' }
     const p = {
       eventId: 'x',
       week: 1,
       role: 'engineer' as const,
-      title: '',
-      text: '',
+      title: M,
+      text: M,
       options: [
-        { id: 'a', label: '', hint: '', quality: 'ok' as const, safe: true },
-        { id: 'b', label: '', hint: '', quality: 'good' as const },
-        { id: 'c', label: '', hint: '', quality: 'poor' as const, bold: true },
+        { id: 'a', label: M, hint: M, quality: 'ok' as const, safe: true },
+        { id: 'b', label: M, hint: M, quality: 'good' as const },
+        { id: 'c', label: M, hint: M, quality: 'poor' as const, bold: true },
       ],
     }
     expect(botChoice(p, 'prudent')).toBe('a')

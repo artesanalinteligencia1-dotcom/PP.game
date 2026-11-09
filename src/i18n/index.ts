@@ -4,6 +4,7 @@
 import en from './strings/en.json'
 import es from './strings/es.json'
 import { useSettings } from '../store/settings'
+import { renderParam, type Msg } from '../engine/text'
 
 export const LANGUAGES = ['en', 'es'] as const
 export type Lang = (typeof LANGUAGES)[number]
@@ -47,6 +48,18 @@ export function translateDynamic(lang: Lang, key: string, fallback: string, para
 export function useTx(): (key: string, fallback: string, params?: Params) => string {
   const lang = useSettings((s) => s.language)
   return (key, fallback, params) => translateDynamic(lang, key, fallback, params)
+}
+
+/** Renders a message emitted by the engine. A plain string (older in-memory data) passes through. */
+export function translateMsg(lang: Lang, m: Msg | string): string {
+  if (typeof m === 'string') return m
+  const params: Params = {}
+  for (const [k, v] of Object.entries(m.params ?? {})) params[k] = renderParam(v, (r) => translateDynamic(lang, r.ref, r.en))
+  return translateDynamic(lang, m.key, m.key, params)
+}
+export function useMsg(): (m: Msg | string) => string {
+  const lang = useSettings((s) => s.language)
+  return (m) => translateMsg(lang, m)
 }
 
 export function useLang(): Lang {

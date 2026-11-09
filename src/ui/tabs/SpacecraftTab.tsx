@@ -114,7 +114,7 @@ export function SpacecraftTab({ design, report }: { design: Design; report: Desi
               key={c.id}
               selected={design.compressionId === c.id}
               onClick={() => update({ compressionId: c.id })}
-              title={tx(`component.${c.id}.name`, c.name)}
+              title={tx(`component.${c.id === 'none' ? 'compression_none' : c.id}.name`, c.name)}
               stats={[
                 c.powerW ? `${c.powerW} W` : '0 W',
                 c.costM ? `$${c.costM} M` : t('spacecraft.free'),

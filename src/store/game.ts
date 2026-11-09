@@ -51,7 +51,7 @@ interface GameState {
   mode: 'free' | 'campaign'
   contractId: string | null
   campaign: CampaignState | null
-  lastReward: (Reward & { contractTitle: string }) | null
+  lastReward: (Reward & { contractId: string; contractTitle: string }) | null
   rewardCollected: boolean
   learnTab: string
   scenarioId: string | null
@@ -164,7 +164,7 @@ export const useGame = create<GameState>((set, get) => ({
     if (!c) return
     const { state, reward } = applySoundingResult(c, result, seed)
     saveCampaign(state)
-    set({ campaign: state, lastReward: { ...reward, contractTitle: 'First Light' }, screen: 'campaign' })
+    set({ campaign: state, lastReward: { ...reward, contractId: 'first_light', contractTitle: CONTRACTS.find((k) => k.id === 'first_light')!.title }, screen: 'campaign' })
   },
   collectReward: () => {
     const { campaign, contractId, mission, rewardCollected } = get()
@@ -174,7 +174,7 @@ export const useGame = create<GameState>((set, get) => ({
     saveCampaign(state)
     set({
       campaign: state,
-      lastReward: { ...reward, contractTitle: CONTRACTS.find((k) => k.id === contractId)?.title ?? contractId },
+      lastReward: { ...reward, contractId: contractId!, contractTitle: CONTRACTS.find((k) => k.id === contractId)?.title ?? contractId },
       rewardCollected: true,
       screen: 'campaign',
       design: null,

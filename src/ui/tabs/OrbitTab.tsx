@@ -87,14 +87,14 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                 key={r.id}
                 selected={getRoute(orbit.id, design.routeId)?.id === r.id}
                 onClick={() => update({ routeId: r.id, tcmReserveDv: undefined })}
-                title={tx(`route.${r.id}.name`, r.name)}
+                title={tx(`route.${orbit.id}.${r.id}.name`, r.name)}
                 stats={[
                   t('orbit.route.arrivalBurn', { dv: r.insertionDv }),
                   t('orbit.route.months', { months: fmt(r.transferMonths, 1) }),
                   t('orbit.route.corrections', { dv: r.tcmDv }),
                 ]}
               >
-                {tx(`route.${r.id}.description`, r.description)}
+                {tx(`route.${orbit.id}.${r.id}.description`, r.description)}
               </OptionCard>
             ))}
           </Grid>
@@ -114,7 +114,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                 />
                 <p className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-xs text-slate-300">
                   <span className="font-semibold text-sky-300">{t('orbit.realWorld')}</span>
-                  {tx(`route.${route.id}.realWorld`, route.realWorld)}
+                  {tx(`route.${orbit.id}.${route.id}.realWorld`, route.realWorld)}
                 </p>
                 {orbit.id === 'em_l2_halo' && (
                   <div className="overflow-hidden rounded-xl border border-slate-800">

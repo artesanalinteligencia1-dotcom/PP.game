@@ -1,3 +1,4 @@
+import { useMsg } from '../i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { audio, useMusic } from '../audio/audio'
 import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
@@ -5,7 +6,7 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'rec
 import { getScenario } from '../engine/catalog'
 import { analyseMission } from '../engine/report'
 import { scoreMission, type Rank } from '../engine/score'
-import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt } from '../i18n/en'
+import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt, localName } from '../i18n/en'
 import { useGame } from '../store/game'
 import { shareUrl } from '../store/share'
 import { Disclaimer, Pill } from './components'
@@ -43,6 +44,7 @@ export function ResultsScreen() {
   const collectReward = useGame((s) => s.collectReward)
   const [copied, setCopied] = useState(false)
   const t = useT()
+  const msg = useMsg()
   const tx = useTx()
   const scenario = getScenario(mission.scenarioId)
   const score = useMemo(() => scoreMission(mission, scenario), [mission, scenario])
@@ -92,7 +94,7 @@ export function ResultsScreen() {
             {score.lines.map((l) => (
               <li key={l.key}>
                 <div className="flex justify-between">
-                  <span className="text-slate-300">{l.label}</span>
+                  <span className="text-slate-300">{msg(l.labelMsg)}</span>
                   <span className="font-mono text-slate-100">
                     {fmt(l.points)} / {fmt(l.max)}
                   </span>
@@ -100,7 +102,7 @@ export function ResultsScreen() {
                 <div className="mt-0.5 h-1.5 overflow-hidden rounded bg-slate-800">
                   <div className="h-full bg-sky-500" style={{ width: `${(l.points / l.max) * 100}%` }} />
                 </div>
-                <div className="mt-0.5 text-[11px] text-slate-500">{l.detail}</div>
+                <div className="mt-0.5 text-[11px] text-slate-500">{msg(l.detail)}</div>
               </li>
             ))}
           </ul>
@@ -151,7 +153,7 @@ export function ResultsScreen() {
                   <span className={q.met ? 'text-emerald-400' : q.optional ? 'text-slate-500' : 'text-rose-400'}>{q.met ? '✔' : q.optional ? '○' : '✘'}</span>
                   <span>
                     {q.optional && <Pill tone="violet">{t('mission.bonus')}</Pill>} {REQUIREMENT_LABEL[q.kind]}{' '}
-                    {typeof q.target === 'number' ? fmt(q.target, 1) : q.target}
+                    {typeof q.target === 'number' ? fmt(q.target, 1) : localName(String(q.target))}
                     {typeof q.actual === 'number' && <span className="text-slate-500">{t('results.gotActual', { actual: fmt(q.actual, 1) })}</span>}
                   </span>
                 </li>

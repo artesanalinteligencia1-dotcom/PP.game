@@ -1,5 +1,7 @@
 // UI strings and Design Review explanations. Engine returns codes + params; text lives in strings/*.json.
 import type { ResourceKey, ReviewItem, Role } from '../engine/types'
+import { adcs, antennas, arrays, bands, batteries, compression, instruments, launchers, obcs, orbits, propulsion, stations, thermal } from '../engine/catalog/components'
+import { ROUTES } from '../engine/catalog/routes'
 import { LOCALE, currentLang, t, type StringKey } from './index'
 
 export const fmt = (n: number | string | undefined, digits = 0): string => {
@@ -260,9 +262,39 @@ export const MESSAGES: Record<string, (p: P) => Message> = {
   SCIENCE_OK: () => ({ title: t('review.msg.SCIENCE_OK.title'), why: t('review.msg.SCIENCE_OK.why') }),
 }
 
+// The engine's review params and requirement targets carry catalog names in English. They are shown translated.
+const NAME_KEYS = new Map<string, string>([
+  ['No compression', 'component.compression_none.name'],
+  ['thrusters for rendezvous', 'requirement.target.thrusters'],
+])
+for (const list of [instruments, launchers, orbits, arrays, batteries, bands, antennas, obcs, adcs, propulsion, thermal, compression, stations]) {
+  for (const c of list) if (!NAME_KEYS.has(c.name)) NAME_KEYS.set(c.name, `component.${c.id}.name`)
+}
+for (const [orbit, list] of Object.entries(ROUTES)) for (const r of list) NAME_KEYS.set(r.name, `route.${orbit}.${r.id}.name`)
+
+/** Translates a catalog name, or a " / "-separated list of them. Anything else is returned as it came. */
+export function localName(value: string): string {
+  return value
+    .split(' / ')
+    .map((name) => {
+      const key = NAME_KEYS.get(name)
+      return key ? t(key as StringKey) : name
+    })
+    .join(' / ')
+}
+
+const POINTING = new Set(['coarse', 'fine', 'precise'])
+
 export function message(item: ReviewItem): Message {
   const f = MESSAGES[item.code]
-  return f ? f(item.params) : { title: item.code, why: '' }
+  if (!f) return { title: item.code, why: '' }
+  const params = Object.fromEntries(
+    Object.entries(item.params).map(([k, v]) => {
+      if (typeof v !== 'string') return [k, v]
+      return [k, k === 'need' && POINTING.has(v) ? t(`spacecraft.adcs.${v}` as StringKey) : localName(v)]
+    }),
+  ) as P
+  return f(params)
 }
 
 const REQUIREMENTS = [

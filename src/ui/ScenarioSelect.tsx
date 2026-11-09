@@ -1,3 +1,4 @@
+import { rich } from './rich'
 import { useMusic } from '../audio/audio'
 import { scenarios } from '../engine/catalog'
 import { useGame } from '../store/game'
@@ -41,7 +42,7 @@ export function ScenarioSelect() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <Pill>{t('select.budget', { budget: s.budgetM })}</Pill>
                 <Pill>{t('select.devMonths', { months: s.devMonths })}</Pill>
-                <Pill>{t('select.lifeYears', { years: s.requiredLifeYears })}</Pill>
+                <Pill>{t(s.requiredLifeYears === 1 ? 'select.lifeYears.one' : 'select.lifeYears.other', { years: s.requiredLifeYears })}</Pill>
               </div>
             </button>
           ))}
@@ -51,9 +52,9 @@ export function ScenarioSelect() {
         <h2 className="font-semibold text-slate-200">{t('select.howToPlay')}</h2>
         <ol className="mt-2 list-inside list-decimal space-y-1 text-slate-400">
           <li>{t('select.step1')}</li>
-          <li>{t('select.step2')}</li>
+          <li>{rich(t('select.step2'))}</li>
           <li>{t('select.step3')}</li>
-          <li>{t('select.step4')}</li>
+          <li>{rich(t('select.step4'))}</li>
         </ol>
       </section>
       <footer className="mt-8 text-center">

@@ -1,3 +1,4 @@
+import { useMsg } from '../../i18n'
 import { useState } from 'react'
 import { useMusic } from '../../audio/audio'
 import { CONTRACTS, INVESTORS, TECH, availableLaunchers, canBuyTech, contractStatus, trustMultiplier, type InvestorId } from '../../engine/campaign'
@@ -27,6 +28,7 @@ export function CampaignScreen() {
   const lastReward = useGame((s) => s.lastReward)
   const [editing, setEditing] = useState(false)
   const t = useT()
+  const msg = useMsg()
   const tx = useTx()
   useMusic('design')
   const launchersNow = availableLaunchers(c)
@@ -52,11 +54,11 @@ export function CampaignScreen() {
 
       {lastReward && (
         <section className="mt-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm">
-          <span className="font-semibold">{lastReward.contractTitle}:</span> {lastReward.fundsM >= 0 ? '+' : '−'}${fmt(Math.abs(lastReward.fundsM), 1)} M ·{' '}
-          +{lastReward.prestige} prestige
+          <span className="font-semibold">{tx(`contract.${lastReward.contractId}.title`, lastReward.contractTitle)}:</span> {lastReward.fundsM >= 0 ? '+' : '−'}${fmt(Math.abs(lastReward.fundsM), 1)} M ·{' '}
+          {t('campaign.reward.prestige', { prestige: lastReward.prestige })}
           {lastReward.notes.map((n) => (
-            <span key={n} className="ml-2 text-slate-300">
-              · {n}
+            <span key={typeof n === 'string' ? n : n.key} className="ml-2 text-slate-300">
+              · {msg(n)}
             </span>
           ))}
         </section>
@@ -76,7 +78,7 @@ export function CampaignScreen() {
             <div className="mt-1 h-1.5 overflow-hidden rounded bg-slate-800" title={t('campaign.investor.trust', { trust: c.trust[id] })}>
               <div className="h-full bg-violet-400" style={{ width: `${c.trust[id]}%` }} />
             </div>
-            <p className="mt-1 text-xs text-slate-400">{INVESTORS[id].wants}</p>
+            <p className="mt-1 text-xs text-slate-400">{tx(`investor.${id}.wants`, INVESTORS[id].wants)}</p>
           </div>
         ))}
       </section>
@@ -106,7 +108,7 @@ export function CampaignScreen() {
                         {k.note && <p className="mt-1 text-xs italic text-slate-500">{tx(`contract.${k.id}.note`, k.note)}</p>}
                         <div className="mt-2 flex flex-wrap gap-2 text-xs">
                           {k.paymentM > 0 && <Pill>{t('campaign.contract.pays', { payment: k.paymentM })}</Pill>}
-                          {rec && <Pill tone="emerald">{t('campaign.contract.best', { best: rec.best, rank: rec.rank })}</Pill>}
+                          {rec && <Pill tone="emerald">{t('campaign.contract.best', { best: rec.best, rank: t(`results.rank.${rec.rank}` as StringKey) })}</Pill>}
                           {status === 'locked' && (
                             <Pill tone="rose">
                               {k.kind === 'preview'
@@ -160,9 +162,9 @@ export function CampaignScreen() {
                         disabled={!check.ok}
                         onClick={() => buyTech(techItem.id)}
                         className="mt-2 rounded bg-orange-500 px-2 py-1 text-xs font-semibold text-white hover:bg-orange-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-                        title={check.why}
+                        title={check.why && msg(check.why)}
                       >
-                        {check.ok ? t('campaign.tech.unlockFor', { cost: techItem.costM }) : check.why}
+                        {check.ok ? t('campaign.tech.unlockFor', { cost: techItem.costM }) : check.why && msg(check.why)}
                       </button>
                     )}
                   </li>

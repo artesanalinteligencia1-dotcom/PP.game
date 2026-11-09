@@ -1,5 +1,7 @@
 # GEMINI.md — handoff for the i18n extraction (Antigravity / Gemini CLI)
 
+> **Finished on 2026-11-08 and merged.** Kept as the recipe for extracting and translating future text.
+
 You are helping on "Paulet: Andes to Orbit" (React 19 + Vite + TypeScript, Vitest). Read this whole file first.
 Talk to the owner in **Spanish**; write code, comments and English game text in **English**.
 

@@ -1,5 +1,6 @@
 // Seeded, weekly mission simulation. Deterministic: same design + same seed + same decisions = same result.
 // Documented in docs/model.md §11–13.
+import { M, ref, type Msg } from './text'
 import { BATTERY_CALENDAR_LIFE_YEARS, batteryCycleLife } from './budget'
 import { getInstrument, getLauncher, getObc, getOrbit, getStation } from './catalog/components'
 import { COLLISION_AVOIDANCE_DV, evaluateDesign } from './evaluate'
@@ -24,8 +25,8 @@ export type EndReason =
 
 export interface DecisionOption {
   id: string
-  label: string
-  hint: string
+  label: Msg
+  hint: Msg
   quality: Quality
   /** The safest option (what a prudent bot picks). */
   safe?: boolean
@@ -37,8 +38,8 @@ export interface PendingDecision {
   eventId: string
   week: number
   role: Role
-  title: string
-  text: string
+  title: Msg
+  text: Msg
   options: DecisionOption[]
   /** Event-specific data needed to apply the decision. */
   meta?: Record<string, number | string>
@@ -48,7 +49,7 @@ export interface LogEntry {
   week: number
   role: Role
   severity: 'info' | 'good' | 'warn' | 'bad'
-  text: string
+  msg: Msg
 }
 
 export interface SeriesPoint {
@@ -133,9 +134,14 @@ function rand(s: MissionState): number {
   return v
 }
 
-function log(s: MissionState, role: Role, severity: LogEntry['severity'], text: string) {
-  s.log.push({ week: s.week, role, severity, text })
+function log(s: MissionState, role: Role, severity: LogEntry['severity'], msg: Msg) {
+  s.log.push({ week: s.week, role, severity, msg })
 }
+
+/** A catalog item's name as a translatable param. */
+const name = (c: { id: string; name: string }) => ref(`component.${c.id}.name`, c.name)
+
+const oppRef = (s: MissionState, field: 'title' | 'text') => ref(`scenario.${s.scenarioId}.opportunity.${field}`, scenarioOpportunity(s)[field])
 
 /** Create a mission: rolls the launch and pre-launch delay. Pure (returns a fresh state). */
 export function createMission(design: Design, scenario: Scenario, seed: number, opts: { difficulty?: Difficulty } = {}): MissionState {
@@ -187,17 +193,17 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
   // Pre-launch delay (schedule pressure).
   if (rand(s) < 0.25) {
     s.launchDelayMonths = 1 + Math.floor(rand(s) * 3)
-    log(s, 'lead', 'warn', `Launch slipped ${s.launchDelayMonths} month(s): the launcher had a ground-test anomaly.`)
+    log(s, 'lead', 'warn', M(s.launchDelayMonths === 1 ? 'sim.slip.one' : 'sim.slip.other', { months: s.launchDelayMonths }))
   }
   // Launch roll.
   const pFail = (1 - launcher.reliability) * DIFFICULTY_LAUNCH_FACTOR[s.difficulty]
   if (rand(s) < pFail) {
     s.phase = 'ended'
     s.endReason = 'launch_failure'
-    log(s, 'lead', 'bad', `Launch failure. The ${launcher.name} did not reach orbit (≈${Math.round(pFail * 100)}% chance with this rocket).`)
+    log(s, 'lead', 'bad', M('sim.launch.fail', { launcher: name(launcher), pct: Math.round(pFail * 100) }))
     return s
   }
-  log(s, 'engineer', 'good', `Launch successful on the ${launcher.name}. Spacecraft separated and healthy.`)
+  log(s, 'engineer', 'good', M('sim.launch.ok', { launcher: name(launcher) }))
   if (launcher.landing) {
     s.boosterLanded = rand(s) < launcher.landing.successP
     log(
@@ -205,17 +211,17 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
       'engineer',
       s.boosterLanded ? 'good' : 'warn',
       s.boosterLanded
-        ? 'The first-stage booster landed and can fly again.'
-        : 'The booster missed its landing and was lost at sea (the mission is fine; the next flight costs more).',
+        ? M('sim.booster.landed')
+        : M('sim.booster.lost'),
     )
   }
   const route = getRoute(orbit.id, design.routeId)
   if (route && report.mass.ispS > 0) {
     // Chaos: the correction actually needed is only known in flight (0.5×–2× the expected value).
     s.tcmNeed = Math.round(route.tcmDv * (0.5 + 1.5 * rand(s)) * 10) / 10
-    log(s, 'astrophysicist', 'info', `Route: ${route.name}. Correction reserve on board: ${Math.round(s.tcmReserve)} m/s.`)
+    log(s, 'astrophysicist', 'info', M('sim.route', { route: ref(`route.${orbit.id}.${route.id}.name`, route.name), reserve: Math.round(s.tcmReserve) }))
   }
-  if (s.transferWeeks > 0) log(s, 'astrophysicist', 'info', `Cruising to ${orbit.name}: ~${Math.round(s.transferWeeks / 4.345)} month(s) of transfer.`)
+  if (s.transferWeeks > 0) log(s, 'astrophysicist', 'info', M(Math.round(s.transferWeeks / 4.345) === 1 ? 'sim.cruise.one' : 'sim.cruise.other', { orbit: name(orbit), months: Math.round(s.transferWeeks / 4.345) }))
   else arrive(s)
   return s
 }
@@ -224,12 +230,12 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
 function arrive(s: MissionState) {
   const orbit = getOrbit(s.design.orbitId)
   s.phase = 'operations'
-  log(s, 'astrophysicist', 'good', `Arrived in ${orbit.name}. Science operations begin.`)
+  log(s, 'astrophysicist', 'good', M('sim.arrived', { orbit: name(orbit) }))
   if (s.tcmNeed === null) return
   if (s.tcmNeed <= s.tcmReserve) {
     const left = Math.round((s.tcmReserve - s.tcmNeed) * 10) / 10
     s.dvRemaining += left // what is left of the correction reserve is kept for station-keeping
-    log(s, 'astrophysicist', 'good', `Course corrections used ${s.tcmNeed} of the ${Math.round(s.tcmReserve)} m/s reserve; ${left} m/s kept for station-keeping.`)
+    log(s, 'astrophysicist', 'good', M('sim.tcm.ok', { need: s.tcmNeed, reserve: Math.round(s.tcmReserve), left }))
     return
   }
   const deficit = Math.round((s.tcmNeed - s.tcmReserve) * 10) / 10
@@ -238,11 +244,11 @@ function arrive(s: MissionState) {
     eventId: 'chaos_correction',
     week: s.week,
     role: 'astrophysicist',
-    title: 'The trajectory drifted more than planned',
-    text: `Tiny errors grew on the way (that is chaos): arriving needs ${s.tcmNeed} m/s of corrections, but the reserve was ${Math.round(s.tcmReserve)} m/s. Missing: ${deficit} m/s.`,
+    title: M('sim.chaos.title'),
+    text: M('sim.chaos.text', { need: s.tcmNeed, reserve: Math.round(s.tcmReserve), deficit }),
     options: [
-      { id: 'borrow', label: `Use ${deficit} m/s of station-keeping propellant`, hint: enough ? 'The mission may end a little earlier.' : 'Most of the station-keeping budget: the mission will be short.', quality: enough ? 'good' : 'poor', safe: true },
-      { id: 'loose', label: 'Accept a wider, less stable orbit', hint: 'Keeps propellant; science drops by 25%.', quality: 'ok', bold: true },
+      { id: 'borrow', label: M('sim.chaos.borrow', { deficit }), hint: enough ? M('sim.chaos.borrow.hintOk') : M('sim.chaos.borrow.hintLow'), quality: enough ? 'good' : 'poor', safe: true },
+      { id: 'loose', label: M('sim.chaos.loose'), hint: M('sim.chaos.loose.hint'), quality: 'ok', bold: true },
     ],
     meta: { deficit },
   }
@@ -264,11 +270,11 @@ function downlinkFactor(s: MissionState): number {
   return Math.min(1, now / designed)
 }
 
-function end(s: MissionState, reason: EndReason, role: Role, text: string) {
+function end(s: MissionState, reason: EndReason, role: Role, msg: Msg) {
   s.phase = 'ended'
   s.endReason = reason
   s.pending = null
-  log(s, role, reason === 'completed' ? 'good' : 'bad', text)
+  log(s, role, reason === 'completed' ? 'good' : 'bad', msg)
 }
 
 // ---------------------------------------------------------------------------
@@ -319,11 +325,11 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: 'astrophysicist',
-        title: 'Solar flare detected',
-        text: `A strong flare is heading our way. Your ${obc.name} ${hard ? 'is radiation-hardened' : 'is NOT radiation-hardened'}. Keep observing, or hide in safe mode for two weeks?`,
+        title: M('sim.flare.title'),
+        text: M(hard ? 'sim.flare.text.hard' : 'sim.flare.text.soft', { obc: name(obc) }),
         options: [
-          { id: 'safe', label: 'Safe mode for 2 weeks', hint: 'No science for 2 weeks; much less radiation damage.', quality: hard ? 'ok' : 'good', safe: true },
-          { id: 'continue', label: 'Keep observing', hint: hard ? 'Your hardened computer should cope.' : 'Risk a computer reset and extra radiation damage.', quality: hard ? 'good' : 'poor', bold: true },
+          { id: 'safe', label: M('sim.flare.safe'), hint: M('sim.flare.safe.hint'), quality: hard ? 'ok' : 'good', safe: true },
+          { id: 'continue', label: M('sim.flare.continue'), hint: hard ? M('sim.flare.continue.hintHard') : M('sim.flare.continue.hintSoft'), quality: hard ? 'good' : 'poor', bold: true },
         ],
       }
       return
@@ -335,11 +341,11 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: 'engineer',
-        title: 'Battery cell failure',
-        text: `One battery cell failed: capacity is down ~20%. Each eclipse now drains ${Math.round(r.power.dodNominal * 125)}% of the battery.`,
+        title: M('sim.battery.title'),
+        text: M('sim.battery.text', { pct: Math.round(r.power.dodNominal * 125) }),
         options: [
-          { id: 'reduce', label: 'Lower instrument duty cycles by 20%', hint: 'Less science, but the battery ages normally.', quality: high ? 'good' : 'ok', safe: true },
-          { id: 'accept', label: 'Keep operating as planned', hint: high ? 'Battery will wear out much faster.' : 'Battery margin is still fine.', quality: high ? 'poor' : 'good', bold: true },
+          { id: 'reduce', label: M('sim.battery.reduce'), hint: M('sim.battery.reduce.hint'), quality: high ? 'good' : 'ok', safe: true },
+          { id: 'accept', label: M('sim.battery.accept'), hint: high ? M('sim.battery.accept.hintHigh') : M('sim.battery.accept.hintOk'), quality: high ? 'poor' : 'good', bold: true },
         ],
       }
       return
@@ -354,11 +360,11 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: 'lead',
-        title: 'Ground station offline',
-        text: `${getStation(st).name} is down for ${weeks} weeks (power failure). Rent time on a commercial backup antenna?`,
+        title: M('sim.station.title'),
+        text: M('sim.station.text', { station: name(getStation(st)), weeks }),
         options: [
-          { id: 'rent', label: `Rent backup ($${(0.15 * weeks).toFixed(1)} M)`, hint: 'No data loss; costs reserve money.', quality: bottleneck ? 'good' : 'ok', safe: true },
-          { id: 'accept', label: 'Wait it out', hint: bottleneck ? 'Data will pile up and may be lost.' : 'Other stations can cover most of it.', quality: bottleneck ? 'poor' : 'good', bold: true },
+          { id: 'rent', label: M('sim.station.rent', { cost: (0.15 * weeks).toFixed(1) }), hint: M('sim.station.rent.hint'), quality: bottleneck ? 'good' : 'ok', safe: true },
+          { id: 'accept', label: M('sim.station.wait'), hint: bottleneck ? M('sim.station.wait.hintBad') : M('sim.station.wait.hintOk'), quality: bottleneck ? 'poor' : 'good', bold: true },
         ],
       }
       s.pending.meta = { station: st, weeks }
@@ -366,7 +372,7 @@ function triggerEvent(s: MissionState, id: EventId) {
     }
     case 'micrometeoroid': {
       s.panelFactor *= 0.92
-      log(s, 'engineer', 'warn', 'Micrometeoroid hit a solar array: −8% power.')
+      log(s, 'engineer', 'warn', M('sim.micrometeoroid'))
       return
     }
     case 'debris_conjunction': {
@@ -375,16 +381,16 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: 'astrophysicist',
-        title: 'Space debris conjunction',
+        title: M('sim.debris.title'),
         text: canMove
-          ? 'A dead satellite fragment will pass within 200 m in 36 hours (≈2% collision risk). Burn propellant to dodge?'
-          : 'A debris fragment will pass within 200 m (≈2% collision risk). You have no propellant to dodge.',
+          ? M('sim.debris.text.can')
+          : M('sim.debris.text.cannot'),
         options: canMove
           ? [
-              { id: 'maneuver', label: 'Avoidance burn (0.5 m/s)', hint: 'Uses a little propellant, removes the risk.', quality: 'good', safe: true },
-              { id: 'accept', label: 'Accept the risk', hint: '2% chance of losing the spacecraft.', quality: 'poor', bold: true },
+              { id: 'maneuver', label: M('sim.debris.burn'), hint: M('sim.debris.burn.hint'), quality: 'good', safe: true },
+              { id: 'accept', label: M('sim.debris.accept'), hint: M('sim.debris.risk.hint'), quality: 'poor', bold: true },
             ]
-          : [{ id: 'accept', label: 'Hope for the best', hint: '2% chance of losing the spacecraft.', quality: 'ok', safe: true, bold: true }],
+          : [{ id: 'accept', label: M('sim.debris.hope'), hint: M('sim.debris.risk.hint'), quality: 'ok', safe: true, bold: true }],
       }
       return
     }
@@ -396,12 +402,12 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: 'lead',
-        title: 'Investors cut the budget',
-        text: `Your funders are cutting $${cut.toFixed(1)} M from operations. Reserve available: $${s.reserveM.toFixed(1)} M.`,
+        title: M('sim.budget.title'),
+        text: M('sim.budget.text', { cut: cut.toFixed(1), reserve: s.reserveM.toFixed(1) }),
         options: [
-          { id: 'absorb', label: 'Absorb it from the reserve', hint: covers ? 'Reserve covers it.' : 'Reserve is too small: operations will stop early.', quality: covers ? 'good' : 'poor', safe: covers },
+          { id: 'absorb', label: M('sim.budget.absorb'), hint: covers ? M('sim.budget.absorb.hintOk') : M('sim.budget.absorb.hintLow'), quality: covers ? 'good' : 'poor', safe: covers },
           ...(multi
-            ? [{ id: 'drop_station', label: 'Cancel the most expensive ground station', hint: 'Saves money; less downlink.', quality: (covers ? 'ok' : 'good') as Quality, safe: !covers, bold: true }]
+            ? [{ id: 'drop_station', label: M('sim.budget.drop'), hint: M('sim.budget.drop.hint'), quality: (covers ? 'ok' : 'good') as Quality, safe: !covers, bold: true }]
             : []),
         ],
       }
@@ -415,8 +421,8 @@ function triggerEvent(s: MissionState, id: EventId) {
       const has = s.design.instruments.some((i) => scenarioOpp.instrumentIds.includes(i.id))
       if (!has) {
         s.missedOpportunities++
-        const names = scenarioOpp.instrumentIds.map((i) => getInstrument(i).name).join(', ')
-        log(s, 'astrobiologist', 'warn', `${scenarioOpp.title} — missed: no suitable instrument on board (${names}).`)
+        const names = scenarioOpp.instrumentIds.map((i) => name(getInstrument(i)))
+        log(s, 'astrobiologist', 'warn', M('sim.opp.missed', { title: oppRef(s, 'title'), names }))
         return
       }
       const owner = getInstrument(s.design.instruments.find((i) => scenarioOpp.instrumentIds.includes(i.id))!.id).discipline
@@ -424,11 +430,11 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: owner,
-        title: scenarioOpp.title,
-        text: scenarioOpp.text,
+        title: M('sim.opp.title', { title: oppRef(s, 'title') }),
+        text: M('sim.opp.text', { text: oppRef(s, 'text') }),
         options: [
-          { id: 'retarget', label: 'Retarget the instruments', hint: `+${scenarioOpp.bonusScience} science; doubles data for one week.`, quality: 'good', bold: true, safe: true },
-          { id: 'ignore', label: 'Stay on the plan', hint: 'No risk, no bonus.', quality: 'ok' },
+          { id: 'retarget', label: M('sim.opp.retarget'), hint: M('sim.opp.retarget.hint', { science: scenarioOpp.bonusScience }), quality: 'good', bold: true, safe: true },
+          { id: 'ignore', label: M('sim.opp.ignore'), hint: M('sim.opp.ignore.hint'), quality: 'ok' },
         ],
       }
       return
@@ -438,11 +444,11 @@ function triggerEvent(s: MissionState, id: EventId) {
         eventId: id,
         week: s.week,
         role: 'astrophysicist',
-        title: 'Orbit drifting away from L2',
-        text: 'Tracking shows the spacecraft slowly sliding off its halo orbit. In a chaotic orbit small deviations grow exponentially — correcting now is cheap, later it is not.',
+        title: M('sim.drift.title'),
+        text: M('sim.drift.text'),
         options: [
-          { id: 'correct_now', label: 'Correct now (1.5 m/s)', hint: 'A small burn while the error is small.', quality: 'good', safe: true },
-          { id: 'wait', label: 'Wait and see', hint: 'Saves propellant if the drift reverses… but it usually grows.', quality: 'poor', bold: true },
+          { id: 'correct_now', label: M('sim.drift.correct'), hint: M('sim.drift.correct.hint'), quality: 'good', safe: true },
+          { id: 'wait', label: M('sim.drift.wait'), hint: M('sim.drift.wait.hint'), quality: 'poor', bold: true },
         ],
       }
       return
@@ -450,18 +456,18 @@ function triggerEvent(s: MissionState, id: EventId) {
     case 'lunar_eclipse': {
       const dod = r.power.longEclipseDod ?? 0
       if (dod <= 0.8) {
-        log(s, 'engineer', 'good', `Lunar eclipse: ${getOrbit(s.design.orbitId).longEclipseH} h in Earth's shadow — the battery coped (${Math.round(dod * 100)}% used).`)
+        log(s, 'engineer', 'good', M('sim.eclipse.coped', { hours: getOrbit(s.design.orbitId).longEclipseH ?? 0, pct: Math.round(dod * 100) }))
         return
       }
       s.pending = {
         eventId: id,
         week: s.week,
         role: 'engineer',
-        title: 'Lunar eclipse ahead',
-        text: `The Moon will pass through Earth's shadow for hours. In safe mode the spacecraft still needs ${Math.round(dod * 100)}% of its battery.`,
+        title: M('sim.eclipse.title'),
+        text: M('sim.eclipse.text', { pct: Math.round(dod * 100) }),
         options: [
-          { id: 'precharge', label: 'Pre-charge and power down for a week', hint: 'Lose a week of science; best survival odds.', quality: 'good', safe: true },
-          { id: 'ride', label: 'Ride it out', hint: dod > 1 ? 'Battery will run flat: spacecraft likely lost.' : 'Deep discharge will age the battery.', quality: 'poor', bold: true },
+          { id: 'precharge', label: M('sim.eclipse.precharge'), hint: M('sim.eclipse.precharge.hint'), quality: 'good', safe: true },
+          { id: 'ride', label: M('sim.eclipse.ride'), hint: dod > 1 ? M('sim.eclipse.ride.hintFlat') : M('sim.eclipse.ride.hintDeep'), quality: 'poor', bold: true },
         ],
       }
       return
@@ -482,13 +488,13 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
   const meta = p.meta ?? {}
   const obc = getObc(s.design.obcId)
   s.pending = null
-  const who = byBot ? 'Bot' : 'You'
+  const who = byBot ? ref('sim.who.bot', 'Bot') : ref('sim.who.you', 'You')
   switch (p.eventId as EventId | 'chaos_correction') {
     case 'solar_flare':
       if (opt.id === 'safe') {
         s.safeModeUntil = s.week + 2
         s.doseKrad += 0.5
-        log(s, p.role, 'info', `${who}: safe mode during the flare. Radiation +0.5 krad.`)
+        log(s, p.role, 'info', M('sim.do.flare.safe', { who }))
       } else {
         const hard = obc.radToleranceKrad >= 100
         s.doseKrad += hard ? 1 : 3
@@ -497,16 +503,16 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
           const lost = s.backlogGb
           s.dataLostGb += lost
           s.backlogGb = 0
-          log(s, p.role, 'bad', `${who} kept observing: the computer rebooted. 3 weeks to recover, ${lost.toFixed(0)} GB of stored data lost.`)
-        } else log(s, p.role, 'good', `${who} kept observing through the flare. Radiation +${hard ? 1 : 3} krad.`)
+          log(s, p.role, 'bad', M('sim.do.flare.reboot', { who, lost: lost.toFixed(0) }))
+        } else log(s, p.role, 'good', M('sim.do.flare.kept', { who, krad: hard ? 1 : 3 }))
       }
       return
     case 'battery_anomaly':
       if (opt.id === 'reduce') {
         s.dutyFactor *= 0.8
         s.batteryWearFactor /= 1.25
-        log(s, p.role, 'info', `${who}: duty cycles −20% to protect the battery.`)
-      } else log(s, p.role, 'warn', `${who}: operating as planned with a weaker battery.`)
+        log(s, p.role, 'info', M('sim.do.battery.reduce', { who }))
+      } else log(s, p.role, 'warn', M('sim.do.battery.accept', { who }))
       return
     case 'station_outage':
       if (opt.id === 'rent') {
@@ -514,16 +520,16 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
         s.stationsDown = s.stationsDown.filter((d) => d.id !== meta.station)
         s.reserveM -= 0.15 * weeks
         s.extraCostM += 0.15 * weeks
-        log(s, p.role, 'info', `${who} rented a backup antenna ($${(0.15 * weeks).toFixed(1)} M).`)
-      } else log(s, p.role, 'warn', `${who}: waiting for the station to come back.`)
+        log(s, p.role, 'info', M('sim.do.station.rent', { who, cost: (0.15 * weeks).toFixed(1) }))
+      } else log(s, p.role, 'warn', M('sim.do.station.wait', { who }))
       return
     case 'debris_conjunction':
       if (opt.id === 'maneuver') {
         s.dvRemaining -= 0.5
-        log(s, p.role, 'good', `${who}: avoidance burn done. Debris passed safely.`)
+        log(s, p.role, 'good', M('sim.do.debris.burn', { who }))
       } else if (rand(s) < 0.02) {
-        end(s, 'collision', p.role, 'Collision with space debris. The spacecraft is lost.')
-      } else log(s, p.role, 'warn', `${who} accepted the risk. The debris missed by 150 m.`)
+        end(s, 'collision', p.role, M('sim.end.collision'))
+      } else log(s, p.role, 'warn', M('sim.do.debris.accept', { who }))
       return
     case 'budget_cut': {
       const cut = Number(meta.cut ?? 0)
@@ -534,10 +540,10 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
         const remainingYears = Math.max(0, (s.plannedOpsWeeks - s.opsWeeks) / WEEKS_PER_YEAR)
         const saved = drop.costPerMonthM * 12 * remainingYears
         s.reserveM += saved - cut
-        log(s, p.role, 'info', `${who} cancelled ${drop.name}, saving ~$${saved.toFixed(1)} M.`)
+        log(s, p.role, 'info', M('sim.do.budget.drop', { who, station: name(drop), saved: saved.toFixed(1) }))
       } else {
         s.reserveM -= cut
-        log(s, p.role, s.reserveM >= 0 ? 'info' : 'warn', `${who} absorbed the $${cut.toFixed(1)} M cut from the reserve.`)
+        log(s, p.role, s.reserveM >= 0 ? 'info' : 'warn', M('sim.do.budget.absorb', { who, cut: cut.toFixed(1) }))
       }
       return
     }
@@ -547,40 +553,40 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
         s.bonusScience += bonus
         s.science += bonus
         s.backlogGb += s.report.data.generatedGbDay * 7
-        log(s, p.role, 'good', `${who} retargeted: +${bonus} science points.`)
-      } else log(s, p.role, 'info', `${who} stayed on the plan.`)
+        log(s, p.role, 'good', M('sim.do.opp.retarget', { who, bonus }))
+      } else log(s, p.role, 'info', M('sim.do.opp.ignore', { who }))
       return
     case 'chaos_correction': {
       const deficit = Number(meta.deficit ?? 0)
       if (opt.id === 'borrow') {
         s.dvRemaining -= deficit
-        log(s, p.role, 'info', `${who} used ${deficit} m/s of station-keeping propellant to reach the planned orbit.`)
+        log(s, p.role, 'info', M('sim.do.chaos.borrow', { who, deficit }))
       } else {
         s.scienceFactor *= 0.75
-        log(s, p.role, 'warn', `${who} accepted a wider orbit: −25% science, propellant kept.`)
+        log(s, p.role, 'warn', M('sim.do.chaos.loose', { who }))
       }
       return
     }
     case 'chaotic_drift':
       if (opt.id === 'correct_now') {
         s.dvRemaining -= 1.5
-        log(s, p.role, 'good', `${who}: correction burn done while the error was small (1.5 m/s).`)
+        log(s, p.role, 'good', M('sim.do.drift.correct', { who }))
       } else if (rand(s) < 0.7) {
         s.dvRemaining -= 6
-        log(s, p.role, 'bad', `${who} waited: the drift grew exponentially and the correction cost 6 m/s.`)
-      } else log(s, p.role, 'info', `${who} waited and the drift happened to reverse. Lucky this time.`)
+        log(s, p.role, 'bad', M('sim.do.drift.grew', { who }))
+      } else log(s, p.role, 'info', M('sim.do.drift.lucky', { who }))
       return
     case 'lunar_eclipse': {
       const dod = s.report.power.longEclipseDod ?? 0
       if (opt.id === 'precharge') {
         s.safeModeUntil = s.week + 1
         if (dod > 1) s.batteryWear += 0.15
-        log(s, p.role, 'good', `${who}: pre-charged and powered down. Survived the eclipse.`)
+        log(s, p.role, 'good', M('sim.do.eclipse.precharge', { who }))
       } else if (dod > 1) {
-        end(s, 'eclipse', p.role, 'The battery ran flat in Earth’s shadow. The spacecraft froze and was lost.')
+        end(s, 'eclipse', p.role, M('sim.end.eclipse'))
       } else {
         s.batteryWear += 0.2
-        log(s, p.role, 'warn', `${who} rode it out. Deep discharge aged the battery.`)
+        log(s, p.role, 'warn', M('sim.do.eclipse.ride', { who }))
       }
       return
     }
@@ -614,9 +620,9 @@ export function advanceWeek(s: MissionState) {
   const powerNeed = r.power.avgLoadW * (1 - r.power.eclipseFraction + r.power.eclipseFraction / 0.9)
   const powerRatio = powerNeed > 0 ? powerNow / powerNeed : 1
 
-  if (s.doseKrad >= obc.radToleranceKrad) return end(s, 'radiation', 'engineer', `Radiation dose reached ${s.doseKrad.toFixed(1)} krad: the ${obc.name} failed.`)
-  if (powerRatio < 0.6) return end(s, 'power', 'engineer', 'Solar arrays can no longer power the spacecraft. Mission over.')
-  if (s.reserveM < -0.01) return end(s, 'funding', 'lead', 'The money ran out: investors stopped funding operations.')
+  if (s.doseKrad >= obc.radToleranceKrad) return end(s, 'radiation', 'engineer', M('sim.end.radiation', { dose: s.doseKrad.toFixed(1), obc: name(obc) }))
+  if (powerRatio < 0.6) return end(s, 'power', 'engineer', M('sim.end.power'))
+  if (s.reserveM < -0.01) return end(s, 'funding', 'lead', M('sim.end.funding'))
 
   if (s.phase === 'transfer') {
     if (s.week >= s.transferWeeks) arrive(s)
@@ -626,7 +632,7 @@ export function advanceWeek(s: MissionState) {
 
   // Operations
   if (s.opsWeeks >= s.plannedOpsWeeks) {
-    return end(s, 'completed', 'lead', `Mission complete: ${(s.opsWeeks / WEEKS_PER_YEAR).toFixed(1)} years of operations.`)
+    return end(s, 'completed', 'lead', M('sim.end.completed', { years: (s.opsWeeks / WEEKS_PER_YEAR).toFixed(1) }))
   }
   s.opsWeeks++
   const inSafe = s.week <= s.safeModeUntil
@@ -639,14 +645,14 @@ export function advanceWeek(s: MissionState) {
     s.batteryWear += (cyclesPerWeek / batteryCycleLife(dod)) * (dod > 1 ? 50 : 1)
   }
   s.batteryWear += 1 / (BATTERY_CALENDAR_LIFE_YEARS * WEEKS_PER_YEAR)
-  if (s.batteryWear >= 1) return end(s, 'battery', 'engineer', 'The battery is worn out and can no longer survive eclipses.')
+  if (s.batteryWear >= 1) return end(s, 'battery', 'engineer', M('sim.end.battery'))
 
   // Orbit keeping.
   if (r.mass.ispS > 0) {
     s.dvRemaining -= maintenanceDvPerYear(orbit, s.design.altitudeKm) / WEEKS_PER_YEAR
-    if (s.dvRemaining < -1) return end(s, 'orbit', 'astrophysicist', 'Out of propellant: the orbit can no longer be maintained.')
+    if (s.dvRemaining < -1) return end(s, 'orbit', 'astrophysicist', M('sim.end.propellant'))
   } else if (years > noPropulsionOrbitLifeYears(orbit, s.design.altitudeKm)) {
-    return end(s, 'orbit', 'astrophysicist', 'Without thrusters the orbit decayed. Mission over.')
+    return end(s, 'orbit', 'astrophysicist', M('sim.end.decayed'))
   }
 
   // Data & science.
@@ -671,7 +677,7 @@ export function advanceWeek(s: MissionState) {
   maybeEvent(s)
   record(s, powerRatio)
   if (s.opsWeeks >= s.plannedOpsWeeks && !s.pending) {
-    end(s, 'completed', 'lead', `Mission complete: ${(s.opsWeeks / WEEKS_PER_YEAR).toFixed(1)} years of operations.`)
+    end(s, 'completed', 'lead', M('sim.end.completed', { years: (s.opsWeeks / WEEKS_PER_YEAR).toFixed(1) }))
   }
 }
 

@@ -42,7 +42,7 @@ function HaloJourney({ mission, playing }: { mission: MissionState; playing: boo
                 : inTransfer
                 ? t('journey.halo.transfer', {
                     pct: Math.round(progress * 100),
-                    route: route ? tx(`route.${route.id}.name`, route.name) : '',
+                    route: route ? tx(`route.${mission.design.orbitId}.${route.id}.name`, route.name) : '',
                   })
                 : t('journey.halo.looping')}
             </text>

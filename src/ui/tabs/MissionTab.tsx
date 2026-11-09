@@ -1,5 +1,5 @@
 import type { DesignReport, Role, Scenario } from '../../engine/types'
-import { PROTAGONIST, REQUIREMENT_LABEL, ROLE_BLURB, ROLE_LABEL, fmt, message } from '../../i18n/en'
+import { PROTAGONIST, REQUIREMENT_LABEL, ROLE_BLURB, ROLE_LABEL, fmt, message, localName } from '../../i18n/en'
 import { Pill, SEV_BORDER, SEV_TEXT, Section } from '../components'
 import { useT, useTx, type StringKey } from '../../i18n'
 
@@ -10,9 +10,9 @@ export function RequirementsList({ report }: { report: DesignReport }) {
   return (
     <ul className="space-y-1.5 text-sm">
       {report.requirements.map((r) => {
-        const actual = typeof r.actual === 'number' ? fmt(r.actual, 1) : r.actual
+        const actual = typeof r.actual === 'number' ? fmt(r.actual, 1) : localName(String(r.actual))
         const target =
-          r.kind === 'withinBudget' ? `$${fmt(r.target as number)} M` : typeof r.target === 'number' ? fmt(r.target, 1) : r.target
+          r.kind === 'withinBudget' ? `$${fmt(r.target as number)} M` : typeof r.target === 'number' ? fmt(r.target, 1) : localName(String(r.target))
         const unit = r.kind === 'lifeYears' ? t('mission.req.yr') : r.kind === 'dataDeliveredGbDay' ? t('mission.req.gbDay') : ''
         return (
           <li key={r.id} className="flex items-start gap-2">

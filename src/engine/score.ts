@@ -1,4 +1,5 @@
 // Mission score (0–1000) and rank. Documented in docs/model.md §12.
+import { M, msgEn, type Msg } from './text'
 import type { MissionState, Quality } from './simulate'
 import { SIM_WEEKS_PER_YEAR } from './simulate'
 import type { Scenario } from './types'
@@ -7,10 +8,12 @@ export type Rank = 'Fail' | 'Partial' | 'Success' | 'Outstanding'
 
 export interface ScoreLine {
   key: 'success' | 'science' | 'efficiency' | 'decisions' | 'schedule' | 'bonus'
+  /** English label (reports, tests). The UI shows labelMsg. */
   label: string
+  labelMsg: Msg
   points: number
   max: number
-  detail: string
+  detail: Msg
 }
 
 export interface ActualRequirement {
@@ -127,15 +130,16 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
   else rank = 'Success'
 
   const fmt1 = (x: number) => (Math.round(x * 10) / 10).toString()
+  const line = (key: ScoreLine['key'], label: Msg, points: number, max: number, detail: Msg): ScoreLine => ({ key, label: msgEn(label), labelMsg: label, points, max, detail })
   const lines: ScoreLine[] = [
-    { key: 'success', label: 'Mission success', points: success * soloRescale, max: 300 * soloRescale, detail: `${metCount}/${mandatory.length} requirements met` },
+    line('success', M('score.label.success'), success * soloRescale, 300 * soloRescale, M('score.detail.success', { met: metCount, total: mandatory.length })),
     cargo
-      ? { key: 'science', label: 'Cargo delivered', points: science * soloRescale, max: 250 * soloRescale, detail: `${Math.round(delivered)} of ${cargoTarget} kg` }
-      : { key: 'science', label: 'Science achieved', points: science * soloRescale, max: 250 * soloRescale, detail: `${fmt1(s.science)} of ${scenario.scienceTarget} points` },
-    { key: 'efficiency', label: 'Resource efficiency', points: efficiency * soloRescale, max: 150 * soloRescale, detail: `launch margin ${Math.round(launchMargin * 100)}%, power margin ${Math.round(r.power.marginEol * 100)}%, budget used ${Math.round(used * 100)}%` },
-    { key: 'decisions', label: 'Engineering decisions', points: decisions * soloRescale, max: 100 * soloRescale, detail: `${warns} design warnings, ${s.decisions.length} flight decisions` },
-    { key: 'schedule', label: 'Schedule', points: schedule * soloRescale, max: 50 * soloRescale, detail: late <= 0 ? 'ready on time' : `${fmt1(late)} months late` },
-    { key: 'bonus', label: 'Bonus objectives', points: launched ? bonus : 0, max: 50, detail: `${requirements.filter((x) => x.optional && x.met).length} bonus objectives` },
+      ? line('science', M('score.label.cargo'), science * soloRescale, 250 * soloRescale, M('score.detail.cargo', { delivered: Math.round(delivered), target: cargoTarget }))
+      : line('science', M('score.label.science'), science * soloRescale, 250 * soloRescale, M('score.detail.science', { science: fmt1(s.science), target: scenario.scienceTarget })),
+    line('efficiency', M('score.label.efficiency'), efficiency * soloRescale, 150 * soloRescale, M('score.detail.efficiency', { launch: Math.round(launchMargin * 100), power: Math.round(r.power.marginEol * 100), budget: Math.round(used * 100) })),
+    line('decisions', M('score.label.decisions'), decisions * soloRescale, 100 * soloRescale, M('score.detail.decisions', { warns, decisions: s.decisions.length })),
+    line('schedule', M('score.label.schedule'), schedule * soloRescale, 50 * soloRescale, late <= 0 ? M('score.detail.onTime') : M('score.detail.late', { months: fmt1(late) })),
+    line('bonus', M('score.label.bonus'), launched ? bonus : 0, 50, M('score.detail.bonus', { count: requirements.filter((x) => x.optional && x.met).length })),
   ]
   return { total, rank, lines, requirements, soloRescale, actual: { lifeYears, deliveredGbDay, costM, devMonths, science: s.science } }
 }

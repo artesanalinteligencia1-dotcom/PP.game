@@ -14,6 +14,7 @@ import { HomeScreen, MenuBackdrop } from './hub/HomeScreen'
 import { IntroScreen } from './hub/IntroScreen'
 import { LearnScreen } from './hub/LearnScreen'
 import { MockScreen, mockFromUrl } from './mock/MockScreen'
+import { useT } from '../i18n'
 import { BootScreen } from './shell/BootScreen'
 import { SettingsPanel } from './shell/SettingsPanel'
 import { Stage } from './shell/Stage'
@@ -49,6 +50,7 @@ function CurrentScreen() {
 const MOCK = mockFromUrl()
 
 export function App() {
+  const t = useT()
   const screen = useGame((s) => s.screen)
   const settingsOpen = useGame((s) => s.settingsOpen)
   const openSettings = useGame((s) => s.openSettings)
@@ -102,8 +104,8 @@ export function App() {
                 type="button"
                 onClick={() => openSettings(true)}
                 className="btn-secondary h-9 w-9 text-sm"
-                aria-label="Settings"
-                title="Settings (Esc)"
+                aria-label={t('settings.title')}
+                title={t('settings.titleEsc')}
               >
                 ⚙
               </button>

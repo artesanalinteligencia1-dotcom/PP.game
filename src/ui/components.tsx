@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Severity } from '../engine/types'
+import { useT } from '../i18n'
 
 export const SEV_TEXT: Record<Severity, string> = { ok: 'text-emerald-400', warn: 'text-amber-400', error: 'text-rose-400' }
 export const SEV_BG: Record<Severity, string> = { ok: 'bg-emerald-500', warn: 'bg-amber-400', error: 'bg-rose-500' }
@@ -115,9 +116,10 @@ export function Pill({ children, tone = 'slate' }: { children: ReactNode; tone?:
 }
 
 export function Disclaimer() {
+  const t = useT()
   return (
     <p className="text-[11px] text-slate-500">
-      Simplified educational model — game values, not real engineering data.
+      {t('home.disclaimer')}
     </p>
   )
 }

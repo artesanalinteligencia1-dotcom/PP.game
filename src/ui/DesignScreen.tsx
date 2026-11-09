@@ -47,7 +47,7 @@ export function DesignScreen({ design }: { design: Design }) {
               {mode === 'campaign' ? t('design.back.career') : t('design.back.missions')}
               {mode === 'campaign' && <span className="ml-3 text-orange-300">{t('design.contract')}</span>}
             </button>
-            <h1 className="mt-1 truncate font-display text-3xl">
+            <h1 className="mt-1 truncate font-display text-3xl" title={tx(`scenario.${scenario.id}.tagline`, scenario.tagline)}>
               {tx(`scenario.${scenario.id}.name`, scenario.name)} <span className="text-base text-white/50">· {tx(`scenario.${scenario.id}.tagline`, scenario.tagline)}</span>
             </h1>
           </div>

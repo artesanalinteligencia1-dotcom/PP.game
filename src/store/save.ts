@@ -1,5 +1,6 @@
 // Save file format (versioned). The campaign lives in localStorage; players can also export it to a file and
 // import it back (offline backups, moving between the web and desktop builds). Pure: no DOM, testable.
+import { t } from '../i18n'
 import { CONTRACTS, type CampaignState } from '../engine/campaign'
 import { GAME_NAME } from '../brand'
 
@@ -30,7 +31,7 @@ const KNOWN_CONTRACTS = new Set(CONTRACTS.map((c) => c.id))
 export function validateCampaign(raw: unknown): CampaignState {
   const c = raw as CampaignState
   const fail = (why: string): never => {
-    throw new Error(`This save file is damaged or from another game (${why}).`)
+    throw new Error(t('save.damaged', { why }))
   }
   if (!c || typeof c !== 'object') fail('no campaign')
   if (c.version !== 1) fail(`unknown campaign version ${String(c.version)}`)
@@ -65,11 +66,11 @@ export function parseSaveFile(text: string): CampaignState {
   try {
     data = JSON.parse(text)
   } catch {
-    throw new Error(`This is not a ${GAME_NAME} save file (not JSON).`)
+    throw new Error(t('save.notJson', { game: GAME_NAME }))
   }
   const f = data as Partial<SaveFile>
   if (f && f.format === SAVE_FORMAT) {
-    if (!num(f.saveVersion) || f.saveVersion! > SAVE_VERSION) throw new Error(`This save comes from a newer version of ${GAME_NAME}. Update the game first.`)
+    if (!num(f.saveVersion) || f.saveVersion! > SAVE_VERSION) throw new Error(t('save.newer', { game: GAME_NAME }))
     return validateCampaign(f.campaign)
   }
   return validateCampaign(data)

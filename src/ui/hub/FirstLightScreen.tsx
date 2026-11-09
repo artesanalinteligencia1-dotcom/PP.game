@@ -1,3 +1,4 @@
+import { rich } from '../rich'
 import { useCallback, useMemo, useState } from 'react'
 import { audio, useMusic } from '../../audio/audio'
 import { getInstrument, getLauncher } from '../../engine/catalog'
@@ -117,10 +118,10 @@ export function FirstLightScreen() {
                 <dt className="text-slate-400">{t('firstLight.payloadRecovered')}</dt>
                 <dd>{result.recovered ? t('firstLight.recovered.yes') : t('firstLight.recovered.no')}</dd>
                 <dt className="text-slate-400">{t('firstLight.science')}</dt>
-                <dd>{fmt(result.science, 1)} pts</dd>
+                <dd>{t('firstLight.sciencePts', { pts: fmt(result.science, 1) })}</dd>
               </dl>
               <p className="mt-2 text-xs text-slate-400">
-                {t('firstLight.lesson')}
+                {rich(t('firstLight.lesson'))}
               </p>
               {campaign ? (
                 <button
