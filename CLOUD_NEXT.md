@@ -45,7 +45,7 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 
 ## Definitive game — owner's queue (2026-11-06)
 1. ✅ Public link: https://paulet-andes-to-orbit.vercel.app/ (production = `main`; merge `cloud/fase-1` by PR to update it)
-2. ✅ Language choice EN/ES (2026-11-08): the whole game is in `src/i18n/strings/{en,es}.json` (1 150 keys each). English is the
+2. ✅ Language choice EN/ES (2026-11-08): the whole game is in `src/i18n/strings/{en,es}.json` (1 187 keys each). English is the
    default; first-boot picker and Settings switch. The engine emits messages (`src/engine/text.ts`: key + params, rendered by
    `useMsg()`), so new event sentences go in en.json + es.json, never inline. Catalog English stays in the engine and a test keeps
    it identical to en.json. Intro: caption-free video, captions drawn by the game per language (`src/i18n/introCaptions.ts`).

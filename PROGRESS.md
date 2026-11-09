@@ -165,7 +165,7 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     back to English, no picker on the next boot, no console errors. 102 tests pass.
 
 15. Languages finished (2026-11-08): every screen, lesson, review message, catalog item, flight event and report line in Spanish
-    (Gemini extracted the UI; Claude moved the engine sentences to key + params, translated all 1 150 strings and fixed two
+    (Gemini extracted the UI; Claude moved the engine sentences to key + params, translated all 1 187 strings and fixed two
     Gemini bugs: route ids and the id `none` collided between categories). Intro re-rendered without burned-in captions; the
     game draws them word by word per language. Checked in headless Chrome, both languages: menu, free mission, 5 lessons, intro
     captions, career, prologue, all design tabs of two scenarios, launch pad, launch captions, flight decisions and report: no
