@@ -1,6 +1,6 @@
-// English UI strings and Design Review explanations. Engine returns codes + params; text lives here.
+// UI strings and Design Review explanations. Engine returns codes + params; text lives in strings/*.json.
 import type { ResourceKey, ReviewItem, Role } from '../engine/types'
-import { LOCALE, currentLang } from './index'
+import { LOCALE, currentLang, t, type StringKey } from './index'
 
 export const fmt = (n: number | string | undefined, digits = 0): string => {
   if (typeof n === 'string') return n
@@ -9,38 +9,28 @@ export const fmt = (n: number | string | undefined, digits = 0): string => {
   return n.toLocaleString(LOCALE[currentLang()], { maximumFractionDigits: digits, minimumFractionDigits: digits })
 }
 
-export const ROLE_LABEL: Record<Role, string> = {
-  lead: 'Mission Director',
-  engineer: 'Spacecraft Engineer',
-  astrophysicist: 'Astrophysicist',
-  astrobiologist: 'Astrobiologist',
-}
+const ROLES: Role[] = ['lead', 'engineer', 'astrophysicist', 'astrobiologist']
+export const ROLE_LABEL: Record<Role, string> = Object.defineProperties(
+  {} as Record<Role, string>,
+  Object.fromEntries(ROLES.map((r) => [r, { get: () => t(`role.${r}.name` as StringKey), enumerable: true }]))
+)
 
-export const ROLE_BLURB: Record<Role, string> = {
-  lead: 'Principal Investigator: contract, investors, budget, launcher, ground stations, schedule, final sign-off.',
-  engineer: 'Builds the spacecraft: power, propulsion, structure, thermal, computer, radio and antenna.',
-  astrophysicist: 'Orbits and trajectories, space weather, telescopes, radar and particle instruments.',
-  astrobiologist: 'Water, life and habitability; Earth-system and planetary science; spectrometers and imagers.',
-}
+export const ROLE_BLURB: Record<Role, string> = Object.defineProperties(
+  {} as Record<Role, string>,
+  Object.fromEntries(ROLES.map((r) => [r, { get: () => t(`role.${r}.blurb` as StringKey), enumerable: true }]))
+)
 
-export const RESOURCE_LABEL: Record<ResourceKey, string> = {
-  mass: 'Mass',
-  power: 'Power',
-  data: 'Data',
-  cost: 'Budget',
-  schedule: 'Schedule',
-  life: 'Lifetime',
-  science: 'Science',
-  risk: 'Risk',
-}
+const RESOURCES: ResourceKey[] = ['mass', 'power', 'data', 'cost', 'schedule', 'life', 'science', 'risk']
+export const RESOURCE_LABEL: Record<ResourceKey, string> = Object.defineProperties(
+  {} as Record<ResourceKey, string>,
+  Object.fromEntries(RESOURCES.map((r) => [r, { get: () => t(`resource.${r}` as StringKey), enumerable: true }]))
+)
 
-const LIFE_FACTOR: Record<string, string> = {
-  battery: 'the battery wearing out from charge cycles',
-  panels: 'solar panels degrading below what you need',
-  propellant: 'the planned mission life (propellant and operations are sized for it)',
-  radiation: 'radiation damaging the computer',
-  orbit: 'the orbit decaying with no thrusters to correct it',
-}
+const LIFE_FACTORS = ['battery', 'panels', 'propellant', 'radiation', 'orbit'] as const
+const LIFE_FACTOR: Record<string, string> = Object.defineProperties(
+  {} as Record<string, string>,
+  Object.fromEntries(LIFE_FACTORS.map((f) => [f, { get: () => t(`lifeFactor.${f}` as StringKey), enumerable: true }]))
+)
 
 export interface Message {
   title: string
@@ -53,191 +43,221 @@ const n = (p: P, k: string, d = 0) => fmt(p[k] as number, d)
 
 export const MESSAGES: Record<string, (p: P) => Message> = {
   NO_PAYLOAD: () => ({
-    title: 'No instruments on board',
-    why: 'A spacecraft without instruments returns no science. Open the Payload tab and add at least one instrument.',
-    levers: ['Payload tab → add an instrument the scenario needs'],
+    title: t('review.msg.NO_PAYLOAD.title'),
+    why: t('review.msg.NO_PAYLOAD.why'),
+    levers: [t('review.msg.NO_PAYLOAD.lever.0')],
   }),
   MASS_OVER_CAPACITY: (p) => ({
-    title: 'Too heavy for the launcher',
-    why: `Your spacecraft weighs ${n(p, 'wet')} kg fully fuelled, but the ${p.launcher} can only carry ${n(p, 'capacity')} kg to this orbit. It would never reach orbit.`,
-    levers: ['Choose a bigger launcher', 'Remove or swap heavy instruments', 'Use more efficient propulsion (less propellant)', 'Shorten the design life (less propellant)'],
+    title: t('review.msg.MASS_OVER_CAPACITY.title'),
+    why: t('review.msg.MASS_OVER_CAPACITY.why', { wet: n(p, 'wet'), launcher: String(p.launcher), capacity: n(p, 'capacity') }),
+    levers: [
+      t('review.msg.MASS_OVER_CAPACITY.lever.0'),
+      t('review.msg.MASS_OVER_CAPACITY.lever.1'),
+      t('review.msg.MASS_OVER_CAPACITY.lever.2'),
+      t('review.msg.MASS_OVER_CAPACITY.lever.3'),
+    ],
   }),
   MASS_MARGIN_LOW: (p) => ({
-    title: 'Launcher almost full',
-    why: `You use ${n(p, 'wet')} of ${n(p, 'capacity')} kg. Real spacecraft tend to grow during development; less than 10 % spare capacity is risky.`,
-    levers: ['Trim mass', 'Pick a launcher with more capacity'],
+    title: t('review.msg.MASS_MARGIN_LOW.title'),
+    why: t('review.msg.MASS_MARGIN_LOW.why', { wet: n(p, 'wet'), capacity: n(p, 'capacity') }),
+    levers: [t('review.msg.MASS_MARGIN_LOW.lever.0'), t('review.msg.MASS_MARGIN_LOW.lever.1')],
   }),
   LAUNCHER_NO_TARGET: (p) => ({
-    title: 'Launcher cannot reach this orbit',
-    why: `The ${p.launcher} is not powerful enough to send anything towards ${p.orbit}.`,
-    levers: ['Choose a bigger launcher'],
+    title: t('review.msg.LAUNCHER_NO_TARGET.title'),
+    why: t('review.msg.LAUNCHER_NO_TARGET.why', { launcher: String(p.launcher), orbit: String(p.orbit) }),
+    levers: [t('review.msg.LAUNCHER_NO_TARGET.lever.0')],
   }),
   LAUNCHER_OVERSIZED: (p) => ({
-    title: 'You are paying for unused rocket',
-    why: `The ${p.cheaper} could carry this spacecraft and would save about $${n(p, 'saving')} M compared with the ${p.launcher}.`,
-    levers: [`Switch to the ${p.cheaper}`, 'Or use the spare capacity for more payload'],
+    title: t('review.msg.LAUNCHER_OVERSIZED.title'),
+    why: t('review.msg.LAUNCHER_OVERSIZED.why', { cheaper: String(p.cheaper), saving: n(p, 'saving'), launcher: String(p.launcher) }),
+    levers: [t('review.msg.LAUNCHER_OVERSIZED.lever.0', { cheaper: String(p.cheaper) }), t('review.msg.LAUNCHER_OVERSIZED.lever.1')],
   }),
   NO_PROPULSION_INSERTION: (p) => ({
-    title: 'No engine to finish the trip',
-    why: `The launcher drops you on a transfer path; reaching ${p.orbit} needs another ${n(p, 'dv')} m/s that only the spacecraft's own engine can provide.`,
-    levers: ['Add propulsion (hydrazine or electric)'],
+    title: t('review.msg.NO_PROPULSION_INSERTION.title'),
+    why: t('review.msg.NO_PROPULSION_INSERTION.why', { orbit: String(p.orbit), dv: n(p, 'dv') }),
+    levers: [t('review.msg.NO_PROPULSION_INSERTION.lever.0')],
   }),
   DV_INFEASIBLE: (p) => ({
-    title: 'This engine cannot do the job',
-    why: `You need ${n(p, 'dv')} m/s of Δv but an engine with Isp ${n(p, 'isp')} s would need more propellant than any tank can hold (rocket equation).`,
-    levers: ['Use propulsion with higher Isp (hydrazine, electric)'],
+    title: t('review.msg.DV_INFEASIBLE.title'),
+    why: t('review.msg.DV_INFEASIBLE.why', { dv: n(p, 'dv'), isp: n(p, 'isp') }),
+    levers: [t('review.msg.DV_INFEASIBLE.lever.0')],
   }),
   POWER_NEGATIVE: (p) => ({
-    title: 'Not enough power',
-    why: `Your solar arrays deliver ${n(p, 'gen')} W on average over an orbit, but the spacecraft needs ${n(p, 'need')} W (including recharging the battery for eclipse). The battery would drain and the spacecraft would shut down — like a phone that uses more than its charger gives.`,
-    levers: ['Increase solar array area', 'Use Sun-tracking arrays', 'Lower instrument duty cycles', 'Remove power-hungry instruments'],
+    title: t('review.msg.POWER_NEGATIVE.title'),
+    why: t('review.msg.POWER_NEGATIVE.why', { gen: n(p, 'gen'), need: n(p, 'need') }),
+    levers: [
+      t('review.msg.POWER_NEGATIVE.lever.0'),
+      t('review.msg.POWER_NEGATIVE.lever.1'),
+      t('review.msg.POWER_NEGATIVE.lever.2'),
+      t('review.msg.POWER_NEGATIVE.lever.3'),
+    ],
   }),
   POWER_EOL_NEGATIVE: (p) => ({
-    title: 'Power runs short before end of mission',
-    why: `Panels degrade every year. After ${n(p, 'years', 1)} years they give only ${n(p, 'gen')} W vs ${n(p, 'need')} W needed.`,
-    levers: ['Add array area as margin', 'Shorten design life'],
+    title: t('review.msg.POWER_EOL_NEGATIVE.title'),
+    why: t('review.msg.POWER_EOL_NEGATIVE.why', { years: n(p, 'years', 1), gen: n(p, 'gen'), need: n(p, 'need') }),
+    levers: [t('review.msg.POWER_EOL_NEGATIVE.lever.0'), t('review.msg.POWER_EOL_NEGATIVE.lever.1')],
   }),
   POWER_MARGIN_LOW: (p) => ({
-    title: 'Thin power margin',
-    why: `End-of-life power margin is only ${n(p, 'marginPct')} %. Engineers usually keep 10–25 % for surprises.`,
-    levers: ['Slightly larger arrays'],
+    title: t('review.msg.POWER_MARGIN_LOW.title'),
+    why: t('review.msg.POWER_MARGIN_LOW.why', { marginPct: n(p, 'marginPct') }),
+    levers: [t('review.msg.POWER_MARGIN_LOW.lever.0')],
   }),
   POWER_OVERSIZED: (p) => ({
-    title: 'Solar arrays bigger than needed',
-    why: `You have ${n(p, 'marginPct')} % more power than needed even at end of life. That extra area costs mass and money.`,
-    levers: ['Reduce array area', 'Or use the spare power for more instruments'],
+    title: t('review.msg.POWER_OVERSIZED.title'),
+    why: t('review.msg.POWER_OVERSIZED.why', { marginPct: n(p, 'marginPct') }),
+    levers: [t('review.msg.POWER_OVERSIZED.lever.0'), t('review.msg.POWER_OVERSIZED.lever.1')],
   }),
   BATTERY_DEPLETED: (p) => ({
-    title: 'Battery dies in every eclipse',
-    why: `Each eclipse lasts ${n(p, 'eclipseMin')} min and needs ${n(p, 'need')} Wh, but the battery holds only ${n(p, 'have')} Wh.`,
-    levers: ['Bigger battery', 'Lower loads', 'Dawn-dusk orbit (almost no eclipses)'],
+    title: t('review.msg.BATTERY_DEPLETED.title'),
+    why: t('review.msg.BATTERY_DEPLETED.why', { eclipseMin: n(p, 'eclipseMin'), need: n(p, 'need'), have: n(p, 'have') }),
+    levers: [t('review.msg.BATTERY_DEPLETED.lever.0'), t('review.msg.BATTERY_DEPLETED.lever.1'), t('review.msg.BATTERY_DEPLETED.lever.2')],
   }),
   BATTERY_DOD_HIGH: (p) => ({
-    title: 'Battery discharged too deeply',
-    why: `Each eclipse empties ${n(p, 'dodPct')} % of the battery. With ~${n(p, 'cycles')} eclipses per year, staying above ${n(p, 'limitPct')} % depth of discharge wears it out quickly (shorter life).`,
-    levers: ['Bigger battery', 'Lower average load'],
+    title: t('review.msg.BATTERY_DOD_HIGH.title'),
+    why: t('review.msg.BATTERY_DOD_HIGH.why', { dodPct: n(p, 'dodPct'), cycles: n(p, 'cycles'), limitPct: n(p, 'limitPct') }),
+    levers: [t('review.msg.BATTERY_DOD_HIGH.lever.0'), t('review.msg.BATTERY_DOD_HIGH.lever.1')],
   }),
   BATTERY_WORST_CASE: (p) => ({
-    title: 'Cannot run everything during eclipse',
-    why: `With all instruments and the radio on (${n(p, 'peak')} W) for a full ${n(p, 'eclipseMin')} min eclipse, the ${n(p, 'have')} Wh battery would run flat. Operations will have to schedule instruments.`,
-    levers: ['Bigger battery', 'Accept scheduled operations'],
+    title: t('review.msg.BATTERY_WORST_CASE.title'),
+    why: t('review.msg.BATTERY_WORST_CASE.why', { peak: n(p, 'peak'), eclipseMin: n(p, 'eclipseMin'), have: n(p, 'have') }),
+    levers: [t('review.msg.BATTERY_WORST_CASE.lever.0'), t('review.msg.BATTERY_WORST_CASE.lever.1')],
   }),
   LONG_ECLIPSE_RISK: (p) => ({
-    title: 'May not survive a long eclipse',
-    why: `Occasionally the Earth's shadow covers the Moon for ~${n(p, 'hours', 1)} h. Even in safe mode you would need ${n(p, 'need')} Wh but the battery holds ${n(p, 'have')} Wh.`,
-    levers: ['Bigger battery', 'Lower safe-mode loads'],
+    title: t('review.msg.LONG_ECLIPSE_RISK.title'),
+    why: t('review.msg.LONG_ECLIPSE_RISK.why', { hours: n(p, 'hours', 1), need: n(p, 'need'), have: n(p, 'have') }),
+    levers: [t('review.msg.LONG_ECLIPSE_RISK.lever.0'), t('review.msg.LONG_ECLIPSE_RISK.lever.1')],
   }),
   ELECTRIC_UNDERPOWERED: (p) => ({
-    title: 'Electric thruster starved of power',
-    why: `Electric propulsion needs about ${n(p, 'need')} W in sunlight while thrusting; your arrays give ${n(p, 'have')} W.`,
-    levers: ['Larger or Sun-tracking arrays', 'Use chemical propulsion'],
+    title: t('review.msg.ELECTRIC_UNDERPOWERED.title'),
+    why: t('review.msg.ELECTRIC_UNDERPOWERED.why', { need: n(p, 'need'), have: n(p, 'have') }),
+    levers: [t('review.msg.ELECTRIC_UNDERPOWERED.lever.0'), t('review.msg.ELECTRIC_UNDERPOWERED.lever.1')],
   }),
   NO_STATIONS: () => ({
-    title: 'No ground stations',
-    why: 'Without a ground station nobody can receive your data or send commands.',
-    levers: ['Ground & Comms → select at least one station'],
+    title: t('review.msg.NO_STATIONS.title'),
+    why: t('review.msg.NO_STATIONS.why'),
+    levers: [t('review.msg.NO_STATIONS.lever.0')],
   }),
   NO_DEEP_STATION: (p) => ({
-    title: 'Too far for ordinary antennas',
-    why: `From ${p.orbit} the signal is extremely weak. Only large deep-space antennas can hear it.`,
-    levers: ['Select at least one Deep Space Antenna'],
+    title: t('review.msg.NO_DEEP_STATION.title'),
+    why: t('review.msg.NO_DEEP_STATION.why', { orbit: String(p.orbit) }),
+    levers: [t('review.msg.NO_DEEP_STATION.lever.0')],
   }),
   DATA_BOTTLENECK: (p) => ({
-    title: 'Data bottleneck',
-    why: `Your instruments produce ${n(p, 'generated', 1)} GB/day but you can only download ${n(p, 'downlink', 1)} GB/day. The on-board memory (${n(p, 'storage')} GB) fills in ${n(p, 'daysToFull', 1)} days; after that ${n(p, 'lostPct')} % of the data is lost.`,
-    levers: ['Add another ground station (high-latitude ones see polar orbits more often)', 'Use a higher band (X → Ka) or a bigger antenna', 'Lower instrument duty cycles', 'Turn on compression'],
+    title: t('review.msg.DATA_BOTTLENECK.title'),
+    why: t('review.msg.DATA_BOTTLENECK.why', {
+      generated: n(p, 'generated', 1),
+      downlink: n(p, 'downlink', 1),
+      storage: n(p, 'storage'),
+      daysToFull: n(p, 'daysToFull', 1),
+      lostPct: n(p, 'lostPct'),
+    }),
+    levers: [
+      t('review.msg.DATA_BOTTLENECK.lever.0'),
+      t('review.msg.DATA_BOTTLENECK.lever.1'),
+      t('review.msg.DATA_BOTTLENECK.lever.2'),
+      t('review.msg.DATA_BOTTLENECK.lever.3'),
+    ],
   }),
   ANTENNA_INCOMPATIBLE: (p) => ({
-    title: 'Antenna does not fit this radio',
-    why: `The ${p.antenna} antenna cannot be used with ${p.band}.`,
-    levers: ['Pick a compatible antenna'],
+    title: t('review.msg.ANTENNA_INCOMPATIBLE.title'),
+    why: t('review.msg.ANTENNA_INCOMPATIBLE.why', { antenna: String(p.antenna), band: String(p.band) }),
+    levers: [t('review.msg.ANTENNA_INCOMPATIBLE.lever.0')],
   }),
   DISH_NEEDS_POINTING: (p) => ({
-    title: 'Dish cannot be aimed',
-    why: `A steerable dish needs accurate attitude control; with ${p.adcs} it misses Earth often and the data rate drops.`,
-    levers: ['Use reaction wheels or a star tracker'],
+    title: t('review.msg.DISH_NEEDS_POINTING.title'),
+    why: t('review.msg.DISH_NEEDS_POINTING.why', { adcs: String(p.adcs) }),
+    levers: [t('review.msg.DISH_NEEDS_POINTING.lever.0')],
   }),
   MAGNETORQUERS_NO_FIELD: () => ({
-    title: 'Magnetorquers need a magnetic field',
-    why: 'Magnetorquers push against Earth’s magnetic field. Far from Earth there is no field to push against: the spacecraft would tumble.',
-    levers: ['Use reaction wheels or a star tracker'],
+    title: t('review.msg.MAGNETORQUERS_NO_FIELD.title'),
+    why: t('review.msg.MAGNETORQUERS_NO_FIELD.why'),
+    levers: [t('review.msg.MAGNETORQUERS_NO_FIELD.lever.0')],
   }),
   POINTING_INSUFFICIENT: (p) => ({
-    title: `${p.instrument} needs precise pointing`,
-    why: `This instrument needs ${p.need} pointing; ${p.have} cannot hold it steady enough, so it would return blurred, useless data.`,
-    levers: ['Add a star tracker', 'Or swap the instrument'],
+    title: t('review.msg.POINTING_INSUFFICIENT.title', { instrument: String(p.instrument) }),
+    why: t('review.msg.POINTING_INSUFFICIENT.why', { need: String(p.need), have: String(p.have) }),
+    levers: [t('review.msg.POINTING_INSUFFICIENT.lever.0'), t('review.msg.POINTING_INSUFFICIENT.lever.1')],
   }),
   POINTING_DEGRADED: (p) => ({
-    title: `${p.instrument} works poorly`,
-    why: `It needs ${p.need} pointing; with ${p.have} you get about half the science.`,
-    levers: ['Use reaction wheels or better'],
+    title: t('review.msg.POINTING_DEGRADED.title', { instrument: String(p.instrument) }),
+    why: t('review.msg.POINTING_DEGRADED.why', { need: String(p.need), have: String(p.have) }),
+    levers: [t('review.msg.POINTING_DEGRADED.lever.0')],
   }),
   LOW_SUN_OPTICAL: () => ({
-    title: 'Long shadows for optical cameras',
-    why: 'In a dawn-dusk orbit the ground below is at sunrise or sunset. Optical cameras get dark, shadowed images (half the science). Radar does not care.',
-    levers: ['Use the 10:30 sun-synchronous orbit for optical instruments', 'Or fly radar/microwave instruments'],
+    title: t('review.msg.LOW_SUN_OPTICAL.title'),
+    why: t('review.msg.LOW_SUN_OPTICAL.why'),
+    levers: [t('review.msg.LOW_SUN_OPTICAL.lever.0'), t('review.msg.LOW_SUN_OPTICAL.lever.1')],
   }),
   COLD_RISK: (p) => ({
-    title: 'Risk of freezing',
-    why: `Around ${p.orbit} long cold periods can freeze batteries and propellant lines without heaters.`,
-    levers: ['Use active thermal control'],
+    title: t('review.msg.COLD_RISK.title'),
+    why: t('review.msg.COLD_RISK.why', { orbit: String(p.orbit) }),
+    levers: [t('review.msg.COLD_RISK.lever.0')],
   }),
   DEBRIS_NO_DISPOSAL: (p) => ({
-    title: 'Cannot clean up after itself',
-    why: `Without thrusters you cannot lower the orbit (${n(p, 'dv')} m/s) at end of life; the dead satellite stays as space debris for decades.`,
-    levers: ['Add even simple propulsion (cold gas)'],
+    title: t('review.msg.DEBRIS_NO_DISPOSAL.title'),
+    why: t('review.msg.DEBRIS_NO_DISPOSAL.why', { dv: n(p, 'dv') }),
+    levers: [t('review.msg.DEBRIS_NO_DISPOSAL.lever.0')],
   }),
   LIFE_SHORT: (p) => ({
-    title: 'Mission ends too early',
-    why: `Expected life is ${n(p, 'life', 1)} years but ${n(p, 'required', 1)} are required. The limit is ${LIFE_FACTOR[p.factor as string] ?? p.factor}.`,
-    levers: ['Fix the limiting factor shown in the Lifetime panel'],
+    title: t('review.msg.LIFE_SHORT.title'),
+    why: t('review.msg.LIFE_SHORT.why', {
+      life: n(p, 'life', 1),
+      required: n(p, 'required', 1),
+      factor: LIFE_FACTOR[p.factor as string] ?? String(p.factor),
+    }),
+    levers: [t('review.msg.LIFE_SHORT.lever.0')],
   }),
   RADIATION: (p) => ({
-    title: 'Computer may not survive the radiation',
-    why: `This orbit gives ~${n(p, 'dose', 1)} krad per year; the ${p.obc} tolerates it for ~${n(p, 'years', 1)} years.`,
-    levers: ['Use a radiation-hardened computer'],
+    title: t('review.msg.RADIATION.title'),
+    why: t('review.msg.RADIATION.why', { dose: n(p, 'dose', 1), obc: String(p.obc), years: n(p, 'years', 1) }),
+    levers: [t('review.msg.RADIATION.lever.0')],
   }),
   OVER_BUDGET: (p) => ({
-    title: 'Over budget',
-    why: `The mission costs $${n(p, 'total', 1)} M but the budget is $${n(p, 'budget')} M. The agency will not approve it.`,
-    levers: ['Cheaper launcher', 'Fewer or more mature (higher TRL) instruments', 'Fewer ground stations', 'Shorter design life (less operations cost)'],
+    title: t('review.msg.OVER_BUDGET.title'),
+    why: t('review.msg.OVER_BUDGET.why', { total: n(p, 'total', 1), budget: n(p, 'budget') }),
+    levers: [
+      t('review.msg.OVER_BUDGET.lever.0'),
+      t('review.msg.OVER_BUDGET.lever.1'),
+      t('review.msg.OVER_BUDGET.lever.2'),
+      t('review.msg.OVER_BUDGET.lever.3'),
+    ],
   }),
   BUDGET_TIGHT: (p) => ({
-    title: 'Budget almost exhausted',
-    why: `$${n(p, 'total', 1)} M of $${n(p, 'budget')} M used. Any surprise will push you over.`,
+    title: t('review.msg.BUDGET_TIGHT.title'),
+    why: t('review.msg.BUDGET_TIGHT.why', { total: n(p, 'total', 1), budget: n(p, 'budget') }),
   }),
   LATE: (p) => ({
-    title: 'Development will run late',
-    why: `Building this spacecraft takes ~${n(p, 'months')} months but launch is planned in ${n(p, 'deadline')}. Immature instruments (low TRL) and heavy designs take longer.`,
-    levers: ['Use higher-TRL instruments', 'Fewer instruments', 'Lighter design'],
+    title: t('review.msg.LATE.title'),
+    why: t('review.msg.LATE.why', { months: n(p, 'months'), deadline: n(p, 'deadline') }),
+    levers: [t('review.msg.LATE.lever.0'), t('review.msg.LATE.lever.1'), t('review.msg.LATE.lever.2')],
   }),
   LAUNCHER_SUBORBITAL: (p) => ({
-    title: `${p.launcher} cannot reach orbit`,
-    why: `It is a sounding rocket: it climbs to ~${n(p, 'apogee')} km for a few minutes and falls back. Staying in orbit needs ~7.8 km/s of sideways speed; Paulet-1 reaches about 1.5 km/s straight up.`,
-    levers: ['Choose an orbital launcher (unlocked after First Light in the campaign)'],
+    title: t('review.msg.LAUNCHER_SUBORBITAL.title', { launcher: String(p.launcher) }),
+    why: t('review.msg.LAUNCHER_SUBORBITAL.why', { apogee: n(p, 'apogee') }),
+    levers: [t('review.msg.LAUNCHER_SUBORBITAL.lever.0')],
   }),
   RIDESHARE_ALTITUDE: (p) => ({
-    title: 'The rideshare does not go that high',
-    why: `Shared flights drop everyone at the same place (up to ~${n(p, 'max')} km). You asked for ${n(p, 'alt')} km.`,
-    levers: [`Lower the altitude to ${n(p, 'max')} km or less`, 'Or buy a dedicated launcher'],
+    title: t('review.msg.RIDESHARE_ALTITUDE.title'),
+    why: t('review.msg.RIDESHARE_ALTITUDE.why', { max: n(p, 'max'), alt: n(p, 'alt') }),
+    levers: [t('review.msg.RIDESHARE_ALTITUDE.lever.0', { max: n(p, 'max') }), t('review.msg.RIDESHARE_ALTITUDE.lever.1')],
   }),
   RIDESHARE_SCHEDULE: (p) => ({
-    title: 'Waiting for the next shared flight',
-    why: `Rideshares fly every ${n(p, 'every')} months; your satellite waits ~${n(p, 'wait', 1)} months on the ground after it is ready.`,
-    levers: ['Accept the wait (it is cheap)', 'Or pay for a dedicated launcher to fly as soon as you are ready'],
+    title: t('review.msg.RIDESHARE_SCHEDULE.title'),
+    why: t('review.msg.RIDESHARE_SCHEDULE.why', { every: n(p, 'every'), wait: n(p, 'wait', 1) }),
+    levers: [t('review.msg.RIDESHARE_SCHEDULE.lever.0'), t('review.msg.RIDESHARE_SCHEDULE.lever.1')],
   }),
   TCM_RESERVE_LOW: (p) => ({
-    title: 'Small correction reserve for a chaotic route',
-    why: `On the ${p.route} small navigation errors grow quickly (chaos). Expected corrections are ~${n(p, 'need')} m/s but you carry ${n(p, 'reserve')} m/s.`,
-    levers: ['Raise the correction reserve (Orbit & Launch)', 'Pick a faster, less sensitive route'],
+    title: t('review.msg.TCM_RESERVE_LOW.title'),
+    why: t('review.msg.TCM_RESERVE_LOW.why', { route: String(p.route), need: n(p, 'need'), reserve: n(p, 'reserve') }),
+    levers: [t('review.msg.TCM_RESERVE_LOW.lever.0'), t('review.msg.TCM_RESERVE_LOW.lever.1')],
   }),
-  MASS_OK: () => ({ title: 'Mass fits the launcher', why: 'Fully fuelled mass is within launcher capacity with a healthy margin.' }),
-  POWER_OK: () => ({ title: 'Power balance positive', why: 'Arrays cover all loads, including battery recharge, through end of life.' }),
-  DATA_OK: () => ({ title: 'Downlink keeps up', why: 'Everything your instruments produce can be downloaded each day.' }),
-  COST_OK: () => ({ title: 'Within budget', why: 'Total cost, including 15 % contingency, fits the budget.' }),
-  SCHEDULE_OK: () => ({ title: 'On schedule', why: 'Development fits before the planned launch date.' }),
-  LIFE_OK: () => ({ title: 'Lifetime meets the requirement', why: 'Battery, panels, propellant, radiation tolerance and orbit all last long enough.' }),
-  SCIENCE_OK: () => ({ title: 'Payload ready', why: 'Instruments have the pointing and lighting they need.' }),
+  MASS_OK: () => ({ title: t('review.msg.MASS_OK.title'), why: t('review.msg.MASS_OK.why') }),
+  POWER_OK: () => ({ title: t('review.msg.POWER_OK.title'), why: t('review.msg.POWER_OK.why') }),
+  DATA_OK: () => ({ title: t('review.msg.DATA_OK.title'), why: t('review.msg.DATA_OK.why') }),
+  COST_OK: () => ({ title: t('review.msg.COST_OK.title'), why: t('review.msg.COST_OK.why') }),
+  SCHEDULE_OK: () => ({ title: t('review.msg.SCHEDULE_OK.title'), why: t('review.msg.SCHEDULE_OK.why') }),
+  LIFE_OK: () => ({ title: t('review.msg.LIFE_OK.title'), why: t('review.msg.LIFE_OK.why') }),
+  SCIENCE_OK: () => ({ title: t('review.msg.SCIENCE_OK.title'), why: t('review.msg.SCIENCE_OK.why') }),
 }
 
 export function message(item: ReviewItem): Message {
@@ -245,32 +265,50 @@ export function message(item: ReviewItem): Message {
   return f ? f(item.params) : { title: item.code, why: '' }
 }
 
-export const REQUIREMENT_LABEL: Record<string, string> = {
-  instrumentAny: 'Carry',
-  orbitIn: 'Orbit',
-  lifeYears: 'Lifetime ≥',
-  dataDeliveredGbDay: 'Data delivered ≥',
-  withinBudget: 'Within budget',
-  onSchedule: 'Ready by deadline',
-  scienceAtLeast: 'Science ≥',
-  cargoAtLeast: 'Cargo ≥ (kg)',
-  altitudeAtMost: 'Altitude ≤ (km)',
-  propulsionAny: 'Thrusters for rendezvous',
-  costAtMost: 'Total cost ≤ ($ M)',
-  dvAtMost: 'Total Δv ≤ (m/s)',
-  arrivalByMonth: 'Operating by month',
-}
+const REQUIREMENTS = [
+  'instrumentAny',
+  'orbitIn',
+  'lifeYears',
+  'dataDeliveredGbDay',
+  'withinBudget',
+  'onSchedule',
+  'scienceAtLeast',
+  'cargoAtLeast',
+  'altitudeAtMost',
+  'propulsionAny',
+  'costAtMost',
+  'dvAtMost',
+  'arrivalByMonth',
+] as const
+export const REQUIREMENT_LABEL: Record<string, string> = Object.defineProperties(
+  {} as Record<string, string>,
+  Object.fromEntries(REQUIREMENTS.map((k) => [k, { get: () => t(`requirement.${k}` as StringKey), enumerable: true }]))
+)
 
-export const GLOSSARY: Record<string, string> = {
-  'Δv (delta-v)': 'How much the spacecraft can change its speed with its own engine. Every manoeuvre costs Δv, and Δv costs propellant (rocket equation).',
-  'Duty cycle': 'Fraction of the day an instrument is switched on. More time on = more data and power use.',
-  Eclipse: 'Time when the planet blocks the Sun. Solar panels give nothing; the battery must carry the load.',
-  'Depth of discharge': 'How much of the battery you use per eclipse. Deep cycles wear batteries out faster.',
-  TRL: 'Technology Readiness Level (6–9). 9 = flown many times; 6 = prototype. Lower TRL costs more, takes longer and fails more often.',
-  'Link budget': 'How much data per second a radio link can carry; depends on band, antenna and distance.',
-  'Payload capacity': 'Maximum mass a launcher can deliver to a given orbit.',
-  'Isp (specific impulse)': 'Fuel efficiency of an engine, in seconds. Higher Isp = more Δv per kg of propellant.',
+const GLOSSARY_ITEMS = [
+  'Δv (delta-v)',
+  'Duty cycle',
+  'Eclipse',
+  'Depth of discharge',
+  'TRL',
+  'Link budget',
+  'Payload capacity',
+  'Isp (specific impulse)',
+] as const
+const GLOSSARY_KEY_MAP: Record<string, StringKey> = {
+  'Δv (delta-v)': 'glossary.dv',
+  'Duty cycle': 'glossary.dutyCycle',
+  Eclipse: 'glossary.eclipse',
+  'Depth of discharge': 'glossary.dod',
+  TRL: 'glossary.trl',
+  'Link budget': 'glossary.linkBudget',
+  'Payload capacity': 'glossary.payloadCapacity',
+  'Isp (specific impulse)': 'glossary.isp',
 }
+export const GLOSSARY: Record<string, string> = Object.defineProperties(
+  {} as Record<string, string>,
+  Object.fromEntries(GLOSSARY_ITEMS.map((k) => [k, { get: () => t(GLOSSARY_KEY_MAP[k]), enumerable: true }]))
+)
 
 // ---------------------------------------------------------------------------
 // Post-mission analysis (Phase 2)
@@ -283,112 +321,136 @@ export interface CauseMessage {
 }
 export const CAUSE_TEXT: Record<string, (p: CP) => CauseMessage> = {
   CAUSE_LAUNCH_FAILURE: (p) => ({
-    title: 'The rocket failed',
-    why: `Your launcher succeeds about ${p.reliability}% of the time. This time it did not. Bad luck — but a real risk you chose.`,
-    change: 'Fly again with a new seed, or pay for a more reliable launcher.',
+    title: t('cause.CAUSE_LAUNCH_FAILURE.title'),
+    why: t('cause.CAUSE_LAUNCH_FAILURE.why', { reliability: String(p.reliability) }),
+    change: t('cause.CAUSE_LAUNCH_FAILURE.change'),
   }),
   CAUSE_END_BATTERY: (p) => ({
-    title: 'Battery wore out early',
-    why: `The battery died after ${p.life} years (needed ${p.required}). Deep discharges in thousands of eclipses age it fast.`,
-    change: 'Use a bigger battery so each eclipse drains less of it.',
+    title: t('cause.CAUSE_END_BATTERY.title'),
+    why: t('cause.CAUSE_END_BATTERY.why', { life: String(p.life), required: String(p.required) }),
+    change: t('cause.CAUSE_END_BATTERY.change'),
   }),
   CAUSE_END_POWER: (p) => ({
-    title: 'Not enough power at the end',
-    why: `Solar arrays degraded until they could not run the spacecraft (after ${p.life} years).`,
-    change: 'Add array area margin for end of life.',
+    title: t('cause.CAUSE_END_POWER.title'),
+    why: t('cause.CAUSE_END_POWER.why', { life: String(p.life) }),
+    change: t('cause.CAUSE_END_POWER.change'),
   }),
   CAUSE_END_RADIATION: (p) => ({
-    title: 'Radiation killed the computer',
-    why: `The computer exceeded its radiation tolerance after ${p.life} years.`,
-    change: 'Use a radiation-hardened computer or a gentler orbit.',
+    title: t('cause.CAUSE_END_RADIATION.title'),
+    why: t('cause.CAUSE_END_RADIATION.why', { life: String(p.life) }),
+    change: t('cause.CAUSE_END_RADIATION.change'),
   }),
   CAUSE_END_ORBIT: (p) => ({
-    title: 'Could not keep the orbit',
-    why: `Without enough propellant or thrusters, the orbit decayed after ${p.life} years.`,
-    change: 'Carry propulsion and size propellant for the whole mission.',
+    title: t('cause.CAUSE_END_ORBIT.title'),
+    why: t('cause.CAUSE_END_ORBIT.why', { life: String(p.life) }),
+    change: t('cause.CAUSE_END_ORBIT.change'),
   }),
   CAUSE_END_FUNDING: (p) => ({
-    title: 'The money ran out',
-    why: `Investors stopped paying for operations after ${p.life} years. Society’s rules apply in space too.`,
-    change: 'Keep a larger budget reserve or cheaper operations (fewer stations).',
+    title: t('cause.CAUSE_END_FUNDING.title'),
+    why: t('cause.CAUSE_END_FUNDING.why', { life: String(p.life) }),
+    change: t('cause.CAUSE_END_FUNDING.change'),
   }),
   CAUSE_END_COLLISION: () => ({
-    title: 'Lost to space debris',
-    why: 'You accepted a collision risk and lost the bet.',
-    change: 'Carry propellant for avoidance manoeuvres and use it.',
+    title: t('cause.CAUSE_END_COLLISION.title'),
+    why: t('cause.CAUSE_END_COLLISION.why'),
+    change: t('cause.CAUSE_END_COLLISION.change'),
   }),
   CAUSE_END_ECLIPSE: () => ({
-    title: 'Frozen in a lunar eclipse',
-    why: 'The battery could not carry the spacecraft through hours of Earth’s shadow.',
-    change: 'Size the battery for the long eclipse, or power down before it.',
+    title: t('cause.CAUSE_END_ECLIPSE.title'),
+    why: t('cause.CAUSE_END_ECLIPSE.why'),
+    change: t('cause.CAUSE_END_ECLIPSE.change'),
   }),
   CAUSE_DATA_LOST: (p) => ({
-    title: 'Data was lost',
-    why: `${p.lostPct}% of everything your instruments produced never reached the ground.`,
-    change: 'More ground stations, a faster radio, lower duty cycles or compression.',
+    title: t('cause.CAUSE_DATA_LOST.title'),
+    why: t('cause.CAUSE_DATA_LOST.why', { lostPct: String(p.lostPct) }),
+    change: t('cause.CAUSE_DATA_LOST.change'),
   }),
   CAUSE_BOTTLENECK: (p) => ({
-    title: 'Downlink bottleneck',
-    why: `Instruments produced ${p.gen} GB/day but only ${p.down} GB/day could be downloaded.`,
-    change: 'Add a high-latitude station or a higher band.',
+    title: t('cause.CAUSE_BOTTLENECK.title'),
+    why: t('cause.CAUSE_BOTTLENECK.why', { gen: String(p.gen), down: String(p.down) }),
+    change: t('cause.CAUSE_BOTTLENECK.change'),
   }),
   CAUSE_SAFE_MODE: (p) => ({
-    title: 'Too much time in safe mode',
-    why: `${p.weeks} weeks without science after flares, anomalies or eclipses.`,
-    change: 'Radiation-hardened electronics and battery margin reduce downtime.',
+    title: t('cause.CAUSE_SAFE_MODE.title'),
+    why: t('cause.CAUSE_SAFE_MODE.why', { weeks: String(p.weeks) }),
+    change: t('cause.CAUSE_SAFE_MODE.change'),
   }),
   CAUSE_MISSED_OPPORTUNITY: (p) => ({
-    title: 'Missed a science opportunity',
-    why: `"${p.title}" happened ${p.count} time(s) and no instrument on board could observe it.`,
-    change: 'Fly an instrument that fits the scenario’s surprises.',
+    title: t('cause.CAUSE_MISSED_OPPORTUNITY.title'),
+    why: t('cause.CAUSE_MISSED_OPPORTUNITY.why', { title: String(p.title), count: String(p.count) }),
+    change: t('cause.CAUSE_MISSED_OPPORTUNITY.change'),
   }),
-  CAUSE_SEIZED_OPPORTUNITY: (p) => ({ title: 'Seized a science opportunity', why: `Retargeting earned +${p.points} science points.` }),
+  CAUSE_SEIZED_OPPORTUNITY: (p) => ({
+    title: t('cause.CAUSE_SEIZED_OPPORTUNITY.title'),
+    why: t('cause.CAUSE_SEIZED_OPPORTUNITY.why', { points: String(p.points) }),
+  }),
   CAUSE_POOR_DECISIONS: (p) => ({
-    title: 'Risky calls in flight',
-    why: `${p.count} decision(s) took more risk than the situation justified.`,
-    change: 'Read what each role is worried about before choosing.',
+    title: t('cause.CAUSE_POOR_DECISIONS.title'),
+    why: t('cause.CAUSE_POOR_DECISIONS.why', { count: String(p.count) }),
+    change: t('cause.CAUSE_POOR_DECISIONS.change'),
   }),
-  CAUSE_GOOD_DECISIONS: (p) => ({ title: 'Sound decisions under pressure', why: `${p.count} in-flight decisions matched the situation.` }),
+  CAUSE_GOOD_DECISIONS: (p) => ({
+    title: t('cause.CAUSE_GOOD_DECISIONS.title'),
+    why: t('cause.CAUSE_GOOD_DECISIONS.why', { count: String(p.count) }),
+  }),
   CAUSE_OVER_BUDGET: (p) => ({
-    title: 'Over budget',
-    why: `Final cost $${p.cost} M vs budget $${p.budget} M.`,
-    change: 'Cheaper launcher, fewer stations or more mature instruments.',
+    title: t('cause.CAUSE_OVER_BUDGET.title'),
+    why: t('cause.CAUSE_OVER_BUDGET.why', { cost: String(p.cost), budget: String(p.budget) }),
+    change: t('cause.CAUSE_OVER_BUDGET.change'),
   }),
   CAUSE_LATE: (p) => ({
-    title: 'Launched late',
-    why: `${p.months} months behind schedule${Number(p.delay) > 0 ? ` (including a ${p.delay}-month launcher delay)` : ''}.`,
-    change: 'Higher-TRL instruments and a lighter spacecraft develop faster.',
+    title: t('cause.CAUSE_LATE.title'),
+    why:
+      Number(p.delay) > 0
+        ? t('cause.CAUSE_LATE.whyWithDelay', { months: String(p.months), delay: String(p.delay) })
+        : t('cause.CAUSE_LATE.why', { months: String(p.months) }),
+    change: t('cause.CAUSE_LATE.change'),
   }),
-  CAUSE_COMPLETED: (p) => ({ title: 'Mission completed', why: `The spacecraft operated for ${p.life} years as planned.` }),
-  CAUSE_BOOSTER_LANDED: () => ({ title: 'The booster came home', why: 'Your reusable first stage landed and can fly again — cheaper launches and prestige.' }),
+  CAUSE_COMPLETED: (p) => ({
+    title: t('cause.CAUSE_COMPLETED.title'),
+    why: t('cause.CAUSE_COMPLETED.why', { life: String(p.life) }),
+  }),
+  CAUSE_BOOSTER_LANDED: () => ({
+    title: t('cause.CAUSE_BOOSTER_LANDED.title'),
+    why: t('cause.CAUSE_BOOSTER_LANDED.why'),
+  }),
   CAUSE_BOOSTER_LOST: () => ({
-    title: 'Booster lost at sea',
-    why: 'The reusable first stage missed its landing. The mission was fine, but replacing the booster costs money.',
-    change: 'Landings get more reliable with experience; it is still worth it on average.',
+    title: t('cause.CAUSE_BOOSTER_LOST.title'),
+    why: t('cause.CAUSE_BOOSTER_LOST.why'),
+    change: t('cause.CAUSE_BOOSTER_LOST.change'),
   }),
-  CAUSE_STRONG_DOWNLINK: (p) => ({ title: 'Plenty of downlink', why: `${p.down} GB/day of capacity kept data flowing even during outages.` }),
+  CAUSE_STRONG_DOWNLINK: (p) => ({
+    title: t('cause.CAUSE_STRONG_DOWNLINK.title'),
+    why: t('cause.CAUSE_STRONG_DOWNLINK.why', { down: String(p.down) }),
+  }),
   CAUSE_LOW_SCIENCE: (p) => ({
-    title: 'Science fell short',
-    why: `${p.science} science points against a target of ${p.target}.`,
-    change: 'More relevant instruments (stars in Payload), higher duty cycles if downlink allows.',
+    title: t('cause.CAUSE_LOW_SCIENCE.title'),
+    why: t('cause.CAUSE_LOW_SCIENCE.why', { science: String(p.science), target: String(p.target) }),
+    change: t('cause.CAUSE_LOW_SCIENCE.change'),
   }),
 }
 
-export const END_REASON_LABEL: Record<string, string> = {
-  completed: 'Mission complete',
-  launch_failure: 'Launch failure',
-  battery: 'Battery worn out',
-  power: 'Power failure',
-  radiation: 'Radiation failure',
-  orbit: 'Orbit lost',
-  funding: 'Funding cut',
-  collision: 'Debris collision',
-  eclipse: 'Frozen in eclipse',
-}
+const END_REASONS = [
+  'completed',
+  'launch_failure',
+  'battery',
+  'power',
+  'radiation',
+  'orbit',
+  'funding',
+  'collision',
+  'eclipse',
+] as const
+export const END_REASON_LABEL: Record<string, string> = Object.defineProperties(
+  {} as Record<string, string>,
+  Object.fromEntries(END_REASONS.map((k) => [k, { get: () => t(`endReason.${k}` as StringKey), enumerable: true }]))
+)
 
 /** Default protagonist (fictional). The player will be able to rename them in Phase 3. */
 export const PROTAGONIST = {
   name: 'Pedro Goicochea',
   title: 'Dr.',
-  bio: 'Physicist from Arequipa, Peru. Inspired as a kid by the story of Pedro Paulet, now Mission Director (Principal Investigator) of a small space institute.',
+  get bio() {
+    return t('protagonist.bio')
+  },
 }
