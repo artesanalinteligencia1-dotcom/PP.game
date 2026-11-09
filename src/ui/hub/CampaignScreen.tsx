@@ -6,7 +6,7 @@ import { fmt } from '../../i18n/en'
 import { useGame } from '../../store/game'
 import { Disclaimer, Pill } from '../components'
 import { ProfileDialog } from './ProfileDialog'
-import { useT, type StringKey } from '../../i18n'
+import { useT, useTx, type StringKey } from '../../i18n'
 
 const ACT_KEY: Record<number, StringKey> = {
   0: 'campaign.act.0',
@@ -27,6 +27,7 @@ export function CampaignScreen() {
   const lastReward = useGame((s) => s.lastReward)
   const [editing, setEditing] = useState(false)
   const t = useT()
+  const tx = useTx()
   useMusic('design')
   const launchersNow = availableLaunchers(c)
 
@@ -66,7 +67,7 @@ export function CampaignScreen() {
           <div key={id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-3 text-sm">
             <div className="flex justify-between">
               <span className="font-semibold">
-                {CLIENT_ICON[id]} {INVESTORS[id].name}
+                {CLIENT_ICON[id]} {tx(`investor.${id}.name`, INVESTORS[id].name)}
               </span>
               <span className="font-mono text-xs text-slate-400">
                 {t('campaign.investor.pays', { mult: trustMultiplier(c.trust[id]).toFixed(2) })}
@@ -98,11 +99,11 @@ export function CampaignScreen() {
                         className={`rounded-xl border p-4 ${status === 'locked' ? 'border-slate-800 bg-slate-950/40 opacity-70' : status === 'completed' ? 'border-emerald-500/40 bg-slate-900/70' : 'border-sky-500/50 bg-slate-900/70'}`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <span className="font-display text-lg font-semibold">{k.title}</span>
-                          <span title={k.client === 'self' ? t('campaign.contract.ownProject') : INVESTORS[k.client].name}>{CLIENT_ICON[k.client]}</span>
+                          <span className="font-display text-lg font-semibold">{tx(`contract.${k.id}.title`, k.title)}</span>
+                          <span title={k.client === 'self' ? t('campaign.contract.ownProject') : tx(`investor.${k.client}.name`, INVESTORS[k.client].name)}>{CLIENT_ICON[k.client]}</span>
                         </div>
-                        <p className="mt-1 text-sm text-slate-400">{k.blurb}</p>
-                        {k.note && <p className="mt-1 text-xs italic text-slate-500">{k.note}</p>}
+                        <p className="mt-1 text-sm text-slate-400">{tx(`contract.${k.id}.blurb`, k.blurb)}</p>
+                        {k.note && <p className="mt-1 text-xs italic text-slate-500">{tx(`contract.${k.id}.note`, k.note)}</p>}
                         <div className="mt-2 flex flex-wrap gap-2 text-xs">
                           {k.paymentM > 0 && <Pill>{t('campaign.contract.pays', { payment: k.paymentM })}</Pill>}
                           {rec && <Pill tone="emerald">{t('campaign.contract.best', { best: rec.best, rank: rec.rank })}</Pill>}
@@ -148,11 +149,11 @@ export function CampaignScreen() {
                 return (
                   <li key={techItem.id} className={`rounded-lg border p-3 text-sm ${owned ? 'border-emerald-500/40' : techItem.available ? 'border-slate-700' : 'border-slate-800 opacity-60'}`}>
                     <div className="flex items-start justify-between gap-2">
-                      <span className="font-medium">{techItem.name}</span>
+                      <span className="font-medium">{tx(`tech.${techItem.id}.name`, techItem.name)}</span>
                       {owned ? <Pill tone="emerald">{t('campaign.tech.owned')}</Pill> : <Pill>{t('campaign.tech.act', { act: techItem.act })}</Pill>}
                     </div>
-                    <p className="mt-1 text-xs text-slate-400">{techItem.description}</p>
-                    {real && <p className="mt-1 text-[11px] text-sky-300/80">{t('campaign.realWorld', { real })}</p>}
+                    <p className="mt-1 text-xs text-slate-400">{tx(`tech.${techItem.id}.description`, techItem.description)}</p>
+                    {real && <p className="mt-1 text-[11px] text-sky-300/80">{t('campaign.realWorld', { real: tx(`component.${techItem.launcherId}.realWorld`, real) })}</p>}
                     {!owned && (
                       <button
                         type="button"
@@ -173,7 +174,7 @@ export function CampaignScreen() {
             <h2 className="hud-label">{t('campaign.launchers.title')}</h2>
             <ul className="mt-2 space-y-1 text-xs text-slate-300">
               {launchersNow.map((id) => (
-                <li key={id}>• {getLauncher(id).name}</li>
+                <li key={id}>• {tx(`component.${id}.name`, getLauncher(id).name)}</li>
               ))}
             </ul>
           </div>
