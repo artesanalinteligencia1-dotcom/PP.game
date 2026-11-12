@@ -176,6 +176,19 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     review codes are typed (`ROCKET_ISSUE_CODES`) and a test checks every code has EN/ES text. Checked in headless Chrome in
     English and Spanish: opens from the menu, presets, a broken design (vacuum engine on stage 1), legs without fins; no
     console errors, no raw keys, no overflow. 125 tests pass.
+18. Rocket Engineer pad, delivery 3 (2026-11-12): the rocket in 3D. `src/engine/rocketLayout.ts` is the pure blueprint in
+    metres (same height as `analyzeRocket().heightM`); `src/ui/launch/three/rocket3d.ts` builds the Three.js model from it
+    (one group per stage with its interstage, nozzles in a ring up to 9, boosters in pairs, ogive fairing in two halves, legs,
+    grid fins). Workbench: 3D viewer (`RocketViewer3D`, drag or arrow keys, a 1.8 m figure for scale) with the side view as a
+    tab and as the fallback without WebGL. Launch: `LaunchScene3D` takes `rocket` (a `RocketDesign`) and flies it on the same
+    timeline: boosters drop at MECO - 0.4 s, stage 1 at MECO, a middle stage halfway to SECO (`stagingTimes`), fairing opens,
+    reusable first stages land in the inset. The rocket is scaled to the pad (34 to 62 m, `launchDisplayScale`). Debug:
+    `?scene3d=custom` (workbench rocket) and `&preset=heavy`. `LaunchSequence` already passes the workbench rocket when the
+    launcher id is `custom` (nothing selects it yet: delivery 4). Realism pass on every 3D launch: bloom + vignette + filmic
+    tone mapping through `postprocessing`, an environment map made from the pad's own sky (`makeEnvironment`), softer flame
+    core. Checked in headless Chrome: workbench with the four presets, drag, a third stage, side-view tab; launches of
+    reusable_heavy (before/after), custom heavy (day), reusable medium (dawn) and a 3-stage rocket with 4 boosters (night);
+    no console errors. 145 tests pass (`tests/rocket3d.test.ts` is new).
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner

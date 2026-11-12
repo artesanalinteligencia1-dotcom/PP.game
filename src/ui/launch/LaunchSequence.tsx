@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { getLauncher, getOrbit } from '../../engine/catalog'
 import type { Design } from '../../engine/types'
 import { audio, hasVoice, type Cue } from '../../audio/audio'
+import { useRocket } from '../../store/rocket'
 import { useReducedMotion } from '../../store/settings'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
@@ -178,7 +179,10 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const farewell = FAREWELLS[farewellIndex(seed)]
   const reduced = useReducedMotion()
   const light = useSceneryStyle(launchWindowStyle(orbit.launchTarget))
-  const use3D = !reduced && LAUNCHERS_3D.has(launcher.id) && webglAvailable()
+  // the player's own rocket (launcher id `custom`, see rocketToLauncher) is drawn from its parts
+  const workbenchRocket = useRocket((s) => s.design)
+  const ownRocket = launcher.id === 'custom' ? workbenchRocket : undefined
+  const use3D = !reduced && (LAUNCHERS_3D.has(launcher.id) || !!ownRocket) && webglAvailable()
   const tRef = useRef(0)
   tRef.current = t
 
@@ -294,7 +298,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
     <div className="relative h-[480px] overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
       {use3D && (
         <Suspense fallback={null}>
-          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} visual={v} landed={boosterLanded !== false} />
+          <LaunchScene3D launcherId={launcher.id} light={light} T={T} tRef={tRef} failAt={fail?.at ?? null} visual={v} landed={boosterLanded !== false} rocket={ownRocket} />
         </Suspense>
       )}
       <svg viewBox="0 0 800 480" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label={tText('launch.aria', { launcher: launcherName })}>

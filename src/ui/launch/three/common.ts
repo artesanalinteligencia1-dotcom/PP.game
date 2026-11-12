@@ -40,6 +40,41 @@ export function skyTexture(top: string, bottom: string) {
   return tex
 }
 
+/**
+ * The pad's own sky as an environment map (sky gradient, ground and a bright Sun), so metal has something to reflect and
+ * the shaded side picks up the colour of the sky. Built once per scene; no image files.
+ */
+export function makeEnvironment(renderer: THREE.WebGLRenderer, L: SceneLight) {
+  const c = document.createElement('canvas')
+  c.width = 8
+  c.height = 256
+  const x = c.getContext('2d')!
+  const ground = `#${L.ground.toString(16).padStart(6, '0')}`
+  const g = x.createLinearGradient(0, 0, 0, 256)
+  g.addColorStop(0, L.sky[0])
+  g.addColorStop(0.5, L.sky[1])
+  g.addColorStop(0.52, ground)
+  g.addColorStop(1, ground)
+  x.fillStyle = g
+  x.fillRect(0, 0, 8, 256)
+  const tex = new THREE.CanvasTexture(c)
+  tex.colorSpace = THREE.SRGBColorSpace
+  const s = new THREE.Scene()
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(100, 32, 16), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide }))
+  const sun = new THREE.Mesh(new THREE.SphereGeometry(7, 16, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(L.sunColor).multiplyScalar(L.sunI * 10) }))
+  sun.position.set(...L.sun).normalize().multiplyScalar(90)
+  s.add(dome, sun)
+  const pmrem = new THREE.PMREMGenerator(renderer)
+  const target = pmrem.fromScene(s, 0.02)
+  pmrem.dispose()
+  tex.dispose()
+  for (const m of [dome, sun]) {
+    m.geometry.dispose()
+    m.material.dispose()
+  }
+  return { texture: target.texture, dispose: () => target.dispose() }
+}
+
 /** The Andes and the snow-capped Misti on the horizon, framed behind the pad from the opening camera at (-70, 22, 130). */
 export function addAndes(scene: THREE.Scene, rnd: () => number, L: SceneLight) {
   const group = new THREE.Group()

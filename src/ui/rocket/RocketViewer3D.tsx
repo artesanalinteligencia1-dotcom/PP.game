@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import type { RocketDesign } from '../../engine/rocket'
 import { rocketLayout } from '../../engine/rocketLayout'
 import { buildRocket3D, type Rocket3D } from '../launch/three/rocket3d'
@@ -21,6 +22,12 @@ export default function RocketViewer3D({ design, label, spin }: { design: Rocket
     el.appendChild(renderer.domElement)
     renderer.domElement.style.display = 'block'
     const scene = new THREE.Scene()
+    // a neutral studio to reflect: without it the metal parts look flat
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const env = pmrem.fromScene(new RoomEnvironment(), 0.04)
+    pmrem.dispose()
+    scene.environment = env.texture
+    scene.environmentIntensity = 0.55
     const camera = new THREE.PerspectiveCamera(30, 1, 0.5, 5000)
     const key = new THREE.DirectionalLight(0xffffff, 2.6)
     const rim = new THREE.DirectionalLight(0x93c5fd, 1.1)
@@ -159,6 +166,7 @@ export default function RocketViewer3D({ design, label, spin }: { design: Rocket
         m.geometry.dispose()
         ;(m.material as THREE.Material).dispose()
       }
+      env.dispose()
       renderer.dispose()
       el.removeChild(renderer.domElement)
     }

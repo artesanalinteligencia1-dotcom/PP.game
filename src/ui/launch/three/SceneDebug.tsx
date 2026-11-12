@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { getScenario } from '../../../engine/catalog'
+import { ROCKET_PRESETS } from '../../../engine/catalog/rocketParts'
 import { flySounding } from '../../../engine/sounding'
+import { useRocket, type RocketPreset } from '../../../store/rocket'
 import { soundingTimeline } from '../../hub/soundingProfile'
 import { spacecraftVisual } from '../../spacecraft/visual'
 import { makeTimeline } from '../LaunchSequence'
@@ -13,6 +15,8 @@ import SoundingScene3D from './SoundingScene3D'
  * `&fail=<seconds>` explodes the rocket then; `&landed=0` loses the booster at sea.
  * `&mission=<scenarioId>&inst=<id,id>&array=deployable&area=6` sets the spacecraft in the fairing (default: Lagrange Observatory with an IR telescope
  * and radio antennas). `?scene3d=paulet&t=12` shows the Paulet-1 prologue instead (`&fail=1` for a failed flight).
+ * `?scene3d=custom` launches the rocket on the workbench (Rocket Engineer pad); `&preset=light|medium|reusable_medium|heavy`
+ * launches that starting design instead.
  */
 export default function SceneDebug({ launcherId }: { launcherId: string }) {
   const params = new URLSearchParams(window.location.search)
@@ -29,6 +33,9 @@ export default function SceneDebug({ launcherId }: { launcherId: string }) {
     return spacecraftVisual({ ...base, ...arrays, instruments: ids.map((id) => ({ id, duty: 0.1 })) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const preset = params.get('preset') ?? ''
+  const workbench = useRocket((s) => s.design)
+  const rocket = launcherId === 'custom' ? (preset in ROCKET_PRESETS ? ROCKET_PRESETS[preset as RocketPreset] : workbench) : undefined
   const tRef = useRef(start)
   useEffect(() => {
     let prev = performance.now()
@@ -44,7 +51,7 @@ export default function SceneDebug({ launcherId }: { launcherId: string }) {
   }, [T, ST, start, launcherId])
   return (
     <div className="fixed inset-0 bg-black">
-      {launcherId === 'paulet' ? <SoundingScene3D T={ST} tRef={tRef} result={sounding} /> : <LaunchScene3D launcherId={launcherId} light={light} T={T} tRef={tRef} failAt={params.has('fail') ? Number(params.get('fail')) : null} visual={visual} landed={params.get('landed') !== '0'} />}
+      {launcherId === 'paulet' ? <SoundingScene3D T={ST} tRef={tRef} result={sounding} /> : <LaunchScene3D launcherId={launcherId} light={light} T={T} tRef={tRef} failAt={params.has('fail') ? Number(params.get('fail')) : null} visual={visual} landed={params.get('landed') !== '0'} rocket={rocket} />}
     </div>
   )
 }

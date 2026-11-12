@@ -6,6 +6,10 @@ verificar en Chrome sin interfaz (puppeteer-core del caché de npx, ver abajo); 
 CLOUD_NEXT.md, commit (con `Co-Authored-By`) y push desde una pestaña de terminal tras `git rebase origin/cloud/fase-1`.
 Nunca force-push. Antes de una tarea grande, estimar el consumo y proponerla en entregas.
 
+> **Entrega 3 hecha (2026-11-12).** Detalle en PROGRESS.md punto 18. Sigue la entrega 4 (ver "No es de esta entrega").
+> Pendiente de realismo, sin empezar: texturas PBR en el fuselaje, humo con partículas en GPU, cámaras con Theatre.js,
+> modelos glTF para torre y barco, física de las piezas que caen, audio espacial.
+
 ## Estado (2026-11-12, rama `cloud/fase-1`, commit b16f9d4, 125 pruebas)
 - Idiomas EN/ES terminados (`src/i18n`, `useT/useTx/useMsg`, 1 300 claves; test de paridad en `tests/i18n.test.ts`).
 - **Entrega 1 ✅** motor puro `src/engine/rocket.ts` + `src/engine/catalog/rocketParts.ts` (docs/model.md §20):

@@ -56,7 +56,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    docs/model.md §20. **2 ✅ workbench (2026-11-12):** Home → Extras → Rocket workbench (`src/ui/rocket/RocketScreen.tsx`,
    store `src/store/rocket.ts`, saved per device): stages, engines, tanks, boosters, fairing, legs/fins, presets, side view to
    scale, live mass / TWR / Δv / capacity / price / reliability, stage table, review in EN/ES (`rocket.*`, `rocketPart.*`).
-   **3:** 3D assembly reusing `src/ui/launch/three/` (suggest Fable to the owner for this one). **4:** campaign: custom rocket
+   **3 ✅ 3D (2026-11-12):** `src/engine/rocketLayout.ts` (pure blueprint) + `src/ui/launch/three/rocket3d.ts` (model),
+   viewer on the workbench (`src/ui/rocket/RocketViewer3D.tsx`), `LaunchScene3D` flies a `RocketDesign` (`rocket` prop,
+   `?scene3d=custom[&preset=heavy]`), bloom / vignette / environment map on all 3D launches. **4:** campaign: custom rocket
    as an extra launcher (catalog launchers stay), parts unlocked by technology, price calibration, a lesson on staging.
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
 5. Mars acts; asynchronous multiplayer (same seed)
