@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { G0, TARGET_DV, analyzeRocket, rocketEquationDv, rocketToLauncher, type RocketDesign } from '../src/engine/rocket'
+import { G0, TARGET_DV, addStage, analyzeRocket, isRocketDesign, removeStage, rocketEquationDv, rocketToLauncher, setBoosters, updateStage, type RocketDesign } from '../src/engine/rocket'
 import { ROCKET_PRESETS, ROCKET_TANKS } from '../src/engine/catalog/rocketParts'
 import { getLauncher } from '../src/engine/catalog'
 
@@ -116,5 +116,29 @@ describe('design review', () => {
     expect(l.kind).toBe('reusable')
     expect(l.landing?.successP).toBeGreaterThan(0)
     expect(l.capacityKg.leo).toBe(analyzeRocket(ROCKET_PRESETS.reusable_medium).capacityKg.leo)
+  })
+})
+
+describe('workbench editing', () => {
+  it('changing an engine keeps the tank on its fuel and size', () => {
+    const d = updateStage(medium, 0, { engineId: 'h_main' })
+    expect(d.stages[0].tankId).toBe('hydrogen_m')
+    expect(codes(d)).not.toContain('ROCKET_FUEL_MISMATCH')
+  })
+
+  it('counts stay in range; stages and boosters respect their limits', () => {
+    expect(updateStage(medium, 0, { engines: 40, tanks: 0 }).stages[0]).toMatchObject({ engines: 9, tanks: 1 })
+    expect(removeStage(removeStage(ROCKET_PRESETS.light, 1), 0).stages.length).toBe(1)
+    const three = addStage(medium)
+    expect(three.stages.length).toBe(3)
+    expect(addStage(three).stages.length).toBe(3)
+    expect(setBoosters(medium, 'srb_s', 3).boosters).toBe(2)
+    expect(setBoosters(medium, undefined, 4)).toMatchObject({ boosters: 0, boosterId: undefined })
+  })
+
+  it('only valid designs are accepted back from storage', () => {
+    expect(isRocketDesign(ROCKET_PRESETS.heavy)).toBe(true)
+    expect(isRocketDesign({ ...medium, fairingId: 'nope' })).toBe(false)
+    expect(isRocketDesign(null)).toBe(false)
   })
 })

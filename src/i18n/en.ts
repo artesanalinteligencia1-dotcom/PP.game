@@ -2,6 +2,7 @@
 import type { ResourceKey, ReviewItem, Role } from '../engine/types'
 import { adcs, antennas, arrays, bands, batteries, compression, instruments, launchers, obcs, orbits, propulsion, stations, thermal } from '../engine/catalog/components'
 import { ROUTES } from '../engine/catalog/routes'
+import { BOOSTERS, FAIRINGS, ROCKET_ENGINES, ROCKET_TANKS } from '../engine/catalog/rocketParts'
 import { LOCALE, currentLang, t, type StringKey } from './index'
 
 export const fmt = (n: number | string | undefined, digits = 0): string => {
@@ -271,6 +272,7 @@ for (const list of [instruments, launchers, orbits, arrays, batteries, bands, an
   for (const c of list) if (!NAME_KEYS.has(c.name)) NAME_KEYS.set(c.name, `component.${c.id}.name`)
 }
 for (const [orbit, list] of Object.entries(ROUTES)) for (const r of list) NAME_KEYS.set(r.name, `route.${orbit}.${r.id}.name`)
+for (const list of [ROCKET_ENGINES, ROCKET_TANKS, BOOSTERS, FAIRINGS]) for (const p of list) NAME_KEYS.set(p.name, `rocketPart.${p.id}.name`)
 
 /** Translates a catalog name, or a " / "-separated list of them. Anything else is returned as it came. */
 export function localName(value: string): string {
@@ -288,13 +290,17 @@ const POINTING = new Set(['coarse', 'fine', 'precise'])
 export function message(item: ReviewItem): Message {
   const f = MESSAGES[item.code]
   if (!f) return { title: item.code, why: '' }
-  const params = Object.fromEntries(
-    Object.entries(item.params).map(([k, v]) => {
-      if (typeof v !== 'string') return [k, v]
+  return f(localizeParams(item.params) as P)
+}
+
+/** Catalog names inside message params, shown in the player's language. */
+export function localizeParams(params: Record<string, string | number | boolean>): Record<string, string | number> {
+  return Object.fromEntries(
+    Object.entries(params).map(([k, v]) => {
+      if (typeof v !== 'string') return [k, typeof v === 'number' ? v : String(v)]
       return [k, k === 'need' && POINTING.has(v) ? t(`spacecraft.adcs.${v}` as StringKey) : localName(v)]
     }),
-  ) as P
-  return f(params)
+  )
 }
 
 const REQUIREMENTS = [

@@ -7,6 +7,8 @@ import { INVESTORS, TECH, CONTRACTS } from '../src/engine/campaign'
 import { botChoice, createMission, advanceWeek, decide, type MissionState } from '../src/engine/simulate'
 import { getScenario, scenarios } from '../src/engine/catalog/scenarios'
 import { ROUTES } from '../src/engine/catalog/routes'
+import { BOOSTERS, FAIRINGS, ROCKET_ENGINES, ROCKET_TANKS } from '../src/engine/catalog/rocketParts'
+import { ROCKET_ISSUE_CODES } from '../src/engine/rocket'
 import { INTRO_SEGMENTS, buildCues, cueAt } from '../src/i18n/introCaptions'
 
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort()
@@ -41,6 +43,14 @@ describe('i18n tables', () => {
     for (const c of TECH) { same(`tech.${c.id}.name`, c.name); same(`tech.${c.id}.description`, c.description) }
     for (const [id, c] of Object.entries(INVESTORS)) { same(`investor.${id}.name`, c.name); same(`investor.${id}.wants`, c.wants) }
     expect(bad).toEqual([])
+  })
+
+  it('rocket parts in en.json match the engine English, and every rocket review code has its text', () => {
+    const E = en as Record<string, string>
+    const parts = [...ROCKET_ENGINES, ...ROCKET_TANKS, ...BOOSTERS, ...FAIRINGS]
+    expect(parts.filter((p) => E[`rocketPart.${p.id}.name`] !== p.name).map((p) => p.id)).toEqual([])
+    expect([...ROCKET_ENGINES, ...BOOSTERS].filter((p) => E[`rocketPart.${p.id}.description`] !== p.description).map((p) => p.id)).toEqual([])
+    expect(ROCKET_ISSUE_CODES.filter((c) => !E[`rocket.issue.${c}.title`] || !E[`rocket.issue.${c}.why`])).toEqual([])
   })
 
   it('every message a mission emits has a key and no unfilled placeholder, in both languages', () => {

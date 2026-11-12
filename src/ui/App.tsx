@@ -15,6 +15,7 @@ import { IntroScreen } from './hub/IntroScreen'
 import { LearnScreen } from './hub/LearnScreen'
 import { MockScreen, mockFromUrl } from './mock/MockScreen'
 import { useT } from '../i18n'
+import { RocketScreen } from './rocket/RocketScreen'
 import { BootScreen } from './shell/BootScreen'
 import { SettingsPanel } from './shell/SettingsPanel'
 import { Stage } from './shell/Stage'
@@ -37,6 +38,8 @@ function CurrentScreen() {
       return <LearnScreen />
     case 'firstlight':
       return <FirstLightScreen />
+    case 'rocket':
+      return <RocketScreen />
     default:
       break
   }

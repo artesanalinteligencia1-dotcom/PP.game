@@ -79,8 +79,24 @@ export interface RocketDesign {
   fins: boolean
 }
 
+export const ROCKET_ISSUE_CODES = [
+  'ROCKET_INCOMPLETE',
+  'ROCKET_FUEL_MISMATCH',
+  'ROCKET_VACUUM_ENGINE_FIRST',
+  'ROCKET_SEA_LEVEL_UPPER',
+  'ROCKET_LEGS_NO_FINS',
+  'ROCKET_ENGINE_NO_RESTART',
+  'ROCKET_TWR_LOW',
+  'ROCKET_TWR_MARGINAL',
+  'ROCKET_TWR_HIGH',
+  'ROCKET_UPPER_TWR_LOW',
+  'ROCKET_NO_ORBIT',
+  'ROCKET_FAIRING_SMALL',
+] as const
+export type RocketIssueCode = (typeof ROCKET_ISSUE_CODES)[number]
+
 export interface RocketIssue {
-  code: string
+  code: RocketIssueCode
   severity: 'error' | 'warn'
   params: Record<string, string | number>
 }
@@ -251,7 +267,7 @@ const EMPTY_CAPACITY: Record<LaunchTarget, number> = { leo: 0, sso: 0, gto: 0, t
 
 export function analyzeRocket(design: RocketDesign, payloadKg = 0): RocketReport {
   const issues: RocketIssue[] = []
-  const add = (code: string, severity: RocketIssue['severity'], params: RocketIssue['params'] = {}) => issues.push({ code, severity, params })
+  const add = (code: RocketIssueCode, severity: RocketIssue['severity'], params: RocketIssue['params'] = {}) => issues.push({ code, severity, params })
   const s = parts(design)
   const fairing = getFairing(design.fairingId)
   if (!s || s.length === 0) {
@@ -336,4 +352,65 @@ export function rocketToLauncher(design: RocketDesign, name: string): Launcher {
     ...(r.reusable ? { landing: { successP: r.landingP } } : {}),
     realWorld: '',
   }
+}
+
+// ---------------------------------------------------------------------------
+// Editing helpers for the workbench. They keep every stage's tank on its engine's fuel and the counts in range.
+// ---------------------------------------------------------------------------
+
+export const LIMITS = { stages: 3, engines: 9, tanks: 6, boosters: 6 } as const
+
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, Math.round(v)))
+const tankSize = (tankId: string) => tankId.split('_').pop() ?? 'm'
+
+function tankForFuel(fuel: PropellantFuel, tankId: string): string {
+  const same = `${fuel}_${tankSize(tankId)}`
+  return getRocketTank(same) ? same : `${fuel}_m`
+}
+
+export function updateStage(d: RocketDesign, i: number, patch: Partial<RocketStage>): RocketDesign {
+  const stages = d.stages.map((s, k) => {
+    if (k !== i) return s
+    const next = { ...s, ...patch }
+    const engine = getRocketEngine(next.engineId)
+    if (engine && patch.engineId) next.tankId = tankForFuel(engine.fuel, next.tankId)
+    next.engines = clamp(next.engines, 1, LIMITS.engines)
+    next.tanks = clamp(next.tanks, 1, LIMITS.tanks)
+    return next
+  })
+  return { ...d, stages }
+}
+
+export function addStage(d: RocketDesign): RocketDesign {
+  if (d.stages.length >= LIMITS.stages) return d
+  return { ...d, stages: [...d.stages, { engineId: 'k_small_vac', engines: 1, tankId: 'kerosene_s', tanks: 1 }] }
+}
+
+export function removeStage(d: RocketDesign, i: number): RocketDesign {
+  if (d.stages.length <= 1) return d
+  return { ...d, stages: d.stages.filter((_, k) => k !== i) }
+}
+
+/** Boosters come in pairs (they must balance each other). */
+export function setBoosters(d: RocketDesign, boosterId: string | undefined, count: number): RocketDesign {
+  if (!boosterId) return { ...d, boosterId: undefined, boosters: 0 }
+  const n = clamp(count, 2, LIMITS.boosters)
+  return { ...d, boosterId, boosters: n - (n % 2) }
+}
+
+/** For data read back from storage: is this a design the engine can analyse? */
+export function isRocketDesign(x: unknown): x is RocketDesign {
+  const d = x as RocketDesign
+  return (
+    !!d &&
+    Array.isArray(d.stages) &&
+    d.stages.length >= 1 &&
+    d.stages.length <= LIMITS.stages &&
+    d.stages.every((s) => !!getRocketEngine(s.engineId) && !!getRocketTank(s.tankId) && s.engines >= 1 && s.tanks >= 1) &&
+    typeof d.boosters === 'number' &&
+    (d.boosters === 0 || !!getBooster(d.boosterId)) &&
+    !!getFairing(d.fairingId) &&
+    typeof d.legs === 'boolean' &&
+    typeof d.fins === 'boolean'
+  )
 }

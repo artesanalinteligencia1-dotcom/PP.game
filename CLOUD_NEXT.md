@@ -53,7 +53,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view), in 4 deliveries:
    **1 ✅ engine (2026-11-11):** `src/engine/rocket.ts` + `catalog/rocketParts.ts` (staged rocket equation, boosters, fairing,
    liftoff TWR, capacity per target, reuse, price, reliability, review codes `ROCKET_*`; `rocketToLauncher()`), 17 tests,
-   docs/model.md §20. **2 next:** the workbench screen with live numbers, review messages EN/ES (keys for parts and codes).
+   docs/model.md §20. **2 ✅ workbench (2026-11-12):** Home → Extras → Rocket workbench (`src/ui/rocket/RocketScreen.tsx`,
+   store `src/store/rocket.ts`, saved per device): stages, engines, tanks, boosters, fairing, legs/fins, presets, side view to
+   scale, live mass / TWR / Δv / capacity / price / reliability, stage table, review in EN/ES (`rocket.*`, `rocketPart.*`).
    **3:** 3D assembly reusing `src/ui/launch/three/` (suggest Fable to the owner for this one). **4:** campaign: custom rocket
    as an extra launcher (catalog launchers stay), parts unlocked by technology, price calibration, a lesson on staging.
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)

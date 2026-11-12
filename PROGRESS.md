@@ -172,6 +172,10 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     console errors, no raw keys, no horizontal scroll. 106 tests pass.
 16. Rocket Engineer pad, delivery 1 (2026-11-11): pure rocket engine and parts catalog. Presets match the catalog launchers'
     LEO capacity (light 320 vs 300 kg, medium 2 500 vs 3 000, reusable 2 040 vs 2 100, heavy 15 660 vs 15 000). 121 tests pass.
+17. Rocket Engineer pad, delivery 2 (2026-11-12): the workbench screen. Editing helpers keep each tank on its engine's fuel;
+    review codes are typed (`ROCKET_ISSUE_CODES`) and a test checks every code has EN/ES text. Checked in headless Chrome in
+    English and Spanish: opens from the menu, presets, a broken design (vacuum engine on stage 1), legs without fins; no
+    console errors, no raw keys, no overflow. 125 tests pass.
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
