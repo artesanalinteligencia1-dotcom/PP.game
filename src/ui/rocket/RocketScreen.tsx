@@ -1,5 +1,5 @@
 // Rocket Engineer pad: build a launcher from parts and watch mass, thrust-to-weight and Δv move live.
-import { useMemo, type ReactNode } from 'react'
+import { Suspense, lazy, useMemo, useState, type ReactNode } from 'react'
 import { useMusic } from '../../audio/audio'
 import { BOOSTERS, FAIRINGS, ROCKET_ENGINES, ROCKET_TANKS } from '../../engine/catalog/rocketParts'
 import {
@@ -22,10 +22,14 @@ import { useT, useTx, type StringKey } from '../../i18n'
 import { fmt, localizeParams } from '../../i18n/en'
 import { useGame } from '../../store/game'
 import { useRocket, type RocketPreset } from '../../store/rocket'
+import { useReducedMotion } from '../../store/settings'
+import { boosterDiameterM } from '../../engine/rocketLayout'
+import { webglAvailable } from '../launch/three/support'
 import { Disclaimer, OptionCard, Pill, Section, Slider } from '../components'
 
 const TARGETS: LaunchTarget[] = ['leo', 'sso', 'gto', 'tli']
 const PRESETS: RocketPreset[] = ['light', 'medium', 'reusable_medium', 'heavy']
+const RocketViewer3D = lazy(() => import('./RocketViewer3D'))
 const FUEL_COLOR = { kerosene: '#cbd5e1', methane: '#94a3b8', hydrogen: '#f97316' } as const
 
 function Stepper({ label, value, min, max, step = 1, onChange }: { label: string; value: number; min: number; max: number; step?: number; onChange: (v: number) => void }) {
@@ -102,7 +106,7 @@ function RocketDrawing({ design, label }: { design: RocketDesign; label: string 
     }
     if (i === 0 && booster) {
       const bl = booster.lengthM * k
-      const bd = (booster.id === 'srb_l' ? 3.2 : 1.6) * k
+      const bd = boosterDiameterM(booster.id) * k
       const pairs = design.boosters / 2
       for (let b = 0; b < pairs; b++) {
         const off = w / 2 + bd / 2 + b * (bd * 0.55)
@@ -135,6 +139,10 @@ export function RocketScreen() {
   const go = useGame((s) => s.go)
   const { design, payloadKg, setDesign, setPayload, loadPreset } = useRocket()
   useMusic('design')
+  const reduced = useReducedMotion()
+  const can3D = useMemo(() => webglAvailable(), [])
+  const [view, setView] = useState<'3d' | 'side'>('3d')
+  const show3D = can3D && view === '3d'
   const report = useMemo(() => analyzeRocket(design, payloadKg), [design, payloadKg])
   const empty = useMemo(() => analyzeRocket(design, 0), [design])
   const partName = (id: string, fallback: string) => tx(`rocketPart.${id}.name`, fallback)
@@ -261,7 +269,25 @@ export function RocketScreen() {
         </div>
 
         <aside className="space-y-4">
-          <RocketDrawing design={design} label={t('rocket.drawing')} />
+          {can3D && (
+            <div className="flex justify-center gap-2 text-xs" role="group" aria-label={t('rocket.view')}>
+              {(['3d', 'side'] as const).map((v) => (
+                <button key={v} type="button" className={`btn-secondary px-3 py-1 ${view === v ? 'border-sky-400 text-sky-200' : ''}`} aria-pressed={view === v} onClick={() => setView(v)}>
+                  {t(`rocket.view.${v}`)}
+                </button>
+              ))}
+            </div>
+          )}
+          {show3D ? (
+            <div>
+              <Suspense fallback={<div className="h-80" />}>
+                <RocketViewer3D design={design} label={t('rocket.view3d.label')} spin={!reduced} />
+              </Suspense>
+              <p className="mt-1 text-center text-[11px] text-slate-400">{t('rocket.view3d.hint')}</p>
+            </div>
+          ) : (
+            <RocketDrawing design={design} label={t('rocket.drawing')} />
+          )}
           <Slider label={t('rocket.payload')} value={Math.min(payloadKg, payloadMax)} min={0} max={payloadMax} step={payloadMax > 5000 ? 100 : 10} onChange={setPayload} format={(v) => `${fmt(v)} kg`} />
           <div className="grid grid-cols-2 gap-2">
             <Stat label={t('rocket.liftoffMass')} value={`${fmt(report.liftoffMassKg / 1000, 1)} t`} />

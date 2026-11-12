@@ -138,7 +138,10 @@ export const MIN_LIFTOFF_TWR = 1.05
 const SEPARATION_RELIABILITY = 0.995
 /** A reused first stage costs this share of a new one per flight (refurbishment and recovery). */
 const REUSE_COST_SHARE = 0.3
-const ENGINE_LENGTH_M = 2.5
+/** Length of every stage's engine section (thrust structure and nozzles), in metres. */
+export const ENGINE_LENGTH_M = 2.5
+/** Fairing length = this × its diameter. */
+export const FAIRING_FINENESS = 2.5
 
 const find = <T extends { id: string }>(list: T[], id: string | undefined): T | undefined => list.find((x) => x.id === id)
 export const getRocketEngine = (id: string) => find(ROCKET_ENGINES, id)
@@ -178,6 +181,12 @@ function parts(design: RocketDesign): StageParts[] | null {
 
 function isReusable(design: RocketDesign, s: StageParts[]): boolean {
   return design.legs && design.fins && s.length > 0 && s[0].engine.restartable
+}
+
+/** Legs, grid fins and a restartable first-stage engine: the first stage can land and fly again. */
+export function isReusableDesign(design: RocketDesign): boolean {
+  const s = parts(design)
+  return !!s && isReusable(design, s)
 }
 
 /** Δv profile for one payload. Boosters burn alongside the first stage and drop when empty. */
@@ -322,7 +331,7 @@ export function analyzeRocket(design: RocketDesign, payloadKg = 0): RocketReport
     s.reduce((r, x) => r * x.engine.reliability ** x.stage.engines, 1) *
     (booster ? booster.reliability ** design.boosters : 1) *
     SEPARATION_RELIABILITY ** separations
-  const fairingLength = fairing ? fairing.diameterM * 2.5 : 0
+  const fairingLength = fairing ? fairing.diameterM * FAIRING_FINENESS : 0
   return {
     payloadKg,
     stages: p.stages,

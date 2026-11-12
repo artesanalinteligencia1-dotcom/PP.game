@@ -89,3 +89,21 @@ export function boosterLandingAt(t: number, landed: boolean): LandingState {
   const tilt = landed ? 0 : 0.5 * clamp((t - 2.2) / 1)
   return { y, legs, burning, tilt, crashed: !landed && t >= LANDING_TOUCH }
 }
+
+/**
+ * Player-built rockets (1 to 3 stages) on the same timeline: the first stage drops at MECO and the stages above share the
+ * time up to SECO evenly. Returns when each stage separates (one entry per stage but the last).
+ */
+export function stagingTimes(T: Timeline, stages: number): number[] {
+  const n = Math.max(1, Math.round(stages))
+  return Array.from({ length: n - 1 }, (_, i) => T.meco + (i * (T.seco - T.meco)) / (n - 1))
+}
+
+/** Which stage of a player-built rocket is burning at `t` (0 = first) and the brief coast while an upper stage drops (0..1). */
+export function customStagingAt(t: number, T: Timeline, stages: number): { stage: number; throttle: number } {
+  const times = stagingTimes(T, stages)
+  const stage = times.filter((x) => t >= x).length
+  // MECO already has its own coast in `ascentAt`; the later separations get a short one here
+  const throttle = times.slice(1).reduce((k, x) => Math.min(k, t < x - 0.15 ? 1 : clamp((t - x - 0.3) / 0.3)), 1)
+  return { stage, throttle }
+}
