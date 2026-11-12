@@ -50,7 +50,12 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    `useMsg()`), so new event sentences go in en.json + es.json, never inline. Catalog English stays in the engine and a test keeps
    it identical to en.json. Intro: caption-free video, captions drawn by the game per language (`src/i18n/introCaptions.ts`).
    Adding a language: `node scripts/i18n/export.mjs <lang>`, translate with `docs/i18n/PROMPT_TRANSLATE.md`, `import.mjs`.
-3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view)
+3. Rocket Engineer pad (parts, live mass / TWR / Δv, 3D view), in 4 deliveries:
+   **1 ✅ engine (2026-11-11):** `src/engine/rocket.ts` + `catalog/rocketParts.ts` (staged rocket equation, boosters, fairing,
+   liftoff TWR, capacity per target, reuse, price, reliability, review codes `ROCKET_*`; `rocketToLauncher()`), 17 tests,
+   docs/model.md §20. **2 next:** the workbench screen with live numbers, review messages EN/ES (keys for parts and codes).
+   **3:** 3D assembly reusing `src/ui/launch/three/` (suggest Fable to the owner for this one). **4:** campaign: custom rocket
+   as an extra launcher (catalog launchers stay), parts unlocked by technology, price calibration, a lesson on staging.
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
 5. Mars acts; asynchronous multiplayer (same seed)
 Also wanted (PLAYBOOK §6c): robot guide, one animated video per role, richer animation/design (postprocessing, GSAP, Motion,

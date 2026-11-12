@@ -170,6 +170,8 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     game draws them word by word per language. Checked in headless Chrome, both languages: menu, free mission, 5 lessons, intro
     captions, career, prologue, all design tabs of two scenarios, launch pad, launch captions, flight decisions and report: no
     console errors, no raw keys, no horizontal scroll. 106 tests pass.
+16. Rocket Engineer pad, delivery 1 (2026-11-11): pure rocket engine and parts catalog. Presets match the catalog launchers'
+    LEO capacity (light 320 vs 300 kg, medium 2 500 vs 3 000, reusable 2 040 vs 2 100, heavy 15 660 vs 15 000). 121 tests pass.
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner

@@ -241,3 +241,32 @@ Science = Σ instrument science × 0.3 × (1 if above 100 km else 0.2) × (1 if 
 - Halo station-keeping 25 m/s/yr; "orbit drifting" events (1.5/yr × difficulty): correct now (1.5 m/s) or wait (70 %: 6 m/s later).
 - Halo orbit: no eclipses, deep-space antennas (480 min/day each), link factor 0.009, radiation 10 krad/yr, no-propulsion life 0.1 yr.
 - R-3 Reusable Heavy: 10 500 / 7 000 / 4 200 / 2 450 kg, $80 M, 96 %, landing 88 % (Act 2 tech: $60 M, 250 prestige, after Lunar Pathfinder).
+
+## 20. Rocket Engineer pad (`src/engine/rocket.ts`)
+The player builds a launcher from parts (`catalog/rocketParts.ts`: engines, tanks per fuel and size, solid boosters,
+fairings, landing legs and grid fins). Parts are generic and fictional; their numbers are rounded game values in the range
+of real engines and stages of each family. The physics is the real one:
+
+- **Rocket equation per stage:** `Δv = Isp · g0 · ln(m0 / mf)`, g0 = 9.80665 m/s². Stages burn in order; each one carries
+  everything above it. Staging matters because empty tanks are dropped (tested: two stages beat one with the same propellant).
+- **Isp:** the first stage uses the average of its sea-level and vacuum Isp (it climbs out of the air); upper stages use
+  vacuum Isp. Vacuum-only engines have no sea-level thrust and cannot fire at liftoff (blocking).
+- **Boosters** burn alongside the first stage with a thrust-weighted Isp, then drop when empty.
+- **Fairing** is carried through the first stage and dropped at staging.
+- **Thrust-to-weight at liftoff** = sea-level thrust / (m0 · g0): below 1 the rocket cannot leave the pad (blocking);
+  1–1.2 marginal (heavy gravity losses); above 3 wasteful. An upper stage with TWR below 0.4 is flagged.
+- **Δv to each target from the ground** (includes ~1.5 km/s of gravity and drag losses, rounded): LEO 9 400, SSO 9 900,
+  GTO 11 800, TLI 12 600 m/s (the same figures as the Learn lesson on the rocket equation).
+- **Capacity** = the largest payload that still reaches the target (bisection on the payload), limited by liftoff TWR ≥ 1.05
+  and by the fairing's packaging limit.
+- **Reuse:** legs + grid fins + a restartable first-stage engine keep 10 % of the first stage's propellant for the landing
+  burn; the first stage then costs 30 % of a new one per flight; landing success 85 %.
+- **Price per flight** = parts + 0.5 M per stage, × 1.15 integration. **Reliability** = product of every engine and booster
+  reliability × 0.995 per separation (stages, boosters, fairing).
+- **Calibration:** the presets in `ROCKET_PRESETS` reproduce the catalog launchers' LEO capacity within 30 % (tested);
+  prices are parts only and stay below the catalog's market prices until the pad joins the campaign (delivery 4).
+
+Sources (NASA Glenn Research Center, Beginner's Guide to Aeronautics): Ideal Rocket Equation
+https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ideal-rocket-equation/ ; Specific Impulse
+https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/specific-impulse/ ; Multistage rockets
+https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/stage/ . g0 is the standard gravity (9.80665 m/s²).
