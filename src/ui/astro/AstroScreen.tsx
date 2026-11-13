@@ -1,6 +1,6 @@
 // Astrobiologist pad: plan the search for water, habitability and signs of life on a world, and watch the evidence and
 // the data budget move live.
-import { useMemo } from 'react'
+import { Suspense, lazy, useMemo, useState } from 'react'
 import { useMusic } from '../../audio/audio'
 import { ASTRO_INSTRUMENT_IDS, ASTRO_TARGETS, COVERED, LINE_QUESTION, analyzeAstro, getAstroTarget, toggleAstroInstrument, type AstroIssue, type AstroQuestion } from '../../engine/astrobio'
 import { dataGbPerDay } from '../../engine/budget'
@@ -9,8 +9,11 @@ import { useT, useTx, type StringKey } from '../../i18n'
 import { fmt, localizeParams } from '../../i18n/en'
 import { useAstro } from '../../store/astro'
 import { useGame } from '../../store/game'
+import { useReducedMotion } from '../../store/settings'
+import { webglAvailable } from '../launch/three/support'
 import { Disclaimer, OptionCard, Section, Slider } from '../components'
 
+const WorldViewer3D = lazy(() => import('./WorldViewer3D'))
 const QUESTIONS: AstroQuestion[] = ['water', 'habitability', 'biosignature']
 const Q_COLOR: Record<AstroQuestion, string> = { water: 'bg-sky-400', habitability: 'bg-emerald-400', biosignature: 'bg-fuchsia-400' }
 const Q_TEXT: Record<AstroQuestion, string> = { water: 'text-sky-300', habitability: 'text-emerald-300', biosignature: 'text-fuchsia-300' }
@@ -32,6 +35,9 @@ export function AstroScreen() {
   const inMission = useGame((s) => s.design !== null && s.mission === null)
   const { plan, setPlan } = useAstro()
   useMusic('design')
+  const reduced = useReducedMotion()
+  const can3D = useMemo(() => webglAvailable(), [])
+  const [inside, setInside] = useState(false)
   const report = useMemo(() => analyzeAstro(plan), [plan])
   const target = getAstroTarget(plan.targetId) ?? ASTRO_TARGETS[0]
   const name = (id: string) => tx(`component.${id}.name`, getInstrument(id).name)
@@ -95,6 +101,21 @@ export function AstroScreen() {
         </div>
 
         <aside className="space-y-5">
+          {can3D && (
+            <section>
+              <Suspense fallback={<div className="h-64" />}>
+                <WorldViewer3D targetId={target.id} inside={inside && target.presence.ocean >= 0.5} spin={!reduced} label={t('astro.view.label', { world: tx(`astro.target.${target.id}.name`, target.id) })} />
+              </Suspense>
+              <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-slate-400">
+                <span>{t('astro.view.hint')}</span>
+                {target.presence.ocean >= 0.5 && (
+                  <button type="button" className={`btn-secondary px-2 py-0.5 ${inside ? 'border-sky-400 text-sky-200' : ''}`} aria-pressed={inside} onClick={() => setInside(!inside)}>
+                    {t('astro.view.inside')}
+                  </button>
+                )}
+              </div>
+            </section>
+          )}
           <section>
             <h3 className="hud-label">{t('astro.questions')}</h3>
             <ul className="mt-2 space-y-3">
