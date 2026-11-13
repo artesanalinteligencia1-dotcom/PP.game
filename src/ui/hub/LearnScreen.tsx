@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useMusic } from '../../audio/audio'
 import { G0, deltaV } from '../../engine/budget'
+import { TARGET_DV, stagedDvMs } from '../../engine/rocket'
+import { fmt } from '../../i18n/en'
 import { L2_LYAPUNOV, VU_KMS, butterfly } from '../../engine/threebody'
 import { CR3BPView, VIEW_WIDE } from '../threebody/CR3BPView'
 import { useGame } from '../../store/game'
@@ -11,6 +13,7 @@ const TABS: { id: string; labelKey: StringKey }[] = [
   { id: 'orbit', labelKey: 'learn.tab.orbit' },
   { id: 'budgets', labelKey: 'learn.tab.budgets' },
   { id: 'rocket', labelKey: 'learn.tab.rocket' },
+  { id: 'staging', labelKey: 'learn.tab.staging' },
   { id: 'chaos', labelKey: 'learn.tab.chaos' },
   { id: 'paulet', labelKey: 'learn.tab.paulet' },
 ]
@@ -116,6 +119,70 @@ function RocketLesson() {
         <p className="text-slate-400">
           {t('learn.rocket.explanation')}
         </p>
+      </div>
+    </div>
+  )
+}
+
+const STAGE_COLORS = ['bg-sky-500', 'bg-emerald-500', 'bg-amber-400', 'bg-fuchsia-400']
+const LESSON_PROPELLANT_KG = 100_000
+const LESSON_PAYLOAD_KG = 2_000
+
+/** Why rockets have stages: the same propellant, split into 1 to 4 stages, against the Δv that low Earth orbit needs. */
+function StagingLesson() {
+  const t = useT()
+  const go = useGame((s) => s.go)
+  const [stages, setStages] = useState(1)
+  const [isp, setIsp] = useState(340)
+  const [dry, setDry] = useState(8)
+  const dvs = stagedDvMs(stages, LESSON_PROPELLANT_KG, LESSON_PAYLOAD_KG, isp, dry / 100)
+  const total = dvs.reduce((a, b) => a + b, 0)
+  const one = stagedDvMs(1, LESSON_PROPELLANT_KG, LESSON_PAYLOAD_KG, isp, dry / 100)[0]
+  const scale = Math.max(TARGET_DV.leo * 1.25, total)
+  const reaches = total >= TARGET_DV.leo
+  // the dead weight the last burn still pushes: every tank with one stage, only the last stage's with several
+  const deadKg = (LESSON_PROPELLANT_KG / stages) * (dry / 100)
+  return (
+    <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950 p-4">
+        <div className="font-display text-3xl">
+          Δv = <span className={reaches ? 'text-emerald-300' : 'text-amber-300'}>{(total / 1000).toFixed(2)} km/s</span>
+        </div>
+        <div className="text-xs text-slate-400">{t('learn.staging.setup', { prop: fmt(LESSON_PROPELLANT_KG / 1000), payload: fmt(LESSON_PAYLOAD_KG / 1000) })}</div>
+        <div className="relative mt-4 h-9" role="img" aria-label={t('learn.staging.barLabel', { dv: (total / 1000).toFixed(2), need: (TARGET_DV.leo / 1000).toFixed(1) })}>
+          <div className="flex h-full overflow-hidden rounded bg-slate-800">
+            {dvs.map((dv, i) => (
+              <div key={i} className={`${STAGE_COLORS[i]} flex items-center justify-center text-[11px] font-semibold text-slate-950`} style={{ width: `${(dv / scale) * 100}%` }}>
+                {dv / scale > 0.08 ? t('learn.staging.stage', { n: i + 1 }) : ''}
+              </div>
+            ))}
+          </div>
+          <div className="absolute -top-2 bottom-[-0.5rem] w-0.5 bg-rose-400" style={{ left: `${(TARGET_DV.leo / scale) * 100}%` }} />
+        </div>
+        <div className="text-right text-[11px] text-rose-300" style={{ width: `${(TARGET_DV.leo / scale) * 100}%` }}>
+          {t('learn.staging.orbitLine', { dv: (TARGET_DV.leo / 1000).toFixed(1) })} ▲
+        </div>
+        <ul className="space-y-1 text-sm">
+          {dvs.map((dv, i) => (
+            <li key={i} className="text-slate-300">
+              {t('learn.staging.stage', { n: i + 1 })}: {(dv / 1000).toFixed(2)} km/s
+            </li>
+          ))}
+          <li className={reaches ? 'text-emerald-300' : 'text-slate-500'}>
+            {reaches ? '✔' : '○'} {t(reaches ? 'learn.staging.reaches' : 'learn.staging.short', { dv: ((TARGET_DV.leo - total) / 1000).toFixed(2) })}
+          </li>
+          {stages > 1 && <li className="text-sky-300">{t('learn.staging.gain', { dv: ((total - one) / 1000).toFixed(2) })}</li>}
+          <li className="text-slate-400">{t('learn.staging.dead', { kg: fmt(deadKg) })}</li>
+        </ul>
+      </div>
+      <div className="space-y-3 text-sm">
+        <Slider label={t('learn.staging.stages')} value={stages} min={1} max={4} step={1} onChange={setStages} format={(x) => `${x}`} />
+        <Slider label={t('learn.rocket.isp')} value={isp} min={250} max={460} step={5} onChange={setIsp} format={(x) => `${x} s`} />
+        <Slider label={t('learn.staging.dry')} value={dry} min={4} max={15} step={1} onChange={setDry} format={(x) => `${x} %`} />
+        <p className="text-slate-400">{t('learn.staging.explanation')}</p>
+        <button type="button" className="btn-secondary px-3 py-1.5" onClick={() => go('rocket')}>
+          {t('learn.staging.try')}
+        </button>
       </div>
     </div>
   )
@@ -291,6 +358,7 @@ export function LearnScreen() {
         {tab === 'orbit' && <OrbitLesson />}
         {tab === 'budgets' && <BudgetsLesson />}
         {tab === 'rocket' && <RocketLesson />}
+        {tab === 'staging' && <StagingLesson />}
         {tab === 'chaos' && <ChaosLesson />}
         {tab === 'paulet' && <PauletLesson />}
       </div>

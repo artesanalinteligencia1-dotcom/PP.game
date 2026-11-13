@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { defaultTcmReserve, getOrbit, getRoute, launchCapacityKg, launchers, maintenanceDvPerYear, orbits, resolveLauncher, routesFor } from '../../engine'
 import { CUSTOM_LAUNCHER_ID, analyzeRocket, rocketToLauncher } from '../../engine/rocket'
 import { useRocket } from '../../store/rocket'
+import { TECH, missingRocketTech } from '../../engine/campaign'
 import { CR3BPView, L2_ORBIT, routeSchematic } from '../threebody/CR3BPView'
 import type { Design, DesignReport } from '../../engine/types'
 import { fmt } from '../../i18n/en'
@@ -21,6 +22,11 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
   const ownDesign = usingOwn && design.customRocket ? design.customRocket : workbench
   const own = useMemo(() => ({ launcher: rocketToLauncher(ownDesign), report: analyzeRocket(ownDesign) }), [ownDesign])
   const ownStale = usingOwn && JSON.stringify(design.customRocket) !== JSON.stringify(workbench)
+  // career: parts that still need a technology keep the rocket on the ground
+  const career = useGame((s) => (s.mode === 'campaign' ? s.campaign : null))
+  const techNames = (ids: string[]) => ids.map((id) => tx(`tech.${id}.name`, TECH.find((x) => x.id === id)?.name ?? id)).join(', ')
+  const ownMissing = career ? missingRocketTech(career, ownDesign) : []
+  const workbenchMissing = career ? missingRocketTech(career, workbench) : []
   const t = useT()
   const tx = useTx()
   const orbit = getOrbit(design.orbitId)
@@ -153,7 +159,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
             const isOwn = l.id === CUSTOM_LAUNCHER_ID
             const cap = launchCapacityKg(l, orbit)
             const fits = cap >= report.mass.wetKg
-            const allowed = launcherAllowed(l.id)
+            const allowed = launcherAllowed(l.id) && !(isOwn && ownMissing.length > 0)
             const priceM = l.costM + (l.costPerKgM ?? 0) * (Number.isFinite(report.mass.wetKg) ? report.mass.wetKg : 0)
             return (
               <OptionCard
@@ -183,7 +189,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                   )
                 }
               >
-                {!allowed ? t(isOwn ? 'orbit.launcher.own.locked' : 'orbit.launcher.unlockHint') : isOwn && own.report.issues.some((i) => i.severity === 'error') ? t('orbit.launcher.own.broken') : null}
+                {!allowed ? (isOwn ? (launcherAllowed(l.id) ? t('orbit.launcher.own.needsTech', { tech: techNames(ownMissing) }) : t('orbit.launcher.own.locked')) : t('orbit.launcher.unlockHint')) : isOwn && own.report.issues.some((i) => i.severity === 'error') ? t('orbit.launcher.own.broken') : null}
               </OptionCard>
             )
           })}
@@ -193,7 +199,8 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
           <button type="button" className="btn-secondary px-3 py-1" onClick={() => go('rocket')}>
             {t('orbit.launcher.own.edit')}
           </button>
-          {ownStale && (
+          {ownStale && workbenchMissing.length > 0 && <span className="text-amber-300">{t('orbit.launcher.own.workbenchNeedsTech', { tech: techNames(workbenchMissing) })}</span>}
+          {ownStale && workbenchMissing.length === 0 && (
             <button type="button" className="btn-secondary border-amber-400/60 px-3 py-1 text-amber-200" onClick={() => update({ customRocket: workbench })}>
               {t('orbit.launcher.own.refresh')}
             </button>

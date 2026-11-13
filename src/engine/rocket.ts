@@ -369,6 +369,20 @@ export function rocketToLauncher(design: RocketDesign, name = CUSTOM_LAUNCHER_NA
   }
 }
 
+/**
+ * Lesson on staging: the same propellant and the same share of structure, split evenly into `stages` that burn in turn
+ * and drop when empty. Returns the Δv (m/s) each stage adds; one stage is the plain rocket equation.
+ */
+export function stagedDvMs(stages: number, propellantKg: number, payloadKg: number, ispS: number, dryShare: number): number[] {
+  const n = Math.max(1, Math.round(stages))
+  const prop = propellantKg / n
+  const dry = prop * dryShare
+  return Array.from({ length: n }, (_, i) => {
+    const above = payloadKg + (n - 1 - i) * (prop + dry)
+    return rocketEquationDv(ispS, above + prop + dry, above + dry)
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Editing helpers for the workbench. They keep every stage's tank on its engine's fuel and the counts in range.
 // ---------------------------------------------------------------------------

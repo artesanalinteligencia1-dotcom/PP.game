@@ -58,8 +58,11 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    scale, live mass / TWR / Δv / capacity / price / reliability, stage table, review in EN/ES (`rocket.*`, `rocketPart.*`).
    **3 ✅ 3D (2026-11-12):** `src/engine/rocketLayout.ts` (pure blueprint) + `src/ui/launch/three/rocket3d.ts` (model),
    viewer on the workbench (`src/ui/rocket/RocketViewer3D.tsx`), `LaunchScene3D` flies a `RocketDesign` (`rocket` prop,
-   `?scene3d=custom[&preset=heavy]`), bloom / vignette / environment map on all 3D launches. **4:** campaign: custom rocket
-   as an extra launcher (catalog launchers stay), parts unlocked by technology, price calibration, a lesson on staging.
+   `?scene3d=custom[&preset=heavy]`), bloom / vignette / environment map on all 3D launches. **4 ✅ missions and career (2026-11-13):** `Design.customRocket` +
+   `resolveLauncher()`, "Your rocket" card in the Orbit tab, parts locked by technology in the career (`rocketPartTech`,
+   new techs `hydrogen_stages` and `methane_engines`), prices and reliability calibrated to the catalog, lesson 4 on staging.
+   Ideas left: let the campaign save the rocket per career instead of per device, a 2D fallback drawing of the player's
+   rocket for reduced motion (today it shows the medium launcher's SVG), flight history that raises reliability.
 4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
 5. Mars acts; asynchronous multiplayer (same seed)
 Also wanted (PLAYBOOK §6c): robot guide, one animated video per role, richer animation/design (postprocessing, GSAP, Motion,

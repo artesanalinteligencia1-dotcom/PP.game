@@ -189,6 +189,26 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     core. Checked in headless Chrome: workbench with the four presets, drag, a third stage, side-view tab; launches of
     reusable_heavy (before/after), custom heavy (day), reusable medium (dawn) and a 3-stage rocket with 4 boosters (night);
     no console errors. 145 tests pass (`tests/rocket3d.test.ts` is new).
+19. Rocket Engineer pad, delivery 4 (2026-11-13): the pad joins the missions and the career.
+    - **Your rocket as a launcher:** `Design.customRocket` (a copy of the workbench rocket, taken when it is chosen) and
+      `resolveLauncher(design)` in `src/engine/launch.ts`; the review, the simulation, the launch pad and the launch
+      sequence use it instead of `getLauncher(design.launcherId)`. Orbit tab: a "Your rocket" card after the catalog
+      launchers, a button to open the workbench (its back button returns to the mission) and one to take the latest
+      workbench version. A rocket with a design error has zero capacity (`LAUNCHER_NO_TARGET`). A `custom` design without a
+      readable rocket falls back to the medium launcher.
+    - **Career:** open once `commercial_launchers` is unlocked (`customRocketAllowed`). Parts need technology
+      (`rocketPartTech`, `missingRocketTech` in `campaign.ts`): legs and grid fins = `reusable_medium`; hydrogen engines and
+      tanks, the large booster and the 5.2 m fairing = new tech `hydrogen_stages` (20 M, 80 prestige); methane engines and
+      tanks = new tech `methane_engines` (30 M, 150 prestige). Kerosene parts are free. The workbench marks locked parts
+      with a padlock and says what is missing; the lock is enforced in the Orbit tab. Free play has no locks.
+    - **Calibration:** K-8 engine 3.5 -> 8 M, M tanks 1.2 -> 3 M (x fuel share), reused first stage 30 % -> 50 % of a new
+      one, and a new design is 3 % less reliable than its parts (`NEW_DESIGN_RELIABILITY`). The four presets now cost
+      within 15 % of their catalog launchers and are within 0.04 of their reliability (tested).
+    - **Lesson 4, "Why rockets have stages":** `stagedDvMs()` splits the same propellant into 1 to 4 stages against the
+      9.4 km/s of low Earth orbit; lessons on chaos and Paulet are now 5 and 6.
+    Checked in the browser: card chosen in a free mission, launch pad and 3D launch with "Your rocket"; lesson; in headless
+    Chrome (Spanish) the two new technologies on the career screen and the workbench notice for medium / heavy / reusable;
+    no console errors. 160 tests pass (`tests/customLauncher.test.ts` is new).
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner

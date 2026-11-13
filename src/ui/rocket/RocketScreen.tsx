@@ -21,6 +21,7 @@ import type { LaunchTarget } from '../../engine/types'
 import { useT, useTx, type StringKey } from '../../i18n'
 import { fmt, localizeParams } from '../../i18n/en'
 import { useGame } from '../../store/game'
+import { TECH, missingRocketTech, rocketPartTech } from '../../engine/campaign'
 import { useRocket, type RocketPreset } from '../../store/rocket'
 import { useReducedMotion } from '../../store/settings'
 import { boosterDiameterM } from '../../engine/rocketLayout'
@@ -147,7 +148,14 @@ export function RocketScreen() {
   const show3D = can3D && view === '3d'
   const report = useMemo(() => analyzeRocket(design, payloadKg), [design, payloadKg])
   const empty = useMemo(() => analyzeRocket(design, 0), [design])
-  const partName = (id: string, fallback: string) => tx(`rocketPart.${id}.name`, fallback)
+  // career locks: shown here, enforced when the rocket is chosen for a contract (free play has none)
+  const career = useGame((s) => s.campaign)
+  const locked = (id: string) => {
+    const tech = rocketPartTech(id)
+    return !!career && !!tech && !career.unlocked.includes(tech)
+  }
+  const missingTech = career ? missingRocketTech(career, design) : []
+  const partName = (id: string, fallback: string) => `${tx(`rocketPart.${id}.name`, fallback)}${locked(id) ? ' 🔒' : ''}`
   const issueText = (i: RocketIssue) => {
     const p = localizeParams(i.params)
     return { title: t(`rocket.issue.${i.code}.title` as StringKey, p), why: t(`rocket.issue.${i.code}.why` as StringKey, p) }
@@ -264,8 +272,8 @@ export function RocketScreen() {
 
           <Section title={t('rocket.recovery')} hint={t('rocket.recovery.hint')}>
             <div className="flex flex-wrap gap-2">
-              <OptionCard selected={design.legs} onClick={() => setDesign({ ...design, legs: !design.legs })} title={t('rocket.legs')} />
-              <OptionCard selected={design.fins} onClick={() => setDesign({ ...design, fins: !design.fins })} title={t('rocket.fins')} />
+              <OptionCard selected={design.legs} onClick={() => setDesign({ ...design, legs: !design.legs })} title={`${t('rocket.legs')}${locked('legs') ? ' 🔒' : ''}`} />
+              <OptionCard selected={design.fins} onClick={() => setDesign({ ...design, fins: !design.fins })} title={`${t('rocket.fins')}${locked('fins') ? ' 🔒' : ''}`} />
             </div>
           </Section>
         </div>
@@ -346,6 +354,14 @@ export function RocketScreen() {
             </table>
           </section>
 
+          {career && (
+            <section className={`rounded-lg border p-2 text-xs ${missingTech.length ? 'border-amber-400/50 text-amber-200' : 'border-slate-800 text-slate-400'}`}>
+              <span className="font-medium">{t('rocket.career.title')}</span>{' '}
+              {missingTech.length
+                ? t('rocket.career.needs', { tech: missingTech.map((id) => tx(`tech.${id}.name`, TECH.find((x) => x.id === id)?.name ?? id)).join(', ') })
+                : t('rocket.career.ready')}
+            </section>
+          )}
           <section>
             <h3 className="hud-label">{t('rocket.review')}</h3>
             <ul className="mt-2 space-y-2 text-sm">

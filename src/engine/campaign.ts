@@ -1,6 +1,7 @@
 // Campaign ("career"): contracts, investors, Funds + Prestige, technology unlocks. Pure functions over a serialisable state.
 import { M, type Msg } from './text'
 import { getLauncher } from './catalog/components'
+import type { RocketDesign } from './rocket'
 import type { MissionScore, Rank } from './score'
 import type { MissionState } from './simulate'
 import type { SoundingResult } from './sounding'
@@ -164,6 +165,8 @@ export const TECH: TechDef[] = [
   { id: 'rideshare', name: 'Rideshare contract', launcherId: 'rideshare', costM: 3, prestige: 40, act: 1, available: true, description: 'Book seats on shared flights to sun-synchronous orbit. Cheap per kg; fixed dates and altitude.' },
   { id: 'reusable_medium', name: 'Reusable boosters (R-2)', launcherId: 'reusable_medium', costM: 35, prestige: 120, requires: ['earth_watch'], act: 1, available: true, description: 'First stages that land and fly again: ~40% cheaper launches, ~30% less payload.' },
   { id: 'reusable_heavy', name: 'Reusable heavy (R-3)', launcherId: 'reusable_heavy', costM: 60, prestige: 250, requires: ['lunar_pathfinder'], act: 2, available: true, description: 'Three cores that land: heavy-lift capacity at a medium price. Opens fast routes to the Moon and L2.' },
+  { id: 'hydrogen_stages', name: 'Cryogenic hydrogen stages', costM: 20, prestige: 80, act: 1, available: true, description: 'Liquid hydrogen engines and tanks for your own rockets, plus the large solid booster and the 5.2 m fairing: the parts of a heavy launcher.' },
+  { id: 'methane_engines', name: 'Methane engines (M-20)', costM: 30, prestige: 150, act: 2, available: true, description: 'Methane engines and tanks for your own rockets: efficient, clean-burning and made to fly again and again.' },
   { id: 'super_heavy', name: 'Fully reusable super-heavy + orbital refuelling', costM: 200, prestige: 600, act: 3, available: false, description: 'In development in the real world. Coming in Act 3 (Moon and Mars).' },
   { id: 'nuclear_stage', name: 'Nuclear-thermal upper stage', costM: 400, prestige: 1000, act: 4, available: false, description: 'Speculative: researched for decades, not operational. Act 4.' },
 ]
@@ -210,6 +213,24 @@ export function availableLaunchers(state: CampaignState): string[] {
     if (u === 'commercial_launchers') return COMMERCIAL_LAUNCHERS
     return [u]
   })
+}
+
+/**
+ * Rocket Engineer pad: the technology a workbench part needs before a rocket that uses it can fly career contracts.
+ * Kerosene engines and tanks, the small booster and the fairings up to 4 m need none. Free play has no locks.
+ */
+export function rocketPartTech(partId: string): string | undefined {
+  if (partId === 'legs' || partId === 'fins') return 'reusable_medium'
+  if (partId.startsWith('h_') || partId.startsWith('hydrogen_') || partId === 'srb_l' || partId === 'fairing_l') return 'hydrogen_stages'
+  if (partId.startsWith('m_') || partId.startsWith('methane_')) return 'methane_engines'
+  return undefined
+}
+
+/** Technologies (ids, in TECH order) this rocket still needs in the career; empty = ready to fly contracts. */
+export function missingRocketTech(state: CampaignState, design: RocketDesign): string[] {
+  const parts = [...design.stages.flatMap((s) => [s.engineId, s.tankId]), design.fairingId, ...(design.boosters > 0 && design.boosterId ? [design.boosterId] : []), ...(design.legs ? ['legs'] : []), ...(design.fins ? ['fins'] : [])]
+  const need = new Set(parts.map(rocketPartTech).filter((t): t is string => !!t && !state.unlocked.includes(t)))
+  return TECH.filter((t) => need.has(t.id)).map((t) => t.id)
 }
 
 /** A rocket of your own can fly contracts once the commercial launch market is open to you (after First Light). */
