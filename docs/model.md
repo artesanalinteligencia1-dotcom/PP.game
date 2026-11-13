@@ -276,3 +276,23 @@ Sources (NASA Glenn Research Center, Beginner's Guide to Aeronautics): Ideal Roc
 https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ideal-rocket-equation/ ; Specific Impulse
 https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/specific-impulse/ ; Multistage rockets
 https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/stage/ . g0 is the standard gravity (9.80665 m/s²).
+
+## 21. Astrobiologist pad (`src/engine/astrobio.ts`)
+The player plans a search on one world: instruments, how much of the time each observes, and the downlink. All scores are
+0..1 game values; the reasoning follows how astrobiology is done.
+
+- **Lines of evidence (9):** hydrogen in the ground, minerals made in water, ice, hidden ocean (water); heat sources,
+  organic molecules, radiation (habitability); gases out of balance, surface pigments (biosignatures).
+- **Worlds (6):** Earth as the reference, lunar poles, Mars, Europa, Enceladus, Titan. `presence[line]` says how much of
+  each signal is expected from what missions have found (e.g. Europa: ocean 0.95, pigments 0). Each world has a typical
+  downlink (Earth 200 Gb/day … Titan 10): the farther, the thinner.
+- **Instruments:** `INSTRUMENT_SENSITIVITY[instrument][line]` over the existing catalog (neutron spectrometer → hydrogen
+  0.9, magnetometer → hidden ocean 0.8, thermal IR → heat 0.85 …).
+- **Plan quality:** `min(1, √(duty / defaultDuty))` (more observing time helps, with diminishing returns) × the share of
+  the data that fits the downlink.
+- **Coverage** of a line = 1 − Π(1 − sensitivity × quality) over the chosen instruments; **detection** = coverage × presence.
+- **Questions:** water = any water line detected; habitability = 0.3 water + 0.3 heat + 0.3 organics + 0.1 radiation;
+  biosignature = (0.4 × stronger line + 0.6 × weaker line) × (0.5 + 0.5 × habitability), so one line alone or an
+  uninhabitable context scores low. Tested: nothing beyond Earth reaches 0.5.
+- **Review codes:** `ASTRO_NO_INSTRUMENTS`, `ASTRO_DATA_OVER_DOWNLINK`, `ASTRO_INSTRUMENT_NO_SIGNAL`,
+  `ASTRO_WATER_UNCHECKED`, `ASTRO_OCEAN_MISSED`, `ASTRO_BIOSIGNATURE_SINGLE_LINE`, `ASTRO_BIOSIGNATURE_NO_CONTEXT`.

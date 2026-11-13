@@ -209,6 +209,15 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     Checked in the browser: card chosen in a free mission, launch pad and 3D launch with "Your rocket"; lesson; in headless
     Chrome (Spanish) the two new technologies on the career screen and the workbench notice for medium / heavy / reusable;
     no console errors. 160 tests pass (`tests/customLauncher.test.ts` is new).
+20. Astrobiologist pad (2026-11-13): the astrobiology lab, Home → Extras, also opened from a mission's Payload tab (it can
+    send its instruments back to the mission). Pure engine `src/engine/astrobio.ts` (docs/model.md §21): six worlds with
+    what is expected there, nine lines of evidence, an instrument × evidence sensitivity table over the existing instrument
+    catalog, observing time with diminishing returns, a downlink budget (data that does not fit is lost), three questions
+    in order (water → habitability → biosignatures) and typed review codes `ASTRO_*`. Screen
+    `src/ui/astro/AstroScreen.tsx`, store `src/store/astro.ts` (`ppgame.astro.v1`). Texts live only in en.json / es.json
+    (`astro.*`, 100 keys; a test checks every world, line, instrument and code has its text). No 3D view in this pad.
+    Checked in headless Chrome in Spanish and English: opens from the menu, world change, instruments on and off, a
+    data-hungry imager on Europa's thin link; no console errors, no raw keys, no overflow. 169 tests pass.
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner

@@ -22,7 +22,7 @@ import { validateCampaign } from './save'
 import { readShareFromHash } from './share'
 
 export type TabId = 'mission' | 'payload' | 'spacecraft' | 'orbit' | 'comms' | 'review'
-export type Screen = 'home' | 'campaign' | 'free' | 'intro' | 'learn' | 'firstlight' | 'rocket' | 'design' | 'launch' | 'flight' | 'results'
+export type Screen = 'home' | 'campaign' | 'free' | 'intro' | 'learn' | 'firstlight' | 'rocket' | 'astro' | 'design' | 'launch' | 'flight' | 'results'
 
 const CAMPAIGN_KEY = 'ppgame.campaign.v1'
 function loadCampaign(): CampaignState | null {

@@ -63,7 +63,9 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    new techs `hydrogen_stages` and `methane_engines`), prices and reliability calibrated to the catalog, lesson 4 on staging.
    Ideas left: let the campaign save the rocket per career instead of per device, a 2D fallback drawing of the player's
    rocket for reduced motion (today it shows the medium launcher's SVG), flight history that raises reliability.
-4. Astrobiologist pad (water, biosignatures, habitability; instruments; data per day; why each instrument)
+4. Astrobiologist pad ✅ (2026-11-13): `src/engine/astrobio.ts`, `src/ui/astro/AstroScreen.tsx`, PROGRESS item 20. Ideas
+   left: tie the lab's evidence score to the science of career contracts, lock worlds by act, a 3D view of the world,
+   a lesson on biosignatures and false positives.
 5. Mars acts; asynchronous multiplayer (same seed)
 Also wanted (PLAYBOOK §6c): robot guide, one animated video per role, richer animation/design (postprocessing, GSAP, Motion,
 Theatre.js, Rive). Before each big task: quote the expected usage and propose it in deliveries.

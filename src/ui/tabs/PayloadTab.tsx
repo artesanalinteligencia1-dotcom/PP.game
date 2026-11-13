@@ -14,6 +14,7 @@ const POINTING_LABEL: Record<PointingLevel, StringKey> = {
 
 export function PayloadTab({ design, scenario }: { design: Design; scenario: Scenario }) {
   const toggle = useGame((s) => s.toggleInstrument)
+  const go = useGame((s) => s.go)
   const setDuty = useGame((s) => s.setDuty)
   const update = useGame((s) => s.update)
   const t = useT()
@@ -35,6 +36,9 @@ export function PayloadTab({ design, scenario }: { design: Design; scenario: Sce
           />
         </Section>
       )}
+      <button type="button" className="btn-secondary mb-3 px-3 py-1.5 text-sm" onClick={() => go('astro')}>
+        {t('payload.openLab')}
+      </button>
       <Section
         title={t('payload.instruments')}
         hint={t('payload.instruments.hint')}

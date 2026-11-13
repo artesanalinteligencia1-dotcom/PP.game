@@ -106,6 +106,7 @@ export function HomeScreen() {
           ) : (
             <>
               {item(t('home.rocket'), () => go('rocket'), t('home.rocket.hint'))}
+              {item(t('home.astro'), () => go('astro'), t('home.astro.hint'))}
               {item(t('home.intro'), () => go('intro'), t('home.intro.hint'))}
               {item(t('home.legacy'), () => openLearn('paulet'), t('home.legacy.hint'))}
               {item(t('home.sandbox'), () => startScenario('sandbox'), t('home.sandbox.hint'))}
