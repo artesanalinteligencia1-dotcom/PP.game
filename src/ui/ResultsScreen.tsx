@@ -8,7 +8,7 @@ import { analyseMission } from '../engine/report'
 import { scoreMission, type Rank } from '../engine/score'
 import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt, localName } from '../i18n/en'
 import { useGame } from '../store/game'
-import { shareUrl } from '../store/share'
+import { challengeUrl, challengeVerdict, shareUrl } from '../store/share'
 import { Disclaimer, Pill } from './components'
 import { useT, useTx, type StringKey } from '../i18n'
 
@@ -43,11 +43,15 @@ export function ResultsScreen() {
   const mode = useGame((s) => s.mode)
   const collectReward = useGame((s) => s.collectReward)
   const [copied, setCopied] = useState(false)
+  const [challengeCopied, setChallengeCopied] = useState(false)
+  const challenge = useGame((s) => s.challenge)
+  const myName = useGame((s) => s.campaign?.profile.name ?? '')
   const t = useT()
   const msg = useMsg()
   const tx = useTx()
   const scenario = getScenario(mission.scenarioId)
   const score = useMemo(() => scoreMission(mission, scenario), [mission, scenario])
+  const verdict = challenge ? challengeVerdict(challenge, mission.scenarioId, mission.seed, score.total) : null
   const analysis = useMemo(() => analyseMission(mission, score, scenario), [mission, score, scenario])
   const [board, setBoard] = useState<BoardEntry[]>([])
   useMusic('results')
@@ -82,6 +86,11 @@ export function ResultsScreen() {
         <Pill tone={mission.endReason === 'completed' ? 'emerald' : 'rose'}>{END_REASON_LABEL[mission.endReason ?? 'completed']}</Pill>
       </div>
 
+      {verdict && challenge && (
+        <p className={`mt-4 rounded-lg border p-3 text-sm ${verdict === 'lose' ? 'border-amber-400/50 text-amber-200' : 'border-emerald-500/50 text-emerald-200'}`}>
+          <span className="font-semibold">{t(`challenge.${verdict}` as StringKey)}</span> {t('challenge.compare', { name: challenge.name || t('challenge.anon'), theirs: challenge.score, mine: score.total })}
+        </p>
+      )}
       <div className="mt-5 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
         <section className={`rounded-2xl border-2 bg-slate-900/70 p-6 text-center ${RANK_STYLE[score.rank]}`}>
           <div className="mx-auto mb-2 w-fit rounded-lg bg-slate-950/70 p-1">
@@ -179,6 +188,20 @@ export function ResultsScreen() {
               className="rounded-lg border border-slate-600 px-4 py-2 hover:border-slate-300"
             >
               🔗 {copied ? t('results.copied') : t('results.share')}
+            </button>
+            <button
+              type="button"
+              title={t('challenge.hint')}
+              onClick={() => {
+                const url = challengeUrl({ scenarioId: mission.scenarioId, seed: mission.seed, score: score.total, name: myName })
+                navigator.clipboard?.writeText(url).then(
+                  () => setChallengeCopied(true),
+                  () => window.prompt(t('results.copyPrompt'), url),
+                )
+              }}
+              className="rounded-lg border border-violet-400/60 px-4 py-2 text-violet-200 hover:border-violet-300"
+            >
+              ⚔ {challengeCopied ? t('results.copied') : t('challenge.send')}
             </button>
             <button type="button" onClick={backToDesign} className="btn-primary px-4 py-2 ">
               {t('results.redesign')}

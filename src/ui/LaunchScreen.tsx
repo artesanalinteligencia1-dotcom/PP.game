@@ -16,6 +16,7 @@ type Phase = 'ready' | 'flying' | 'success' | 'failure'
 export function LaunchScreen() {
   const design = useGame((s) => s.design)!
   const seed = useGame((s) => s.seed)
+  const challenge = useGame((s) => s.challenge)
   const setSeed = useGame((s) => s.setSeed)
   const launch = useGame((s) => s.launch)
   const startFlight = useGame((s) => s.startFlight)
@@ -50,6 +51,11 @@ export function LaunchScreen() {
         </button>
         <span className="text-xs text-slate-500">{t('launch.seedRule')}</span>
       </div>
+      {challenge && challenge.scenarioId === design.scenarioId && (
+        <p className={`mt-3 rounded-lg border p-2 text-sm ${challenge.seed === seed ? 'border-violet-400/50 text-violet-200' : 'border-amber-400/50 text-amber-200'}`}>
+          {challenge.seed === seed ? t('challenge.active', { name: challenge.name || t('challenge.anon'), score: challenge.score }) : t('challenge.seedChanged', { seed: challenge.seed })}
+        </p>
+      )}
       <h1 className="mt-3 text-2xl font-semibold">
         {t('launch.title', { name: tx(`scenario.${scenario.id}.name`, scenario.name) })}
       </h1>

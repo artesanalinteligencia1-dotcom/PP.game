@@ -2,6 +2,7 @@ import type { DesignReport, Role, Scenario } from '../../engine/types'
 import { PROTAGONIST, REQUIREMENT_LABEL, ROLE_BLURB, ROLE_LABEL, fmt, message, localName } from '../../i18n/en'
 import { Pill, SEV_BORDER, SEV_TEXT, Section } from '../components'
 import { useT, useTx, type StringKey } from '../../i18n'
+import { useGame } from '../../store/game'
 
 export const ROLE_ICON: Record<Role, string> = { lead: '★', engineer: '⚙', astrophysicist: '✦', astrobiologist: '❋' }
 
@@ -42,8 +43,12 @@ export function MissionTab({ scenario, report }: { scenario: Scenario; report: D
   const t = useT()
   const tx = useTx()
   const roles: Role[] = ['lead', 'engineer', 'astrophysicist', 'astrobiologist']
+  const challenge = useGame((s) => (s.challenge?.scenarioId === scenario.id ? s.challenge : null))
   return (
     <div>
+      {challenge && (
+        <p className="mb-4 rounded-lg border border-violet-400/50 p-3 text-sm text-violet-200">{t('challenge.active', { name: challenge.name || t('challenge.anon'), score: challenge.score })}</p>
+      )}
       <Section title={t('mission.briefing')}>
         <p className="mb-2 text-xs text-slate-400">
           <span className="font-semibold text-slate-200">

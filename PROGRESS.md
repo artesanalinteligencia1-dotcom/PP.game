@@ -218,6 +218,17 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     (`astro.*`, 100 keys; a test checks every world, line, instrument and code has its text). No 3D view in this pad.
     Checked in headless Chrome in Spanish and English: opens from the menu, world change, instruments on and off, a
     data-hungry imager on Europa's thin link; no console errors, no raw keys, no overflow. 169 tests pass.
+21. Astrobiology lab in 3D (2026-11-13): `src/ui/astro/WorldViewer3D.tsx` (lazy, WebGL only): a procedural globe per world
+    (canvas texture from a seeded RNG, no image files), atmosphere for Earth / Mars / Titan, the spacecraft on a polar orbit,
+    Enceladus' plume, and "Look inside" for worlds with a hidden ocean (thin crust, blue ocean, rocky core). Checked in
+    headless Chrome: Europa inside, Enceladus; the button only shows where an ocean is expected.
+22. Asynchronous multiplayer, first step (2026-11-13): challenge links, no server. `src/store/share.ts`:
+    `encodeChallenge` / `decodeChallenge` / `challengeUrl` (`#c=`: scenario, seed, score to beat, name) and
+    `challengeVerdict` (a flight only counts with the same scenario and seed). Results screen: "Challenge a friend" copies
+    the link. Opening it starts that scenario with a fresh design and the challenger's seed; banners on the briefing and
+    the launch pad, win / tie / lose on the results. Changing the seed or flying a random one drops out of the challenge.
+    Checked in the browser: the link opens the scenario with its banner. The results banner was not flown end to end
+    (its verdict is unit-tested). 173 tests pass (`tests/challenge.test.ts` is new).
 
 ## Next exact step
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner

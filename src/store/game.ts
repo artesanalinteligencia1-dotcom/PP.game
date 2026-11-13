@@ -19,7 +19,7 @@ import { advanceWeek, botChoice, createMission, decide, type MissionState, type 
 import type { SoundingResult } from '../engine/sounding'
 import type { Design, Role } from '../engine/types'
 import { validateCampaign } from './save'
-import { readShareFromHash } from './share'
+import { readChallengeFromHash, readShareFromHash, type Challenge } from './share'
 
 export type TabId = 'mission' | 'payload' | 'spacecraft' | 'orbit' | 'comms' | 'review'
 export type Screen = 'home' | 'campaign' | 'free' | 'intro' | 'learn' | 'firstlight' | 'rocket' | 'astro' | 'design' | 'launch' | 'flight' | 'results'
@@ -42,6 +42,8 @@ function saveCampaign(c: CampaignState | null) {
   }
 }
 const shared = readShareFromHash()
+// a challenge link opens its scenario with the challenger's seed and a fresh design
+const challenged = shared ? null : readChallengeFromHash()
 
 export const ALL_ROLES: Role[] = ['lead', 'engineer', 'astrophysicist', 'astrobiologist']
 
@@ -61,6 +63,8 @@ interface GameState {
   tab: TabId
   screen: Screen
   seed: number
+  /** asynchronous multiplayer: the score to beat on this scenario and seed (from a challenge link) */
+  challenge: Challenge | null
   mission: MissionState | null
   /** Bumped whenever the (mutable) mission object changes, to re-render. */
   tick: number
@@ -116,11 +120,12 @@ export const useGame = create<GameState>((set, get) => ({
   lastReward: null,
   rewardCollected: false,
   learnTab: 'orbit',
-  scenarioId: shared ? shared.design.scenarioId : null,
-  design: shared ? shared.design : null,
+  scenarioId: shared ? shared.design.scenarioId : (challenged?.scenarioId ?? null),
+  design: shared ? shared.design : challenged ? structuredClone(getScenario(challenged.scenarioId).baseDesign) : null,
+  challenge: challenged,
   tab: shared ? 'review' : 'mission',
-  screen: shared ? 'design' : 'home',
-  seed: shared ? shared.seed : randomSeed(),
+  screen: shared || challenged ? 'design' : 'home',
+  seed: shared ? shared.seed : (challenged?.seed ?? randomSeed()),
   mission: null,
   tick: 0,
   playing: false,
@@ -198,7 +203,7 @@ export const useGame = create<GameState>((set, get) => ({
   startScenario: (id) =>
     set({ mode: 'free', contractId: null, scenarioId: id, design: structuredClone(getScenario(id).baseDesign), tab: 'mission', screen: 'design', mission: null }),
   exit: () =>
-    set({ scenarioId: null, design: null, tab: 'mission', screen: get().mode === 'campaign' ? 'campaign' : 'free', mission: null, playing: false }),
+    set({ scenarioId: null, design: null, tab: 'mission', screen: get().mode === 'campaign' ? 'campaign' : 'free', mission: null, playing: false, challenge: null }),
   resetDesign: () => {
     const id = get().scenarioId
     if (id) set({ design: structuredClone(getScenario(id).baseDesign) })
@@ -276,5 +281,5 @@ export const useGame = create<GameState>((set, get) => ({
   setPersonality: (personality) => set({ personality }),
   showResults: () => set({ screen: 'results', playing: false }),
   backToDesign: () => set({ screen: 'design', tab: 'review', mission: null, playing: false }),
-  flyAgain: (sameSeed) => set({ screen: 'launch', mission: null, playing: false, seed: sameSeed ? get().seed : randomSeed() }),
+  flyAgain: (sameSeed) => set({ screen: 'launch', mission: null, playing: false, seed: sameSeed ? get().seed : randomSeed(), ...(sameSeed ? {} : { challenge: null }) }),
 }))
