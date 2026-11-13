@@ -6,7 +6,8 @@ verificar en Chrome sin interfaz (puppeteer-core del caché de npx, ver abajo); 
 CLOUD_NEXT.md, commit (con `Co-Authored-By`) y push desde una pestaña de terminal tras `git rebase origin/cloud/fase-1`.
 Nunca force-push. Antes de una tarea grande, estimar el consumo y proponerla en entregas.
 
-> **Entrega 3 hecha (2026-11-12).** Detalle en PROGRESS.md punto 18. Sigue la entrega 4 (ver "No es de esta entrega").
+> **Entregas 3 y 4 hechas (2026-11-12 y 13).** Detalle en PROGRESS.md puntos 18 y 19. El pad del Ingeniero de cohetes está
+> completo; sigue el pad del Astrobiólogo (CLOUD_NEXT punto 4).
 > Pendiente de realismo, sin empezar: texturas PBR en el fuselaje, humo con partículas en GPU, cámaras con Theatre.js,
 > modelos glTF para torre y barco, física de las piezas que caen, audio espacial.
 

@@ -260,11 +260,17 @@ of real engines and stages of each family. The physics is the real one:
 - **Capacity** = the largest payload that still reaches the target (bisection on the payload), limited by liftoff TWR ≥ 1.05
   and by the fairing's packaging limit.
 - **Reuse:** legs + grid fins + a restartable first-stage engine keep 10 % of the first stage's propellant for the landing
-  burn; the first stage then costs 30 % of a new one per flight; landing success 85 %.
+  burn; the first stage then costs 50 % of a new one per flight; landing success 85 %.
 - **Price per flight** = parts + 0.5 M per stage, × 1.15 integration. **Reliability** = product of every engine and booster
-  reliability × 0.995 per separation (stages, boosters, fairing).
+  reliability × 0.995 per separation (stages, boosters, fairing) × 0.97 for a new design with no flight history.
 - **Calibration:** the presets in `ROCKET_PRESETS` reproduce the catalog launchers' LEO capacity within 30 % (tested);
-  prices are parts only and stay below the catalog's market prices until the pad joins the campaign (delivery 4).
+  part prices are set so the same presets cost within 15 % of the catalog launchers and their reliability is within 0.04
+  (tested in `tests/customLauncher.test.ts`).
+- **In a mission:** the chosen rocket is copied into the design (`Design.customRocket`) and becomes a `Launcher` through
+  `rocketToLauncher()`; capacity per target, price, reliability and landing chance come from `analyzeRocket`.
+- **Career locks:** `rocketPartTech(partId)` names the technology a part needs (kerosene parts: none).
+- **Staging lesson:** `stagedDvMs(n, propellant, payload, Isp, dryShare)` splits propellant and structure evenly into n
+  stages; each stage's Δv is the rocket equation with everything above it as payload.
 
 Sources (NASA Glenn Research Center, Beginner's Guide to Aeronautics): Ideal Rocket Equation
 https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ideal-rocket-equation/ ; Specific Impulse
