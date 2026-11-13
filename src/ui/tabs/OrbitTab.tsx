@@ -1,4 +1,7 @@
-import { defaultTcmReserve, getLauncher, getOrbit, getRoute, launchCapacityKg, launchers, maintenanceDvPerYear, orbits, routesFor } from '../../engine'
+import { useMemo } from 'react'
+import { defaultTcmReserve, getOrbit, getRoute, launchCapacityKg, launchers, maintenanceDvPerYear, orbits, resolveLauncher, routesFor } from '../../engine'
+import { CUSTOM_LAUNCHER_ID, analyzeRocket, rocketToLauncher } from '../../engine/rocket'
+import { useRocket } from '../../store/rocket'
 import { CR3BPView, L2_ORBIT, routeSchematic } from '../threebody/CR3BPView'
 import type { Design, DesignReport } from '../../engine/types'
 import { fmt } from '../../i18n/en'
@@ -11,6 +14,13 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
   const update = useGame((s) => s.update)
   const launcherAllowed = useGame((s) => s.launcherAllowed)
   const setOrbit = useGame((s) => s.setOrbit)
+  const go = useGame((s) => s.go)
+  // Your own rocket: the card shows the copy inside this design once chosen, the workbench's rocket before that
+  const workbench = useRocket((s) => s.design)
+  const usingOwn = design.launcherId === CUSTOM_LAUNCHER_ID
+  const ownDesign = usingOwn && design.customRocket ? design.customRocket : workbench
+  const own = useMemo(() => ({ launcher: rocketToLauncher(ownDesign), report: analyzeRocket(ownDesign) }), [ownDesign])
+  const ownStale = usingOwn && JSON.stringify(design.customRocket) !== JSON.stringify(workbench)
   const t = useT()
   const tx = useTx()
   const orbit = getOrbit(design.orbitId)
@@ -139,7 +149,8 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
       )}
       <Section title={t('orbit.launcher.title')} hint={t('orbit.launcher.hint')}>
         <Grid>
-          {launchers.map((l) => {
+          {[...launchers, own.launcher].map((l) => {
+            const isOwn = l.id === CUSTOM_LAUNCHER_ID
             const cap = launchCapacityKg(l, orbit)
             const fits = cap >= report.mass.wetKg
             const allowed = launcherAllowed(l.id)
@@ -149,7 +160,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                 key={l.id}
                 selected={design.launcherId === l.id}
                 disabled={!allowed}
-                onClick={() => update({ launcherId: l.id, ...(l.rideshare && design.altitudeKm > l.rideshare.maxAltitudeKm ? { altitudeKm: l.rideshare.maxAltitudeKm } : {}) })}
+                onClick={() => update({ launcherId: l.id, ...(isOwn ? { customRocket: ownDesign } : {}), ...(l.rideshare && design.altitudeKm > l.rideshare.maxAltitudeKm ? { altitudeKm: l.rideshare.maxAltitudeKm } : {}) })}
                 title={tx(`component.${l.id}.name`, l.name)}
                 stats={[
                   l.suborbital
@@ -160,6 +171,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                   `$${fmt(priceM, 1)} M${l.costPerKgM ? t('orbit.launcher.perKg') : ''}`,
                   t('orbit.launcher.reliable', { pct: fmt(l.reliability * 100) }),
                   l.kind === 'reusable' ? t('orbit.launcher.boosterLands') : undefined,
+                  isOwn ? t('orbit.launcher.own.stats', { height: fmt(own.report.heightM, 1), stages: own.report.stages.length }) : undefined,
                 ]}
                 badge={
                   !allowed ? (
@@ -171,14 +183,25 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                   )
                 }
               >
-                {!allowed ? t('orbit.launcher.unlockHint') : null}
+                {!allowed ? t(isOwn ? 'orbit.launcher.own.locked' : 'orbit.launcher.unlockHint') : isOwn && own.report.issues.some((i) => i.severity === 'error') ? t('orbit.launcher.own.broken') : null}
               </OptionCard>
             )
           })}
         </Grid>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+          <span>{t('orbit.launcher.own.hint')}</span>
+          <button type="button" className="btn-secondary px-3 py-1" onClick={() => go('rocket')}>
+            {t('orbit.launcher.own.edit')}
+          </button>
+          {ownStale && (
+            <button type="button" className="btn-secondary border-amber-400/60 px-3 py-1 text-amber-200" onClick={() => update({ customRocket: workbench })}>
+              {t('orbit.launcher.own.refresh')}
+            </button>
+          )}
+        </div>
         <p className="mt-3 rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-xs text-slate-300">
           <span className="font-semibold text-sky-300">{t('orbit.realWorld')}</span>
-          {tx(`component.${design.launcherId}.realWorld`, getLauncher(design.launcherId).realWorld)}
+          {tx(`component.${design.launcherId}.realWorld`, resolveLauncher(design).realWorld)}
         </p>
       </Section>
     </div>

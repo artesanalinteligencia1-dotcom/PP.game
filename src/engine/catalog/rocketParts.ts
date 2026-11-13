@@ -5,7 +5,7 @@ import type { Fairing, PropellantFuel, RocketDesign, RocketEngine, RocketTank, S
 export const ROCKET_ENGINES: RocketEngine[] = [
   { id: 'k_small', name: 'Small kerosene engine (K-1)', fuel: 'kerosene', thrustSlKN: 25, thrustVacKN: 28, ispSl: 300, ispVac: 320, massKg: 50, costM: 0.4, reliability: 0.997, restartable: false, description: 'A small pump-fed engine. Nine of them lift a light rocket.' },
   { id: 'k_small_vac', name: 'Small vacuum kerosene engine (K-1V)', fuel: 'kerosene', thrustSlKN: 0, thrustVacKN: 26, ispSl: 0, ispVac: 340, massKg: 60, costM: 0.5, reliability: 0.997, restartable: true, description: 'A long nozzle for space: more efficient, but it cannot fire at sea level.' },
-  { id: 'k_med', name: 'Kerosene engine (K-8)', fuel: 'kerosene', thrustSlKN: 850, thrustVacKN: 950, ispSl: 282, ispVac: 311, massKg: 900, costM: 3.5, reliability: 0.997, restartable: true, description: 'The workhorse of medium rockets. It can relight to land a booster.' },
+  { id: 'k_med', name: 'Kerosene engine (K-8)', fuel: 'kerosene', thrustSlKN: 850, thrustVacKN: 950, ispSl: 282, ispVac: 311, massKg: 900, costM: 8, reliability: 0.997, restartable: true, description: 'The workhorse of medium rockets. It can relight to land a booster.' },
   { id: 'k_med_vac', name: 'Vacuum kerosene engine (K-8V)', fuel: 'kerosene', thrustSlKN: 0, thrustVacKN: 900, ispSl: 0, ispVac: 345, massKg: 600, costM: 4, reliability: 0.997, restartable: true, description: 'Upper-stage version with a large nozzle for the vacuum of space.' },
   { id: 'm_big', name: 'Methane engine (M-20)', fuel: 'methane', thrustSlKN: 2200, thrustVacKN: 2400, ispSl: 330, ispVac: 355, massKg: 1600, costM: 5, reliability: 0.996, restartable: true, description: 'Burns methane and oxygen: clean, efficient and made to fly again and again.' },
   { id: 'm_vac', name: 'Vacuum methane engine (M-20V)', fuel: 'methane', thrustSlKN: 0, thrustVacKN: 2500, ispSl: 0, ispVac: 375, massKg: 1900, costM: 6, reliability: 0.996, restartable: true, description: 'Methane engine with a vacuum nozzle for upper stages.' },
@@ -22,7 +22,7 @@ const FUEL: Record<PropellantFuel, { density: number; dryShare: number; costShar
 const SIZES = [
   { id: 'xs', label: 'XS', propellantKg: 1000, diameterM: 1.2, costM: 0.1 },
   { id: 's', label: 'S', propellantKg: 5000, diameterM: 1.8, costM: 0.3 },
-  { id: 'm', label: 'M', propellantKg: 30000, diameterM: 3.7, costM: 1.2 },
+  { id: 'm', label: 'M', propellantKg: 30000, diameterM: 3.7, costM: 3 },
   { id: 'l', label: 'L', propellantKg: 120000, diameterM: 5.2, costM: 3.5 },
 ] as const
 

@@ -25,7 +25,6 @@ import {
   getBattery,
   getCompression,
   getInstrument,
-  getLauncher,
   getObc,
   getOrbit,
   getPropulsion,
@@ -34,7 +33,7 @@ import {
   launchers,
 } from './catalog/components'
 import { defaultTcmReserve, getRoute } from './catalog/routes'
-import { TRL_COST_FACTOR, TRL_MONTHS, launchCapacityKg, successProbability } from './launch'
+import { TRL_COST_FACTOR, TRL_MONTHS, launchCapacityKg, resolveLauncher, successProbability } from './launch'
 import {
   MINUTES_PER_DAY,
   MINUTES_PER_YEAR,
@@ -127,7 +126,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   // ---------- Resolve and sanitise inputs ----------
   const orbit = getOrbit(design.orbitId)
   const alt = clampAltitude(orbit, design.altitudeKm)
-  const launcher = getLauncher(design.launcherId)
+  const launcher = resolveLauncher(design)
   const array = getArray(design.arrayId)
   const area = clamp(design.arrayAreaM2, 0, array.maxAreaM2)
   const battery = getBattery(design.batteryId)

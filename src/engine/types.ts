@@ -1,3 +1,4 @@
+import type { RocketDesign } from './rocket'
 // Pure engine types. No React, no DOM.
 
 export type Difficulty = 'beginner' | 'engineer' | 'expert' | 'sandbox'
@@ -215,6 +216,8 @@ export interface Design {
   orbitId: string
   altitudeKm: number
   launcherId: string
+  /** With launcher id `custom`: the rocket from the workbench, copied into the design when it was chosen. */
+  customRocket?: RocketDesign
   arrayId: string
   arrayAreaM2: number
   batteryId: string

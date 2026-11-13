@@ -2,7 +2,8 @@
 // Documented in docs/model.md §11–13.
 import { M, ref, type Msg } from './text'
 import { BATTERY_CALENDAR_LIFE_YEARS, batteryCycleLife } from './budget'
-import { getInstrument, getLauncher, getObc, getOrbit, getStation } from './catalog/components'
+import { getInstrument, getObc, getOrbit, getStation } from './catalog/components'
+import { resolveLauncher } from './launch'
 import { COLLISION_AVOIDANCE_DV, evaluateDesign } from './evaluate'
 import { getScenario } from './catalog/scenarios'
 import { getRoute } from './catalog/routes'
@@ -147,7 +148,7 @@ const oppRef = (s: MissionState, field: 'title' | 'text') => ref(`scenario.${s.s
 export function createMission(design: Design, scenario: Scenario, seed: number, opts: { difficulty?: Difficulty } = {}): MissionState {
   const report = evaluateDesign(design, scenario)
   const orbit = getOrbit(design.orbitId)
-  const launcher = getLauncher(design.launcherId)
+  const launcher = resolveLauncher(design)
   const designLife = Math.min(15, Math.max(0.5, design.designLifeYears))
   const s: MissionState = {
     seed: seed >>> 0,

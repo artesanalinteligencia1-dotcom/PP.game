@@ -137,7 +137,9 @@ export const LANDING_RESERVE = 0.1
 export const MIN_LIFTOFF_TWR = 1.05
 const SEPARATION_RELIABILITY = 0.995
 /** A reused first stage costs this share of a new one per flight (refurbishment and recovery). */
-const REUSE_COST_SHARE = 0.3
+const REUSE_COST_SHARE = 0.5
+/** A rocket of your own has no flight history yet: new designs fail more often than proven ones. */
+export const NEW_DESIGN_RELIABILITY = 0.97
 /** Length of every stage's engine section (thrust structure and nozzles), in metres. */
 export const ENGINE_LENGTH_M = 2.5
 /** Fairing length = this × its diameter. */
@@ -330,7 +332,8 @@ export function analyzeRocket(design: RocketDesign, payloadKg = 0): RocketReport
   const reliability =
     s.reduce((r, x) => r * x.engine.reliability ** x.stage.engines, 1) *
     (booster ? booster.reliability ** design.boosters : 1) *
-    SEPARATION_RELIABILITY ** separations
+    SEPARATION_RELIABILITY ** separations *
+    NEW_DESIGN_RELIABILITY
   const fairingLength = fairing ? fairing.diameterM * FAIRING_FINENESS : 0
   return {
     payloadKg,
@@ -349,17 +352,20 @@ export function analyzeRocket(design: RocketDesign, payloadKg = 0): RocketReport
 }
 
 /** The player's rocket as a launcher the rest of the game understands. */
-export function rocketToLauncher(design: RocketDesign, name: string): Launcher {
+export const CUSTOM_LAUNCHER_ID = 'custom'
+export const CUSTOM_LAUNCHER_NAME = 'Your rocket'
+
+export function rocketToLauncher(design: RocketDesign, name = CUSTOM_LAUNCHER_NAME): Launcher {
   const r = analyzeRocket(design)
   return {
-    id: 'custom',
+    id: CUSTOM_LAUNCHER_ID,
     name,
     kind: r.reusable ? 'reusable' : 'expendable',
     capacityKg: r.capacityKg,
     costM: r.costM,
     reliability: r.reliability,
     ...(r.reusable ? { landing: { successP: r.landingP } } : {}),
-    realWorld: '',
+    realWorld: 'Built on your workbench from engines, tanks and boosters. Price and reliability come from its parts; a new design has no flight history yet.',
   }
 }
 

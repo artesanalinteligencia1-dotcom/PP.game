@@ -137,6 +137,8 @@ export function RocketScreen() {
   const t = useT()
   const tx = useTx()
   const go = useGame((s) => s.go)
+  // opened from a mission's launcher choice: go back to that mission
+  const inMission = useGame((s) => s.design !== null && s.mission === null)
   const { design, payloadKg, setDesign, setPayload, loadPreset } = useRocket()
   useMusic('design')
   const reduced = useReducedMotion()
@@ -155,8 +157,8 @@ export function RocketScreen() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
-      <button type="button" onClick={() => go('home')} className="text-sm text-slate-400 hover:text-slate-100">
-        {t('rocket.back')}
+      <button type="button" onClick={() => go(inMission ? 'design' : 'home')} className="text-sm text-slate-400 hover:text-slate-100">
+        {t(inMission ? 'rocket.backToMission' : 'rocket.back')}
       </button>
       <h1 className="mt-2 text-2xl font-semibold">{t('rocket.title')}</h1>
       <p className="mt-1 max-w-3xl text-sm text-slate-400">{t('rocket.subtitle')}</p>

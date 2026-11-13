@@ -212,6 +212,11 @@ export function availableLaunchers(state: CampaignState): string[] {
   })
 }
 
+/** A rocket of your own can fly contracts once the commercial launch market is open to you (after First Light). */
+export function customRocketAllowed(state: CampaignState): boolean {
+  return state.unlocked.includes('commercial_launchers')
+}
+
 const isSuccess = (r?: Rank) => r === 'Success' || r === 'Outstanding'
 
 export function contractStatus(state: CampaignState, c: ContractDef): 'locked' | 'available' | 'completed' {

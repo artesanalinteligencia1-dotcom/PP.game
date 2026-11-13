@@ -6,12 +6,14 @@ import {
   applySoundingResult,
   availableLaunchers,
   buyTech as buyTechPure,
+  customRocketAllowed,
   newCampaign,
   type CampaignState,
   type Profile,
   type Reward,
 } from '../engine/campaign'
 import { getInstrument, getOrbit, getBand, getScenario, launchers } from '../engine/catalog'
+import { CUSTOM_LAUNCHER_ID } from '../engine/rocket'
 import { scoreMission } from '../engine/score'
 import { advanceWeek, botChoice, createMission, decide, type MissionState, type Personality } from '../engine/simulate'
 import type { SoundingResult } from '../engine/sounding'
@@ -190,7 +192,8 @@ export const useGame = create<GameState>((set, get) => ({
   },
   launcherAllowed: (launcherId) => {
     const { mode, campaign } = get()
-    return mode !== 'campaign' || !campaign || availableLaunchers(campaign).includes(launcherId)
+    if (mode !== 'campaign' || !campaign) return true
+    return launcherId === CUSTOM_LAUNCHER_ID ? customRocketAllowed(campaign) : availableLaunchers(campaign).includes(launcherId)
   },
   startScenario: (id) =>
     set({ mode: 'free', contractId: null, scenarioId: id, design: structuredClone(getScenario(id).baseDesign), tab: 'mission', screen: 'design', mission: null }),

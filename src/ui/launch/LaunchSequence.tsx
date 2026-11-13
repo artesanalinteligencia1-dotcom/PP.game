@@ -1,8 +1,9 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
-import { getLauncher, getOrbit } from '../../engine/catalog'
+import { getOrbit } from '../../engine/catalog'
+import { resolveLauncher } from '../../engine/launch'
+import { CUSTOM_LAUNCHER_ID } from '../../engine/rocket'
 import type { Design } from '../../engine/types'
 import { audio, hasVoice, type Cue } from '../../audio/audio'
-import { useRocket } from '../../store/rocket'
 import { useReducedMotion } from '../../store/settings'
 import { SpacecraftDrawing } from '../spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from '../spacecraft/visual'
@@ -165,7 +166,11 @@ export function Rocket({ launcherId, t, failAt, v, T }: { launcherId: string; t:
 export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, boosterLanded }: Props) {
   const tText = useT()
   const tx = useTx()
-  const launcher = getLauncher(design.launcherId)
+  const launcher = useMemo(() => resolveLauncher(design), [design])
+  // the player's own rocket (Rocket Engineer pad) is drawn from its parts
+  const ownRocket = design.launcherId === CUSTOM_LAUNCHER_ID ? design.customRocket : undefined
+  /** strap-on boosters drop before MECO: the catalog's heavy launcher, or a rocket of your own that has them */
+  const sideBoosters = design.launcherId === 'heavy' || (ownRocket?.boosters ?? 0) > 0
   const launcherName = tx(`component.${launcher.id}.name`, launcher.name)
   const orbit = getOrbit(design.orbitId)
   const v = useMemo(() => spacecraftVisual(design), [design])
@@ -179,9 +184,6 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
   const farewell = FAREWELLS[farewellIndex(seed)]
   const reduced = useReducedMotion()
   const light = useSceneryStyle(launchWindowStyle(orbit.launchTarget))
-  // the player's own rocket (launcher id `custom`, see rocketToLauncher) is drawn from its parts
-  const workbenchRocket = useRocket((s) => s.design)
-  const ownRocket = launcher.id === 'custom' ? workbenchRocket : undefined
   const use3D = !reduced && (LAUNCHERS_3D.has(launcher.id) || !!ownRocket) && webglAvailable()
   const tRef = useRef(0)
   tRef.current = t
@@ -206,7 +208,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
       cues.push({ at: T.ignition, voice: 'ignition' }, { at: T.liftoff, voice: 'liftoff' }, { at: T.farewell, voice: `farewell_${farewellIndex(seed) + 1}` })
     } else cues.push({ at: Math.max(0, T.count - 3), sfx: 'countdown' })
     cues.push({ at: T.ignition, sfx: 'liftoff' })
-    if (design.launcherId === 'heavy') cues.push({ at: T.boosterSep, sfx: 'staging' })
+    if (sideBoosters) cues.push({ at: T.boosterSep, sfx: 'staging' })
     cues.push({ at: T.meco, sfx: 'staging' }, { at: T.fairing, sfx: 'fairing' }, { at: T.deploy, sfx: 'deploy' }, { at: T.end, sfx: 'orbit' })
     const kept = fail ? [...cues.filter((c) => c.at <= fail.at), { at: fail.at, sfx: 'explosion' as const }] : cues
     const cancel = audio.schedule(kept.map((c) => ({ ...c, at: c.at - elapsed })))
@@ -221,7 +223,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
       cancelAnimationFrame(raf)
       cancel()
     }
-  }, [running, skipTo, fail, T, voice, seed, design.launcherId])
+  }, [running, skipTo, fail, T, voice, seed, sideBoosters])
 
   // Music changes and completion.
   useEffect(() => {
@@ -271,9 +273,9 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
     if (t < T.ignition) return tText('launch.caption.countdown')
     if (t < T.liftoff) return tText('launch.caption.ignition')
     if (t < T.maxQ) return tText('launch.caption.liftoff')
-    if (t < (design.launcherId === 'heavy' ? T.boosterSep : T.meco))
+    if (t < (sideBoosters ? T.boosterSep : T.meco))
       return tText('launch.caption.maxQ')
-    if (design.launcherId === 'heavy' && t < T.meco) return tText('launch.caption.boosters')
+    if (sideBoosters && t < T.meco) return tText('launch.caption.boosters')
     if (t < T.fairing) return tText('launch.caption.meco')
     if (launcher.landing && t < T.meco + 4.5) return tText('launch.caption.landingSep')
     if (t < T.seco)

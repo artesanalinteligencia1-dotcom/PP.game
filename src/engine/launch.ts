@@ -1,5 +1,16 @@
 // Launcher ↔ orbit ↔ mass compatibility and mission success probability.
-import type { Launcher, Orbit, Trl } from './types'
+import { getLauncher } from './catalog/components'
+import { CUSTOM_LAUNCHER_ID, isRocketDesign, rocketToLauncher } from './rocket'
+import type { Design, Launcher, Orbit, Trl } from './types'
+
+/**
+ * The launcher of a design: a catalog launcher, or the player's own rocket (id `custom`) turned into one from its parts.
+ * A `custom` design without a usable rocket falls back to the catalog's medium launcher.
+ */
+export function resolveLauncher(design: Pick<Design, 'launcherId' | 'customRocket'>): Launcher {
+  if (design.launcherId !== CUSTOM_LAUNCHER_ID) return getLauncher(design.launcherId)
+  return isRocketDesign(design.customRocket) ? rocketToLauncher(design.customRocket) : getLauncher('medium')
+}
 
 /** Payload capacity (kg) of a launcher for the chosen orbit. 0 = cannot reach it. */
 export function launchCapacityKg(launcher: Launcher, orbit: Orbit): number {

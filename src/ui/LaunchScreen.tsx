@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from 'react'
 import { prefersReducedMotion } from '../store/settings'
 import { audio, useMusic } from '../audio/audio'
-import { getLauncher, getOrbit, getScenario } from '../engine/catalog'
+import { getOrbit, getScenario } from '../engine/catalog'
+import { resolveLauncher } from '../engine/launch'
 import { evaluateDesign } from '../engine/evaluate'
 import { fmt } from '../i18n/en'
 import { randomSeed, useGame } from '../store/game'
@@ -25,7 +26,7 @@ export function LaunchScreen() {
   const tx = useTx()
   const scenario = getScenario(design.scenarioId)
   const report = useMemo(() => evaluateDesign(design, scenario), [design, scenario])
-  const launcher = getLauncher(design.launcherId)
+  const launcher = resolveLauncher(design)
   const orbit = getOrbit(design.orbitId)
   const [phase, setPhase] = useState<Phase>('ready')
   const [skip, setSkip] = useState(false)
