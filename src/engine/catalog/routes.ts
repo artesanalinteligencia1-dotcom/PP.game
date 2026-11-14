@@ -1,4 +1,4 @@
-// Transfer routes for destinations where the three-body problem matters (Moon, Earth–Moon L2).
+// Transfer routes for destinations where the three-body problem matters (Moon, Earth–Moon L2), and the ways to reach Mars.
 // Game values; real-world references are approximate.
 
 export interface Route {
@@ -10,6 +10,8 @@ export interface Route {
   transferMonths: number
   /** Expected trajectory-correction need (m/s). Real needs vary: small errors grow in chaotic regions. */
   tcmDv: number
+  /** Landing sites: speed at the top of the atmosphere (km/s). */
+  entryKms?: number
   description: string
   realWorld: string
 }
@@ -64,6 +66,88 @@ export const ROUTES: Record<string, Route[]> = {
       realWorld: 'The CAPSTONE cubesat (2022) took about four months on a ballistic lunar transfer to reach its near-rectilinear halo orbit.',
     },
   ],
+}
+
+const MARS_HOHMANN_REAL = 'Minimum-energy trips to Mars take seven to nine months; that is how most Mars missions have flown since the 1960s.'
+const MARS_FAST_REAL = 'Faster trajectories reach Mars in about seven months; the spacecraft arrives faster and must brake harder.'
+
+ROUTES.mars_low = [
+  {
+    id: 'hohmann',
+    name: 'Minimum-energy transfer (~8.5 months)',
+    insertionDv: 2100,
+    transferMonths: 8.5,
+    tcmDv: 30,
+    description: 'Half an ellipse around the Sun that just touches Mars’ orbit. The cheapest trip, but you must brake all the way into a low orbit with your own engine.',
+    realWorld: MARS_HOHMANN_REAL,
+  },
+  {
+    id: 'aerobrake',
+    name: 'Capture, then aerobraking (~13.5 months)',
+    insertionDv: 1000,
+    transferMonths: 13.5,
+    tcmDv: 45,
+    description: 'Brake just enough to be caught in a long ellipse, then dip into the top of the atmosphere hundreds of times: the air does the rest of the braking. Half the propellant, five more months, and every pass must be watched.',
+    realWorld: 'Mars Reconnaissance Orbiter (2006) braked about 1 km/s with its engines, then used some 400 passes through the upper atmosphere over five months to shrink its orbit.',
+  },
+  {
+    id: 'fast',
+    name: 'Fast transfer (~7 months)',
+    insertionDv: 2550,
+    transferMonths: 7,
+    tcmDv: 30,
+    description: 'A shorter arc that arrives faster, so the braking burn is bigger. Two months less of cruise for a lot more propellant.',
+    realWorld: MARS_FAST_REAL,
+  },
+]
+ROUTES.mars_areo = [
+  {
+    id: 'hohmann',
+    name: 'Minimum-energy transfer (~8.5 months)',
+    insertionDv: 1750,
+    transferMonths: 8.5,
+    tcmDv: 30,
+    description: 'Brake close to Mars into a long ellipse, then a second burn at the top makes the orbit circular at 17 030 km.',
+    realWorld: MARS_HOHMANN_REAL,
+  },
+  {
+    id: 'fast',
+    name: 'Fast transfer (~7 months)',
+    insertionDv: 2200,
+    transferMonths: 7,
+    tcmDv: 30,
+    description: 'Two months less of cruise, a harder braking burn on arrival.',
+    realWorld: MARS_FAST_REAL,
+  },
+]
+
+ROUTES.mars_surface = [
+  {
+    id: 'hohmann',
+    name: 'Minimum-energy transfer (~8.5 months)',
+    insertionDv: 0,
+    transferMonths: 8.5,
+    tcmDv: 20,
+    entryKms: 5.7,
+    description: 'The cheapest trip, and the slowest arrival: the capsule meets the air at 5.7 km/s and goes straight in, with no orbit first.',
+    realWorld: 'Mars landers usually enter directly from their interplanetary trajectory at 5 to 6 km/s, as Curiosity (2012) and Perseverance (2021) did.',
+  },
+  {
+    id: 'fast',
+    name: 'Fast transfer (~7 months)',
+    insertionDv: 0,
+    transferMonths: 7,
+    tcmDv: 20,
+    entryKms: 6.1,
+    description: 'Six weeks sooner on the ground. The capsule enters faster, so the heat shield must be thicker and heavier.',
+    realWorld: 'Heat on the shield grows steeply with entry speed: a faster arrival means a thicker heat shield.',
+  },
+]
+
+/** Days of interplanetary cruise of a Mars route (aerobraking adds months at Mars after an ordinary cruise). */
+export const AEROBRAKE_MONTHS = 5
+export function marsCruiseDays(route: Route): number {
+  return (route.id === 'aerobrake' ? route.transferMonths - AEROBRAKE_MONTHS : route.transferMonths) * (365.25 / 12)
 }
 
 export function routesFor(orbitId: string): Route[] {

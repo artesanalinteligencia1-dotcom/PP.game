@@ -283,7 +283,7 @@ export function LaunchSequence({ design, running, failed, seed, onDone, skipTo, 
         ? tText('launch.caption.fairingRideshare')
         : tText('launch.caption.fairingStandard')
     if (t < T.deploy) {
-      if (orbit.launchTarget === 'tli') return tText('launch.caption.tli', { parking: String(Math.round(parking)) })
+      if (orbit.launchTarget === 'tli' || orbit.launchTarget === 'tmi') return tText('launch.caption.tli', { parking: String(Math.round(parking)) })
       if (orbit.launchTarget === 'gto') return tText('launch.caption.gto', { parking: String(Math.round(parking)) })
       return tText('launch.caption.orbitInsertion', { parking: String(Math.round(parking)), speed: vOrbit.toFixed(1) })
     }

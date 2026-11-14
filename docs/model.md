@@ -296,3 +296,70 @@ The player plans a search on one world: instruments, how much of the time each o
   uninhabitable context scores low. Tested: nothing beyond Earth reaches 0.5.
 - **Review codes:** `ASTRO_NO_INSTRUMENTS`, `ASTRO_DATA_OVER_DOWNLINK`, `ASTRO_INSTRUMENT_NO_SIGNAL`,
   `ASTRO_WATER_UNCHECKED`, `ASTRO_OCEAN_MISSED`, `ASTRO_BIOSIGNATURE_SINGLE_LINE`, `ASTRO_BIOSIGNATURE_NO_CONTEXT`.
+
+## 22. Mars (`src/engine/mars.ts`)
+Earth and Mars on circular, coplanar orbits around the Sun (Mars' real orbit is eccentric, so real windows, trip times and
+distances change from one opposition to the next; the game uses the averages).
+
+- **Constants:** 1 AU = 149 597 870.7 km; Mars at 1.5237 AU, year 686.98 days, radius 3 389.5 km, μ = 42 828.4 km³/s²,
+  sol = 24.6597 h; Earth year 365.256 days; μ_Sun = 1.327 124 4 × 10¹¹ km³/s².
+- **Launch windows:** the synodic period, 1 / (1/T_Earth − 1/T_Mars) = 779.9 days = 25.6 months.
+- **Minimum-energy (Hohmann) trip:** half the period of the ellipse touching both orbits, π·√(a³/μ_Sun) with
+  a = 1.2619 AU → 258.9 days (8.5 months).
+- **Phase angle on launch day:** Mars must lead Earth by sweep − n_Mars·T = 180° − 0.524°/day × 258.9 = 44.3°. Faster
+  trips sweep less than 180° (game rule: 180° × T / T_Hohmann).
+- **Distance and radio delay:** d = √(1 + r² − 2r·cos φ) AU with φ the lead angle, which shrinks 0.4616°/day after
+  launch; delay = d / c. Range 0.52 to 2.52 AU → 4.4 to 21.0 minutes one way; 13.3 minutes on a Hohmann arrival day.
+- **Solar conjunction:** φ = 180°, first 486 days after launch, then every synodic period; two weeks without a link.
+- **Capture burn:** v_hyp = √(v∞² + 2μ/r_p) at periapsis minus the periapsis speed of the target orbit; a second burn at
+  apoapsis circularises high orbits. With v∞ = 2.65 km/s (Hohmann arrival): 2 081 m/s into a 400 km circular orbit
+  (catalog 2 100), 857 m/s into a 300 × 44 000 km ellipse (catalog 1 000, the figure of Mars Reconnaissance Orbiter),
+  1 714 m/s into the areostationary orbit (catalog 1 750). With v∞ = 3.5 km/s (fast trip): 2 542 and 2 175 m/s
+  (catalog 2 550 and 2 200). A test keeps the catalog within 5 % of the formula.
+- **Areostationary orbit:** one revolution per sol → 17 058 km from Kepler's third law (catalog 17 030 km).
+- **Orbits:** `mars_low` 250-500 km, period ≈ 118 min, eclipse 35 %, 320 min/day of contact per deep-space antenna
+  (Mars hides the spacecraft for a third of each orbit); `mars_areo` 480 min/day. Both: sunlight at 1.52 AU (43 % of
+  Earth's), link factor 0.0005, 6 krad/yr, operations 0.6 M/month.
+- **Launch target `tmi`:** 13 000 m/s from the ground (LEO 9 400 + 3 600); catalog launchers lift about 80 % of their
+  trans-lunar capacity.
+- **Window in a design:** launch month = first window ≥ the month the spacecraft is ready; the wait costs
+  0.5 × 0.6 M/month; `MARS_WINDOW_MISSED` when ready after the scenario's first window, `MARS_WINDOW_TIGHT` under
+  3 months of margin (pre-launch slips are 1 to 3 months, 25 % of flights).
+- **Flight events:** dust storm during aerobraking (60 %, 10 weeks before the end: raise = +3 weeks and +8 m/s;
+  hold = 45 % chance of losing 15 % of array power, else 2 weeks saved); conjunction decision (store on board if
+  2 weeks of data fit the storage, else switch instruments off).
+- Sources: NASA JPL *Basics of Space Flight* (interplanetary trajectories); NASA Mars fact sheet (NSSDCA); Mars
+  Reconnaissance Orbiter mission pages (orbit insertion and aerobraking, 2006); NASA on solar conjunction and
+  communication delays with Mars.
+
+## 23. Entry, descent and landing on Mars (`src/engine/edl.ts`)
+The budget is computed from the ground up, because every kilogram set down has to be braked three times.
+
+- **Air:** ρ = 0.020 · exp(−h / 11.1 km) kg/m³, h = site elevation above the reference level; g = 3.71 m/s².
+- **Terminal speed under the parachute:** v = √(2·m·g / (ρ·Cd·A)), Cd = 0.4 (effective, game value), A from the
+  parachute's diameter, m = everything still hanging from it (landed mass + landing hardware + braking propellant).
+- **Landing systems** (hardware as a share of the landed mass; braking Δv; specific impulse; limits):
+  airbags 0.30, Δv = v, 260 s, ≤ 550 kg, parachute speed ≤ 70 m/s, reliability 0.95, 12 M;
+  legs and retro-rockets 0.18, Δv = 1.25·v + 80, 225 s, ≤ 900 kg, ≤ 90 m/s, 0.93, 30 M, +1 month;
+  sky crane 0.75, Δv = 1.25·v + 150, 225 s, ≤ 1 300 kg, ≤ 90 m/s, 0.96, 70 M, +3 months.
+  Propellant = (landed + hardware) · (e^(Δv / (Isp·g0)) − 1), iterated with the terminal speed.
+- **Guided entry:** +40 kg, +10 M, +2 months; landing ellipse 100 km → 25 (airbags), 20 (legs), 8 km (sky crane).
+- **Aeroshell:** mass = 28 kg/m² of frontal area + 8 % of the entry mass × (v_entry / 5.7 km/s)². Diameters 2.65, 3.5
+  and 4.5 m (8, 14, 25 M). Entry speed 5.7 km/s on a minimum-energy trip (√(v∞² + v_esc²), v_esc = 5.03 km/s), 6.1 km/s
+  on the fast one.
+- **Ballistic coefficient:** β = m_entry / (1.6 · A_shell) kg/m². Limit β_max = 150 · ρ(h) / ρ(−2 km): above it the
+  capsule is still supersonic too low for the parachute (`EDL_SHELL_TOO_SMALL`); above 90 % of it the landing is 3 %
+  less reliable (`EDL_SHELL_MARGIN`).
+- **Cruise stage:** 15 % of the entry mass. Launch mass = entry mass × 1.15.
+- **Reliability of the landing:** landing system × 0.99 (heat shield) × 0.98 (parachute) × 0.97 if the margin is thin.
+  In flight: rolled on arrival, scaled by the difficulty like the launch; a storm ignored before entry multiplies it
+  by 0.9.
+- **Checks against real landers (tests):** Curiosity (899 kg rover, sky crane, 4.5 m, 21.5 m parachute, −4.4 km):
+  real entry mass 3 300 kg, model within 2 400 to 3 600; Phoenix (350 kg on legs, 2.65 m): real 570 kg, model within
+  500 to 800.
+- **Surface as a destination (`mars_surface`):** no insertion burn; eclipse fraction 0.5 of a 24.66 h sol (the battery
+  must carry the night); panel loss 15 %/yr (dust); 3 krad/yr; link factor 0.004 and 30 min/day per deep-space antenna
+  (relay orbiter passes).
+- Sources: NASA JPL mission pages and press kits for Mars Pathfinder, Mars Exploration Rovers, Phoenix, Mars Science
+  Laboratory and Mars 2020 (entry masses, aeroshell and parachute sizes, landing ellipses); Braun & Manning, "Mars
+  Exploration Entry, Descent and Landing Challenges" (2007) for the ballistic-coefficient limit; NASA Mars fact sheet.

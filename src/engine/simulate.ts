@@ -6,7 +6,9 @@ import { getInstrument, getObc, getOrbit, getStation } from './catalog/component
 import { resolveLauncher } from './launch'
 import { COLLISION_AVOIDANCE_DV, evaluateDesign } from './evaluate'
 import { getScenario } from './catalog/scenarios'
-import { getRoute } from './catalog/routes'
+import { getRoute, marsCruiseDays } from './catalog/routes'
+import { EDL_MINUTES } from './edl'
+import { CONJUNCTION_BLACKOUT_WEEKS, conjunctionDays } from './mars'
 import { MINUTES_PER_YEAR, maintenanceDvPerYear, noPropulsionOrbitLifeYears, stationContactMinutes } from './orbit'
 import { mixSeed, rngNext } from './rng'
 import type { Design, DesignReport, Difficulty, Role, Scenario } from './types'
@@ -16,6 +18,7 @@ export type Personality = 'prudent' | 'balanced' | 'bold'
 export type EndReason =
   | 'completed'
   | 'launch_failure'
+  | 'landing_failure'
   | 'battery'
   | 'power'
   | 'radiation'
@@ -81,6 +84,10 @@ export interface MissionState {
   /** Three-body routes: correction Δv actually needed (drawn at launch; chaos makes it uncertain) and the reserve carried. */
   tcmNeed: number | null
   tcmReserve: number
+  /** Landers: multiplier on the chance of a safe landing (decisions before entry). */
+  landingFactor?: number
+  /** Mars: no radio link through this week (the Sun is between the two planets). */
+  blackoutUntil?: number
   /** Multiplier on science (e.g. after accepting a looser, less stable orbit). */
   scienceFactor: number
   // spacecraft health
@@ -195,6 +202,12 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
   if (rand(s) < 0.25) {
     s.launchDelayMonths = 1 + Math.floor(rand(s) * 3)
     log(s, 'lead', 'warn', M(s.launchDelayMonths === 1 ? 'sim.slip.one' : 'sim.slip.other', { months: s.launchDelayMonths }))
+    // Mars: the planets do not wait. A slip longer than the margin means the next window.
+    const wait = report.schedule.windowWaitMonths
+    if (wait !== undefined && scenario.launchWindow) {
+      if (s.launchDelayMonths > wait + 1e-9) log(s, 'lead', 'bad', M('sim.mars.windowMissed', { margin: wait.toFixed(1), every: scenario.launchWindow.everyMonths }))
+      else log(s, 'lead', 'good', M('sim.mars.windowHeld', { margin: wait.toFixed(1) }))
+    }
   }
   // Launch roll.
   const pFail = (1 - launcher.reliability) * DIFFICULTY_LAUNCH_FACTOR[s.difficulty]
@@ -230,8 +243,20 @@ export function createMission(design: Design, scenario: Scenario, seed: number, 
 /** Arrival: report how much trajectory correction chaos really demanded. */
 function arrive(s: MissionState) {
   const orbit = getOrbit(s.design.orbitId)
+  const edl = s.report.edl
+  if (edl) {
+    // Seven minutes from the top of the air to the ground, and the radio delay is longer than that: nobody can help.
+    log(s, 'engineer', 'info', M('sim.edl.entry', { minutes: EDL_MINUTES, delay: Math.round(s.report.schedule.arrivalDelayMin ?? 0), speed: edl.entrySpeedKms }))
+    const pFail = Math.min(1, (1 - edl.reliability * (s.landingFactor ?? 1)) * DIFFICULTY_LAUNCH_FACTOR[s.difficulty])
+    if (rand(s) < pFail) return end(s, 'landing_failure', 'engineer', M('sim.edl.crash', { pct: Math.round(pFail * 100) }))
+    s.phase = 'operations'
+    log(s, 'engineer', 'good', M('sim.edl.landed', { km: Math.round(rand(s) * edl.ellipseKm * 5) / 10, ellipse: edl.ellipseKm }))
+    return
+  }
   s.phase = 'operations'
   log(s, 'astrophysicist', 'good', M('sim.arrived', { orbit: name(orbit) }))
+  if (s.report.schedule.arrivalDelayMin !== undefined)
+    log(s, 'engineer', 'info', M('sim.mars.capture', { delay: Math.round(s.report.schedule.arrivalDelayMin) }))
   if (s.tcmNeed === null) return
   if (s.tcmNeed <= s.tcmReserve) {
     const left = Math.round((s.tcmReserve - s.tcmNeed) * 10) / 10
@@ -261,6 +286,7 @@ function activeStations(s: MissionState): string[] {
 
 /** Fraction of the designed downlink currently available. */
 function downlinkFactor(s: MissionState): number {
+  if (s.week <= (s.blackoutUntil ?? -1)) return 0
   const orbit = getOrbit(s.design.orbitId)
   const all = s.design.stationIds.filter((id) => !s.removedStations.includes(id)).map(getStation)
   const up = activeStations(s).map(getStation)
@@ -293,6 +319,8 @@ function eventAllowed(s: MissionState, id: EventId): boolean {
       return orbit.id === 'em_l2_halo' && s.phase === 'operations' && s.dvRemaining > 0
     case 'station_outage':
       return activeStations(s).length > 0
+    case 'micrometeoroid':
+      return !orbit.surface
     default:
       return true
   }
@@ -476,6 +504,63 @@ function triggerEvent(s: MissionState, id: EventId) {
   }
 }
 
+/** Mars: weeks after launch in which the Sun stands between Earth and Mars. */
+function conjunctionWeeks(s: MissionState): number[] {
+  const orbit = getOrbit(s.design.orbitId)
+  const route = getRoute(orbit.id, s.design.routeId)
+  if (orbit.body !== 'mars' || !route) return []
+  return conjunctionDays(8, marsCruiseDays(route)).map((d) => Math.round(d / 7))
+}
+
+/** Solar conjunction: two weeks without a link. Keep observing and store, or wait it out? */
+function conjunction(s: MissionState) {
+  s.blackoutUntil = s.week + CONJUNCTION_BLACKOUT_WEEKS
+  const r = s.report
+  const needGb = r.data.generatedGbDay * 7 * CONJUNCTION_BLACKOUT_WEEKS * s.dutyFactor + s.backlogGb
+  const fits = needGb <= r.data.storageGb
+  s.pending = {
+    eventId: 'conjunction',
+    week: s.week,
+    role: 'lead',
+    title: M('sim.conjunction.title'),
+    text: M('sim.conjunction.text', { weeks: CONJUNCTION_BLACKOUT_WEEKS, need: needGb.toFixed(0), storage: r.data.storageGb }),
+    options: [
+      { id: 'record', label: M('sim.conjunction.record'), hint: fits ? M('sim.conjunction.record.hintOk') : M('sim.conjunction.record.hintFull'), quality: fits ? 'good' : 'poor', bold: true, safe: fits },
+      { id: 'standby', label: M('sim.conjunction.standby'), hint: M('sim.conjunction.standby.hint'), quality: fits ? 'ok' : 'good', safe: !fits },
+    ],
+  }
+}
+
+/** Landers: a dust storm over the landing site, seen two weeks before entry. */
+function landingStorm(s: MissionState) {
+  s.pending = {
+    eventId: 'landing_storm',
+    week: s.week,
+    role: 'engineer',
+    title: M('sim.landingStorm.title'),
+    text: M('sim.landingStorm.text'),
+    options: [
+      { id: 'update', label: M('sim.landingStorm.update'), hint: M('sim.landingStorm.update.hint'), quality: 'good', safe: true },
+      { id: 'proceed', label: M('sim.landingStorm.proceed'), hint: M('sim.landingStorm.proceed.hint'), quality: 'poor', bold: true },
+    ],
+  }
+}
+
+/** Aerobraking: a dust storm swells the upper atmosphere while the orbit is still being lowered. */
+function aerobrakeStorm(s: MissionState) {
+  s.pending = {
+    eventId: 'aerobrake_storm',
+    week: s.week,
+    role: 'engineer',
+    title: M('sim.aerobrake.title'),
+    text: M('sim.aerobrake.text'),
+    options: [
+      { id: 'raise', label: M('sim.aerobrake.raise'), hint: M('sim.aerobrake.raise.hint'), quality: 'good', safe: true },
+      { id: 'hold', label: M('sim.aerobrake.hold'), hint: M('sim.aerobrake.hold.hint'), quality: 'poor', bold: true },
+    ],
+  }
+}
+
 function scenarioOpportunity(s: MissionState) {
   return getScenario(s.scenarioId).opportunity
 }
@@ -490,7 +575,36 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
   const obc = getObc(s.design.obcId)
   s.pending = null
   const who = byBot ? ref('sim.who.bot', 'Bot') : ref('sim.who.you', 'You')
-  switch (p.eventId as EventId | 'chaos_correction') {
+  switch (p.eventId as EventId | 'chaos_correction' | 'conjunction' | 'aerobrake_storm' | 'landing_storm') {
+    case 'landing_storm':
+      if (opt.id === 'update') {
+        s.reserveM -= 2
+        s.extraCostM += 2
+        log(s, p.role, 'good', M('sim.do.landingStorm.update', { who }))
+      } else {
+        s.landingFactor = 0.9
+        log(s, p.role, 'warn', M('sim.do.landingStorm.proceed', { who }))
+      }
+      return
+    case 'conjunction':
+      if (opt.id === 'standby') {
+        s.safeModeUntil = s.week + CONJUNCTION_BLACKOUT_WEEKS
+        log(s, p.role, 'info', M('sim.do.conjunction.standby', { who }))
+      } else log(s, p.role, opt.quality === 'good' ? 'good' : 'warn', M('sim.do.conjunction.record', { who }))
+      return
+    case 'aerobrake_storm':
+      if (opt.id === 'raise') {
+        s.transferWeeks += 3
+        if (s.tcmNeed !== null) s.tcmNeed = Math.round((s.tcmNeed + 8) * 10) / 10
+        log(s, p.role, 'good', M('sim.do.aerobrake.raise', { who }))
+      } else if (rand(s) < 0.45) {
+        s.panelFactor *= 0.85
+        log(s, p.role, 'bad', M('sim.do.aerobrake.burned', { who }))
+      } else {
+        s.transferWeeks -= 2
+        log(s, p.role, 'good', M('sim.do.aerobrake.lucky', { who }))
+      }
+      return
     case 'solar_flare':
       if (opt.id === 'safe') {
         s.safeModeUntil = s.week + 2
@@ -627,6 +741,12 @@ export function advanceWeek(s: MissionState) {
 
   if (s.phase === 'transfer') {
     if (s.week >= s.transferWeeks) arrive(s)
+    else if (s.design.routeId === 'aerobrake' && orbit.body === 'mars' && s.week === s.transferWeeks - 10 && !s.decisions.some((d) => d.eventId === 'aerobrake_storm') && rand(s) < 0.6) aerobrakeStorm(s)
+    else if (s.report.edl && s.week === s.transferWeeks - 2 && !s.decisions.some((d) => d.eventId === 'landing_storm') && rand(s) < 0.35) landingStorm(s)
+    else if (conjunctionWeeks(s).includes(s.week)) {
+      s.blackoutUntil = s.week + CONJUNCTION_BLACKOUT_WEEKS
+      log(s, 'lead', 'info', M('sim.conjunction.cruise', { weeks: CONJUNCTION_BLACKOUT_WEEKS }))
+    }
     record(s, powerRatio)
     return
   }
@@ -675,7 +795,8 @@ export function advanceWeek(s: MissionState) {
   s.science += (rawPerYear / WEEKS_PER_YEAR) * deliveredFraction * dutyScience * Math.min(1, powerRatio) * s.scienceFactor
 
   // Events, then end-of-plan check.
-  maybeEvent(s)
+  if (conjunctionWeeks(s).includes(s.week)) conjunction(s)
+  else maybeEvent(s)
   record(s, powerRatio)
   if (s.opsWeeks >= s.plannedOpsWeeks && !s.pending) {
     end(s, 'completed', 'lead', M('sim.end.completed', { years: (s.opsWeeks / WEEKS_PER_YEAR).toFixed(1) }))

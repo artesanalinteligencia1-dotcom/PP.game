@@ -41,7 +41,7 @@ describe('your own rocket as a mission launcher', () => {
 
   it('a rocket with a design error cannot carry anything', () => {
     const broken: RocketDesign = { ...ROCKET_PRESETS.medium, stages: [{ ...ROCKET_PRESETS.medium.stages[0], engineId: 'k_med_vac' }, ROCKET_PRESETS.medium.stages[1]] }
-    expect(resolveLauncher(withRocket(broken)).capacityKg).toEqual({ leo: 0, sso: 0, gto: 0, tli: 0 })
+    expect(resolveLauncher(withRocket(broken)).capacityKg).toEqual({ leo: 0, sso: 0, gto: 0, tli: 0, tmi: 0 })
     expect(evaluateDesign(withRocket(broken), scenario).review.map((i) => i.code)).toContain('LAUNCHER_NO_TARGET')
   })
 

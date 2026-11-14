@@ -3,6 +3,7 @@ import { M, msgEn, type Msg } from './text'
 import type { MissionState, Quality } from './simulate'
 import { SIM_WEEKS_PER_YEAR } from './simulate'
 import type { Scenario } from './types'
+import { nextWindowMonth } from './mars'
 
 export type Rank = 'Fail' | 'Partial' | 'Success' | 'Outstanding'
 
@@ -55,12 +56,16 @@ export function plateau(x: number, zero: number, lo: number, hi: number, far: nu
 
 export function scoreMission(s: MissionState, scenario: Scenario): MissionScore {
   const r = s.report
-  const launched = s.endReason !== 'launch_failure'
+  // a lander that crashes delivers nothing, like a rocket that fails
+  const launched = s.endReason !== 'launch_failure' && s.endReason !== 'landing_failure'
   const lifeYears = s.opsWeeks / SIM_WEEKS_PER_YEAR
   const opsDays = s.opsWeeks * 7
   const deliveredGbDay = opsDays > 0 ? s.dataDeliveredGb / opsDays : 0
   const costM = r.cost.totalM + s.extraCostM
   const devMonths = r.schedule.devMonths + s.launchDelayMonths
+  // Mars: a slip past the window means flying in the next one.
+  const window = r.schedule.launchMonth !== undefined ? scenario.launchWindow : undefined
+  const launchMonth = window ? nextWindowMonth(devMonths, window) : devMonths
 
   const requirements: ActualRequirement[] = scenario.requirements.map((req) => {
     const designed = r.requirements.find((x) => x.id === req.id)!
@@ -79,7 +84,7 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
       case 'costAtMost':
         return { ...base, met: costM <= (req.value ?? Infinity), actual: costM, target: req.value ?? 0 }
       case 'arrivalByMonth': {
-        const arrival = devMonths + r.schedule.transferMonths
+        const arrival = launchMonth + r.schedule.transferMonths
         return { ...base, met: launched && arrival <= (req.value ?? Infinity), actual: arrival, target: req.value ?? 0 }
       }
       default:
@@ -110,7 +115,7 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
   const flightQ = s.decisions.length ? (50 * s.decisions.reduce((t, d) => t + QUALITY_VALUE[d.quality], 0)) / s.decisions.length : 50
   const decisions = designQ + flightQ
   // 5. Schedule (50)
-  const late = devMonths - scenario.devMonths
+  const late = window ? launchMonth - window.firstMonth : devMonths - scenario.devMonths
   const schedule = late <= 0 ? 50 : Math.max(0, 50 - 10 * late)
   // 6. Bonus objectives (≤ 50)
   const bonus = Math.min(

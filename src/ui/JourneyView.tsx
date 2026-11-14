@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getOrbit, getRoute } from '../engine/catalog'
+import { marsCruiseDays } from '../engine/catalog/routes'
+import { marsDelayMin } from '../engine/mars'
+import { MarsTransferView, craftPx } from './mars/MarsTransferView'
 import type { MissionState } from '../engine/simulate'
 import { SpacecraftDrawing } from './spacecraft/SpacecraftSprite'
 import { spacecraftVisual } from './spacecraft/visual'
@@ -56,7 +59,31 @@ function HaloJourney({ mission, playing }: { mission: MissionState; playing: boo
 /** Live view of the journey: the player's own spacecraft (same drawing as in design/launch) orbiting or in transfer. */
 export function JourneyView({ mission, playing }: { mission: MissionState; playing: boolean }) {
   if (mission.design.orbitId === 'em_l2_halo') return <HaloJourney mission={mission} playing={playing} />
+  const orbit = getOrbit(mission.design.orbitId)
+  const route = getRoute(orbit.id, mission.design.routeId)
+  if (orbit.body === 'mars' && route && mission.phase === 'transfer' && mission.week * 7 < marsCruiseDays(route)) return <MarsJourney mission={mission} cruiseDays={marsCruiseDays(route)} />
   return <OrbitJourney mission={mission} playing={playing} />
+}
+
+/** Cruise to Mars: Earth, Mars and the spacecraft around the Sun, to scale, with the radio delay growing. */
+function MarsJourney({ mission, cruiseDays }: { mission: MissionState; cruiseDays: number }) {
+  const v = useMemo(() => spacecraftVisual(mission.design), [mission.design])
+  const t = useT()
+  const day = mission.week * 7
+  const [x, y] = craftPx(day, cruiseDays)
+  const blackout = mission.week <= (mission.blackoutUntil ?? -1)
+  return (
+    <MarsTransferView cruiseDays={cruiseDays} day={day} label={t('journey.mars.aria')}>
+      <g transform={`translate(${x} ${y}) scale(0.3) translate(-50 -50)`}>
+        <SpacecraftDrawing v={v} thrusting={mission.design.propulsionId === 'electric'} />
+      </g>
+      <text x={8} y={16} fill="#cbd5e1" fontSize={11}>
+        {blackout
+          ? t('journey.mars.blackout')
+          : t('journey.mars.cruise', { pct: Math.round(Math.min(1, day / cruiseDays) * 100), delay: Math.round(marsDelayMin(day, cruiseDays)) })}
+      </text>
+    </MarsTransferView>
+  )
 }
 
 function OrbitJourney({ mission, playing }: { mission: MissionState; playing: boolean }) {
@@ -72,7 +99,10 @@ function OrbitJourney({ mission, playing }: { mission: MissionState; playing: bo
   const electric = mission.design.propulsionId === 'electric'
   const progress = mission.transferWeeks > 0 ? Math.min(1, mission.week / mission.transferWeeks) : 1
   const spin = { animation: `orbit-spin ${orbit.id === 'geo' ? 14 : orbit.body === 'moon' ? 7 : 6}s linear infinite`, animationPlayState: playing && !ended ? 'running' : 'paused' }
-  const bodyColor = orbit.body === 'moon' ? '#9ca3af' : orbit.body === 'sun' ? '#fbbf24' : '#1d4ed8'
+  const bodyColor = orbit.body === 'moon' ? '#9ca3af' : orbit.body === 'sun' ? '#fbbf24' : orbit.body === 'mars' ? '#c2410c' : '#1d4ed8'
+  const marsRoute = orbit.body === 'mars' ? getRoute(orbit.id, mission.design.routeId) : null
+  const marsDelay = marsRoute ? Math.round(marsDelayMin(mission.week * 7, marsCruiseDays(marsRoute))) : 0
+  const blackout = mission.week <= (mission.blackoutUntil ?? -1)
   const sc = 0.55
 
   // Transfer to the Moon / interplanetary: show the path.
@@ -108,8 +138,8 @@ function OrbitJourney({ mission, playing }: { mission: MissionState; playing: bo
 
   const cx = 130
   const cy = 112
-  const R = orbit.body === 'moon' ? 34 : orbit.body === 'sun' ? 18 : 42
-  const ring = orbit.id === 'geo' ? 96 : orbit.id === 'meo' ? 80 : orbit.body === 'sun' ? 86 : R + 22
+  const R = orbit.body === 'moon' ? 34 : orbit.body === 'sun' ? 18 : orbit.body === 'mars' ? 38 : 42
+  const ring = orbit.surface ? R + 9 : orbit.id === 'geo' || orbit.id === 'mars_areo' ? 96 : orbit.id === 'meo' ? 80 : orbit.body === 'sun' ? 86 : R + 22
   const eclipse = (orbit.eclipseOverride ?? 1) > 0 && orbit.body !== 'sun'
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-56 w-full" role="img" aria-label={t('journey.orbit.aria', { orbit: tx(`component.${orbit.id}.name`, orbit.name) })}>
@@ -124,24 +154,32 @@ function OrbitJourney({ mission, playing }: { mission: MissionState; playing: bo
         {t('journey.sun')}
       </text>
       {eclipse && <rect x={0} y={cy - R} width={cx} height={R * 2} fill="#020617" opacity={0.75} />}
-      <circle cx={cx} cy={cy} r={ring} fill="none" stroke="#334155" strokeDasharray="3 3" />
+      {!orbit.surface && <circle cx={cx} cy={cy} r={ring} fill="none" stroke="#334155" strokeDasharray="3 3" />}
       <circle cx={cx} cy={cy} r={R} fill={bodyColor} />
       {orbit.body === 'earth' && <circle cx={cx} cy={cy} r={R} fill="none" stroke="#60a5fa" strokeOpacity={0.4} strokeWidth={3} />}
-      <g style={{ ...spin, transformOrigin: `${cx}px ${cy}px` }}>
+      <g style={orbit.surface ? undefined : { ...spin, transformOrigin: `${cx}px ${cy}px` }}>
         <g transform={`translate(${cx} ${cy - ring}) scale(${sc}) translate(-50 -50)`}>
           <SpacecraftDrawing v={v} grey={lost} />
         </g>
       </g>
       <text x={8} y={16} fill="#cbd5e1" fontSize={11}>
         {ended
-          ? (lost ? t('journey.signalLost') : t('journey.orbit.complete'))
+          ? (mission.endReason === 'landing_failure' ? t('journey.mars.surface.lost') : lost ? t('journey.signalLost') : t('journey.orbit.complete'))
+          : orbit.surface && !inTransfer
+          ? t('journey.mars.surface')
+          : blackout && marsRoute
+          ? t('journey.mars.blackout')
+          : inTransfer && marsRoute
+          ? t('journey.mars.aerobraking', { delay: marsDelay })
           : tx(`component.${orbit.id}.name`, orbit.name)}
       </text>
-      <text x={8} y={H - 8} fill="#64748b" fontSize={9}>
-        {t('journey.instrumentsPointing', {
-          target: orbit.body === 'moon' ? t('journey.target.moon') : orbit.body === 'sun' ? t('journey.target.stars') : t('journey.target.earth'),
-        })}
-      </text>
+      {!orbit.surface && (
+        <text x={8} y={H - 8} fill="#64748b" fontSize={9}>
+          {t('journey.instrumentsPointing', {
+            target: orbit.body === 'moon' ? t('journey.target.moon') : orbit.body === 'mars' ? t('journey.target.mars') : orbit.body === 'sun' ? t('journey.target.stars') : t('journey.target.earth'),
+          })}
+        </text>
+      )}
     </svg>
   )
 }

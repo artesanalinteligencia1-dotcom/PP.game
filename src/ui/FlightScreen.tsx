@@ -4,7 +4,9 @@ import { useEffect, useRef } from 'react'
 import { audio, useMusic } from '../audio/audio'
 import { JourneyView } from './JourneyView'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { getObc, getScenario } from '../engine/catalog'
+import { getObc, getOrbit, getRoute, getScenario } from '../engine/catalog'
+import { marsCruiseDays } from '../engine/catalog/routes'
+import { marsDelayMin } from '../engine/mars'
 import { SIM_WEEKS_PER_YEAR, type Personality } from '../engine/simulate'
 import type { Role } from '../engine/types'
 import { ROLE_BLURB, ROLE_LABEL, fmt } from '../i18n/en'
@@ -84,6 +86,8 @@ export function FlightScreen() {
   const batteryHealth = last ? last.battery / 100 : 1
   const powerRatio = last ? last.power / 100 : 1
   const logs = [...mission.log].reverse().slice(0, 40)
+  const destination = getOrbit(mission.design.orbitId)
+  const marsRoute = destination.body === 'mars' ? getRoute(destination.id, mission.design.routeId) : null
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-4">
@@ -102,6 +106,11 @@ export function FlightScreen() {
                 total: fmt(mission.plannedOpsWeeks / SIM_WEEKS_PER_YEAR, 1),
               })}
         </span>
+        {marsRoute && !ended && (
+          <span className="font-mono text-xs text-violet-300" title={t('flight.delay.title')}>
+            {t('flight.delay', { delay: Math.round(marsDelayMin(mission.week * 7, marsCruiseDays(marsRoute))) })}
+          </span>
+        )}
         <span className="text-xs text-slate-500">{t('results.seed', { seed: mission.seed })}</span>
         <div className="ml-auto flex items-center gap-1">
           {!ended && (

@@ -1,11 +1,13 @@
+import type { EdlReport, LandingDesign } from './edl'
+import type { LaunchWindow } from './mars'
 import type { RocketDesign } from './rocket'
 // Pure engine types. No React, no DOM.
 
 export type Difficulty = 'beginner' | 'engineer' | 'expert' | 'sandbox'
 export type Trl = 6 | 7 | 8 | 9
 export type PointingLevel = 'coarse' | 'fine' | 'precise'
-export type CentralBody = 'earth' | 'moon' | 'sun'
-export type LaunchTarget = 'leo' | 'sso' | 'gto' | 'tli'
+export type CentralBody = 'earth' | 'moon' | 'sun' | 'mars'
+export type LaunchTarget = 'leo' | 'sso' | 'gto' | 'tli' | 'tmi'
 
 export type Discipline = 'astrophysicist' | 'astrobiologist'
 
@@ -81,6 +83,8 @@ export interface Orbit {
   lowSunAngle?: boolean
   /** Distance from the Sun in AU for solar flux (1 for Earth/Moon). */
   sunDistanceAu: number
+  /** A landing site, not an orbit: the spacecraft needs an entry, descent and landing system. */
+  surface?: boolean
   /** Orbits not described by a simple altitude (e.g. a halo orbit): period in minutes. */
   periodMinOverride?: number
   description: string
@@ -233,6 +237,8 @@ export interface Design {
   designLifeYears: number
   /** Cargo carried to a destination (resupply contracts), kg. */
   cargoKg?: number
+  /** Landing sites: heat shield, parachute and descent system (see edl.ts). */
+  landing?: LandingDesign
   /** Transfer route for three-body destinations (see catalog/routes.ts). */
   routeId?: string
   /** Trajectory-correction Δv reserve (m/s); defaults to twice the route's expected need. */
@@ -256,6 +262,7 @@ export interface Requirement {
     | 'costAtMost'
     | 'dvAtMost'
     | 'arrivalByMonth'
+    | 'ellipseKmAtMost'
   instrumentIds?: string[]
   orbitIds?: string[]
   propulsionIds?: string[]
@@ -280,6 +287,10 @@ export interface Scenario {
   baseDesign: Design
   /** Science points that earn the full science score over the required life. */
   scienceTarget: number
+  /** Landing missions: elevation of the site (km above the Martian reference level). */
+  landingSiteKm?: number
+  /** Planetary missions: the launch can only happen in a window (project months). */
+  launchWindow?: LaunchWindow
   /** 'cargo' contracts score delivered cargo instead of science. */
   scoring?: 'science' | 'cargo'
   /** Who pays for this contract (campaign). */
@@ -376,6 +387,11 @@ export interface ScheduleBreakdown {
   /** Chosen transfer route (three-body destinations) and the trajectory-correction reserve carried. */
   routeId: string | null
   tcmReserveDv: number
+  /** Launch windows (Mars): project month of the launch and months spent waiting for it; undefined elsewhere. */
+  launchMonth?: number
+  windowWaitMonths?: number
+  /** Mars: one-way radio delay on arrival day (minutes). */
+  arrivalDelayMin?: number
 }
 
 export interface LifeBreakdown {
@@ -394,6 +410,8 @@ export interface DesignReport {
   life: LifeBreakdown
   science: { perYear: number; total: number; byInstrument: { id: string; value: number }[] }
   risk: { successProbability: number; launchReliability: number }
+  /** Landing sites: the entry, descent and landing budget. */
+  edl?: EdlReport
   review: ReviewItem[]
   requirements: RequirementResult[]
   canLaunch: boolean

@@ -30,7 +30,7 @@ export function OrbitDiagram({ orbit, altitudeKm, eclipseFraction }: { orbit: Or
   const a0 = Math.PI - half
   const a1 = Math.PI + half
   const p = (a: number) => `${c + ringR * Math.cos(a)} ${c + ringR * Math.sin(a)}`
-  const bodyColor = orbit.body === 'earth' ? '#1d4ed8' : '#9ca3af'
+  const bodyColor = orbit.body === 'earth' ? '#1d4ed8' : orbit.body === 'mars' ? '#c2410c' : '#9ca3af'
   return (
     <svg viewBox={`0 0 ${size} ${size}`} className="h-52 w-52" role="img" aria-label={t('orbitDiagram.schematic', { name: tx(`component.${orbit.id}.name`, orbit.name) })}>
       <defs>

@@ -509,3 +509,29 @@ Al terminar el proyecto: un **texto detallado tipo storytelling** de todos los p
 - **"Breathing Mars"**: producir oxígeno del CO₂ (referencia real: MOXIE en Perseverance, 2021–2023).
 - **Terraformación** como gran desafío por etapas: lo actual (hielo, oxígeno) → futuro cercano (hábitats) → terraformación especulativa (siglos), explicando que con la tecnología actual no es posible.
 - Requiere en el motor: ventanas interplanetarias y subsistema de aterrizaje (escudo térmico, paracaídas, retrocohetes).
+
+## 21. ADDENDUM v7 — Estado al 2026-11-13 y cambio de cuenta (PREVALECE si hay conflicto)
+
+### 21.1 Cómo retomar
+- El proyecto se continúa desde **otra cuenta de Claude** en la PC del dueño. El historial de chat anterior no existe para
+  la sesión nueva: todo el contexto está en `docs/PLAYBOOK.md` (leer primero), `CLOUD_NEXT.md` (cola y siguiente paso),
+  `PROGRESS.md` (qué se hizo, numerado), `DECISIONS.md`, `docs/model.md` (cada fórmula) y la memoria de Claude Code en
+  `C:\Users\roone\.claude\projects\C--PPgame\memory\`.
+- Repositorio `artesanalinteligencia1-dotcom/PP.game`, rama `cloud/fase-1`, clon en `C:\PPgame\PP.game`. Producción:
+  https://paulet-andes-to-orbit.vercel.app/ (rama `main`; se actualiza con un PR desde `cloud/fase-1`).
+- Servidor de desarrollo: configuración `paulet-dev` en `C:\PPgame\.claude\launch.json` (puerto 5173). Pruebas:
+  `npm test` dentro de `PP.game` (209 en verde). El `push` se hace desde la terminal del dueño (PLAYBOOK §3.7).
+
+### 21.2 Hecho desde el addendum v6
+Juego base completo (2026-11-05); enlace público; idiomas EN/ES; taller del Ingeniero de cohetes (4 entregas);
+laboratorio del Astrobiólogo con vista 3D del mundo; retos por enlace (multijugador asíncrono);
+**Marte, entregas a, b y c** (motor de Marte; primer contrato jugable del Acto 3, "Horizonte Rojo"; aterrizaje y
+la misión "Varado" / "Stranded", 2026-11-14). La lista viva de hecho y pendiente está en `HANDOFF.md` (raíz del repo).
+
+### 21.3 Marte (reemplaza la última línea de §20.4)
+- Ya está en el motor: ventanas interplanetarias cada 25,6 meses, viaje de 7 a 13,5 meses, retardo de radio de 4 a
+  21 minutos, conjunción solar, captura y aerofrenado, destino de lanzamiento `tmi`, órbitas `mars_low` y `mars_areo`.
+- Hecho el 2026-11-14 (entrega c): aterrizaje (`src/engine/edl.ts`: escudo térmico, paracaídas, airbags / patas /
+  grúa aérea, entrada guiada) y la misión "Stranded".
+- Falta: "Breathing Mars" (entrega d); terraformación (Acto 4, especulativo). Robot guía y videos por rol siguen pendientes
+  (PLAYBOOK §6c).

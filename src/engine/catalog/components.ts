@@ -40,35 +40,35 @@ export const OPTICAL_INSTRUMENTS = ['pan_camera', 'multispectral', 'hires_camera
 
 export const launchers: Launcher[] = [
   {
-    id: 'paulet', name: 'Paulet-1 (sounding rocket)', kind: 'sounding', capacityKg: { leo: 0, sso: 0, gto: 0, tli: 0 }, costM: 1.5, reliability: 0.8,
+    id: 'paulet', name: 'Paulet-1 (sounding rocket)', kind: 'sounding', capacityKg: { leo: 0, sso: 0, gto: 0, tli: 0, tmi: 0 }, costM: 1.5, reliability: 0.8,
     suborbital: { apogeeKm: 110, payloadKg: 8 },
     realWorld: 'Built by Pedro Goicochea from Pedro Paulet’s notebooks (fiction). Paulet claimed in a 1927 letter to have tested a liquid-propellant engine in Paris in the 1890s — not independently verified. The first verified liquid-fuel rocket flight was Robert Goddard’s, in 1926.',
   },
   {
-    id: 'light', name: 'Light (L-1)', kind: 'expendable', capacityKg: { leo: 300, sso: 200, gto: 0, tli: 0 }, costM: 7, reliability: 0.9,
+    id: 'light', name: 'Light (L-1)', kind: 'expendable', capacityKg: { leo: 300, sso: 200, gto: 0, tli: 0, tmi: 0 }, costM: 7, reliability: 0.9,
     realWorld: 'Small dedicated launchers (a few hundred kg to low orbit) appeared in the late 2010s for small satellites.',
   },
   {
-    id: 'rideshare', name: 'Rideshare (shared ride to SSO)', kind: 'rideshare', capacityKg: { leo: 0, sso: 150, gto: 0, tli: 0 }, costM: 0.5, costPerKgM: 0.015, reliability: 0.95,
+    id: 'rideshare', name: 'Rideshare (shared ride to SSO)', kind: 'rideshare', capacityKg: { leo: 0, sso: 150, gto: 0, tli: 0, tmi: 0 }, costM: 0.5, costPerKgM: 0.015, reliability: 0.95,
     rideshare: { maxAltitudeKm: 620, everyMonths: 6 },
     realWorld: 'Dedicated rideshare flights carry dozens of small satellites at once to sun-synchronous orbit: cheap per kg, but you go when and where the rocket goes.',
   },
   {
-    id: 'medium', name: 'Medium (M-2)', kind: 'expendable', capacityKg: { leo: 3000, sso: 2000, gto: 1000, tli: 400 }, costM: 45, reliability: 0.94,
+    id: 'medium', name: 'Medium (M-2)', kind: 'expendable', capacityKg: { leo: 3000, sso: 2000, gto: 1000, tli: 400, tmi: 320 }, costM: 45, reliability: 0.94,
     realWorld: 'Classic medium launchers, thrown away after each flight, flew most satellites of the last decades.',
   },
   {
-    id: 'reusable_medium', name: 'R-2 Reusable Medium', kind: 'reusable', capacityKg: { leo: 2100, sso: 1400, gto: 700, tli: 280 }, costM: 27, reliability: 0.95,
+    id: 'reusable_medium', name: 'R-2 Reusable Medium', kind: 'reusable', capacityKg: { leo: 2100, sso: 1400, gto: 700, tli: 280, tmi: 220 }, costM: 27, reliability: 0.95,
     landing: { successP: 0.9 },
     realWorld: 'In December 2015 an orbital rocket’s first stage (Falcon 9) landed back for the first time; boosters have been re-flown since 2017. Landing needs propellant, so a reusable rocket lifts less than the same rocket thrown away — but each flight costs much less.',
   },
   {
-    id: 'reusable_heavy', name: 'R-3 Reusable Heavy', kind: 'reusable', capacityKg: { leo: 10500, sso: 7000, gto: 4200, tli: 2450 }, costM: 80, reliability: 0.96,
+    id: 'reusable_heavy', name: 'R-3 Reusable Heavy', kind: 'reusable', capacityKg: { leo: 10500, sso: 7000, gto: 4200, tli: 2450, tmi: 1950 }, costM: 80, reliability: 0.96,
     landing: { successP: 0.88 },
     realWorld: 'In 2018 the two side boosters of a heavy rocket (Falcon Heavy) landed side by side after launch. Recovering three cores makes heavy launches much cheaper.',
   },
   {
-    id: 'heavy', name: 'Heavy (H-3)', kind: 'expendable', capacityKg: { leo: 15000, sso: 10000, gto: 6000, tli: 3500 }, costM: 130, reliability: 0.96,
+    id: 'heavy', name: 'Heavy (H-3)', kind: 'expendable', capacityKg: { leo: 15000, sso: 10000, gto: 6000, tli: 3500, tmi: 2800 }, costM: 130, reliability: 0.96,
     realWorld: 'Heavy expendable launchers send big satellites to geostationary orbit and probes to the Moon and planets.',
   },
 ]
@@ -121,6 +121,24 @@ export const orbits: Orbit[] = [
     launchTarget: 'tli', capacityFactor: 0.6, insertionDv: 300, disposalDv: 0, radiationKradYr: 8, panelDegradation: 0.03,
     linkFactor: 0.0005, contact: 'deep', stationKeepingDv: 10, drag: false, sunDistanceAu: 1.5, eclipseOverride: 0,
     description: 'Leaves Earth for good. Weaker sunlight, tiny data rates, minutes of signal delay, years of cruise.',
+  },
+  {
+    id: 'mars_low', name: 'Low Mars Orbit', body: 'mars', altitudeKm: [250, 500], defaultAltitudeKm: 400,
+    launchTarget: 'tmi', capacityFactor: 1, insertionDv: 2100, disposalDv: 20, radiationKradYr: 6, panelDegradation: 0.03,
+    linkFactor: 0.0005, contact: 'deep', stationKeepingDv: 20, drag: false, sunDistanceAu: 1.52,
+    description: 'Close to Mars, over both poles every two hours: sharp maps of ice and landing sites. Sunlight is less than half of Earth’s, the planet hides you from Earth on every orbit, and your commands take minutes to arrive.',
+  },
+  {
+    id: 'mars_surface', name: 'Mars Surface', body: 'mars', altitudeKm: [0, 0], defaultAltitudeKm: 0, surface: true,
+    launchTarget: 'tmi', capacityFactor: 1, insertionDv: 0, disposalDv: 0, radiationKradYr: 3, panelDegradation: 0.15,
+    linkFactor: 0.004, contact: 'deep', stationKeepingDv: 0, drag: false, sunDistanceAu: 1.52, eclipseOverride: 0.5, periodMinOverride: 1479.6,
+    description: 'On the ground. No braking burn: the atmosphere stops you, if your heat shield, parachute and landing system are up to it. Nights last twelve hours, dust settles on the solar panels, and data goes home through a relay orbiter passing overhead.',
+  },
+  {
+    id: 'mars_areo', name: 'Areostationary Orbit', body: 'mars', altitudeKm: [17030, 17030], defaultAltitudeKm: 17030,
+    launchTarget: 'tmi', capacityFactor: 1, insertionDv: 1750, disposalDv: 10, radiationKradYr: 6, panelDegradation: 0.03,
+    linkFactor: 0.0005, contact: 'deep', stationKeepingDv: 15, drag: false, sunDistanceAu: 1.52,
+    description: 'One turn per Martian day, 17 030 km up: you hover over one side of Mars. Ideal as a radio relay for whoever is on the ground below, too far for sharp pictures.',
   },
 ]
 

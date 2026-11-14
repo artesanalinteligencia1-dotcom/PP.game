@@ -249,6 +249,41 @@ export const MESSAGES: Record<string, (p: P) => Message> = {
     why: t('review.msg.RIDESHARE_SCHEDULE.why', { every: n(p, 'every'), wait: n(p, 'wait', 1) }),
     levers: [t('review.msg.RIDESHARE_SCHEDULE.lever.0'), t('review.msg.RIDESHARE_SCHEDULE.lever.1')],
   }),
+  EDL_SHELL_TOO_SMALL: (p) => ({
+    title: t('review.msg.EDL_SHELL_TOO_SMALL.title'),
+    why: t('review.msg.EDL_SHELL_TOO_SMALL.why', { entry: n(p, 'entry'), diameter: n(p, 'diameter', 2), beta: n(p, 'beta'), max: n(p, 'max') }),
+    levers: [t('review.msg.EDL_SHELL_TOO_SMALL.lever.0'), t('review.msg.EDL_SHELL_TOO_SMALL.lever.1'), t('review.msg.EDL_SHELL_TOO_SMALL.lever.2')],
+  }),
+  EDL_SHELL_MARGIN: (p) => ({
+    title: t('review.msg.EDL_SHELL_MARGIN.title'),
+    why: t('review.msg.EDL_SHELL_MARGIN.why', { beta: n(p, 'beta'), max: n(p, 'max') }),
+    levers: [t('review.msg.EDL_SHELL_MARGIN.lever.0'), t('review.msg.EDL_SHELL_MARGIN.lever.1')],
+  }),
+  EDL_CHUTE_TOO_SMALL: (p) => ({
+    title: t('review.msg.EDL_CHUTE_TOO_SMALL.title'),
+    why: t('review.msg.EDL_CHUTE_TOO_SMALL.why', { speed: n(p, 'speed'), max: n(p, 'max'), diameter: n(p, 'diameter', 1), system: t(`edl.descent.${p.system}.name` as StringKey) }),
+    levers: [t('review.msg.EDL_CHUTE_TOO_SMALL.lever.0'), t('review.msg.EDL_CHUTE_TOO_SMALL.lever.1')],
+  }),
+  EDL_DESCENT_LIMIT: (p) => ({
+    title: t('review.msg.EDL_DESCENT_LIMIT.title'),
+    why: t('review.msg.EDL_DESCENT_LIMIT.why', { landed: n(p, 'landed'), max: n(p, 'max'), system: t(`edl.descent.${p.system}.name` as StringKey) }),
+    levers: [t('review.msg.EDL_DESCENT_LIMIT.lever.0'), t('review.msg.EDL_DESCENT_LIMIT.lever.1')],
+  }),
+  EDL_ELLIPSE_WIDE: (p) => ({
+    title: t('review.msg.EDL_ELLIPSE_WIDE.title'),
+    why: t('review.msg.EDL_ELLIPSE_WIDE.why', { ellipse: n(p, 'ellipse'), need: n(p, 'need') }),
+    levers: [t('review.msg.EDL_ELLIPSE_WIDE.lever.0'), t('review.msg.EDL_ELLIPSE_WIDE.lever.1')],
+  }),
+  MARS_WINDOW_MISSED: (p) => ({
+    title: t('review.msg.MARS_WINDOW_MISSED.title'),
+    why: t('review.msg.MARS_WINDOW_MISSED.why', { ready: n(p, 'ready', 1), missed: n(p, 'missed'), next: n(p, 'next', 1), wait: n(p, 'wait', 1), every: n(p, 'every', 1) }),
+    levers: [t('review.msg.MARS_WINDOW_MISSED.lever.0'), t('review.msg.MARS_WINDOW_MISSED.lever.1'), t('review.msg.MARS_WINDOW_MISSED.lever.2')],
+  }),
+  MARS_WINDOW_TIGHT: (p) => ({
+    title: t('review.msg.MARS_WINDOW_TIGHT.title'),
+    why: t('review.msg.MARS_WINDOW_TIGHT.why', { ready: n(p, 'ready', 1), window: n(p, 'window', 1), margin: n(p, 'margin', 1), every: n(p, 'every', 1) }),
+    levers: [t('review.msg.MARS_WINDOW_TIGHT.lever.0'), t('review.msg.MARS_WINDOW_TIGHT.lever.1')],
+  }),
   TCM_RESERVE_LOW: (p) => ({
     title: t('review.msg.TCM_RESERVE_LOW.title'),
     why: t('review.msg.TCM_RESERVE_LOW.why', { route: String(p.route), need: n(p, 'need'), reserve: n(p, 'reserve') }),
@@ -317,6 +352,7 @@ const REQUIREMENTS = [
   'costAtMost',
   'dvAtMost',
   'arrivalByMonth',
+  'ellipseKmAtMost',
 ] as const
 export const REQUIREMENT_LABEL: Record<string, string> = Object.defineProperties(
   {} as Record<string, string>,
@@ -362,6 +398,11 @@ export const CAUSE_TEXT: Record<string, (p: CP) => CauseMessage> = {
     title: t('cause.CAUSE_LAUNCH_FAILURE.title'),
     why: t('cause.CAUSE_LAUNCH_FAILURE.why', { reliability: String(p.reliability) }),
     change: t('cause.CAUSE_LAUNCH_FAILURE.change'),
+  }),
+  CAUSE_LANDING_FAILURE: (p) => ({
+    title: t('cause.CAUSE_LANDING_FAILURE.title'),
+    why: t('cause.CAUSE_LANDING_FAILURE.why', { reliability: String(p.reliability) }),
+    change: t('cause.CAUSE_LANDING_FAILURE.change'),
   }),
   CAUSE_END_BATTERY: (p) => ({
     title: t('cause.CAUSE_END_BATTERY.title'),
@@ -471,6 +512,7 @@ export const CAUSE_TEXT: Record<string, (p: CP) => CauseMessage> = {
 const END_REASONS = [
   'completed',
   'launch_failure',
+  'landing_failure',
   'battery',
   'power',
   'radiation',

@@ -66,11 +66,30 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 4. Astrobiologist pad ✅ (2026-11-13): `src/engine/astrobio.ts`, `src/ui/astro/AstroScreen.tsx`, PROGRESS item 20. Ideas
    left: tie the lab's evidence score to the science of career contracts, lock worlds by act, a 3D view of the world,
    a lesson on biosignatures and false positives.
-5. Mars acts (not started); asynchronous multiplayer: challenge links ✅ (2026-11-13, PROGRESS item 22). Left for
-   multiplayer: a shared leaderboard needs a server (out of scope for the offline game), real-time co-op of the 4 roles.
-   Mars plan, in deliveries: (a) engine: Mars orbit and a trans-Mars launch target, launch windows every 26 months,
-   7-9 month cruise, light-time delay; (b) first playable Act 3 contract (orbiter / relay) replacing a preview card;
-   (c) entry-descent-landing budget and the "Stranded" supply mission; (d) "Breathing Mars" (oxygen from CO2).
+5. Mars acts: deliveries a, b ✅ (2026-11-13, PROGRESS items 23 and 24) and c ✅ (2026-11-14, item 25); asynchronous multiplayer: challenge links ✅
+   (2026-11-13, PROGRESS item 22). Left for multiplayer: a shared leaderboard needs a server (out of scope for the
+   offline game), real-time co-op of the 4 roles.
+   Mars plan, in deliveries: **(a) ✅ engine** `src/engine/mars.ts`: Mars orbit, launch target `tmi`, windows every
+   25.6 months, 7 to 13.5 month trips, radio delay, conjunctions, aerobraking. **(b) ✅ first playable Act 3 contract**
+   "Red Horizon" (`mars_orbiter`), added before the two preview cards, which stay as previews.
+   **(c) ✅ landing** `src/engine/edl.ts` and "Stranded" (`mars_stranded`): destination `mars_surface`, heat shield,
+   parachute, airbags / legs / sky crane, guided entry, landing roll in flight.
+   **(d) next: "Breathing Mars"** (oxygen from CO2; real reference MOXIE on Perseverance, 2021-2023). Start from: a
+   lander on `mars_surface` (delivery c) carrying an oxygen plant as its payload. Suggested model: the plant is an
+   instrument-like component with mass, power and a production rate (MOXIE: about 300 W for 6 to 10 g of O2 per hour);
+   power on the surface is the limit (night, dust on the panels, 43 % of Earth's sunlight), so the lesson is the energy
+   budget per kilogram of oxygen; score the kilograms produced over the mission (`scoring: 'cargo'`-like, or a new
+   `scoring: 'product'`); turn the `mars_oxygen` preview into `kind: 'orbital'` after `mars_stranded`. Before starting,
+   quote the expected usage to the owner.
+   Ideas left from a/b/c: a lesson on launch windows (the phase angle, animated with `transferView`) and one on the
+   seven minutes; a 3D Mars in the flight view (reuse `WorldViewer3D`); a choice of landing site (`landingSiteKm` is
+   fixed per scenario today); a check that the aeroshell fits the launcher's fairing; the `helio` flyby orbit moved to
+   the `tmi` target; a bipropellant engine for big capture burns; an animated landing in 3D.
+   **General handoff:** `HANDOFF.md` at the repo root lists what is done and what is pending, in order. Keep it
+   current after every task (the owner works from several Claude accounts).
+   **Session note (2026-11-13):** the project moved to another Claude account on the owner's PC. Nothing lives in the
+   chat history: these files, `docs/PLAYBOOK.md` and the Claude Code memory in
+   `C:\Users\roone\.claude\projects\C--PPgame\memory\` are the whole context.
 Also wanted (PLAYBOOK §6c): robot guide, one animated video per role, richer animation/design (postprocessing, GSAP, Motion,
 Theatre.js, Rive). Before each big task: quote the expected usage and propose it in deliveries.
 

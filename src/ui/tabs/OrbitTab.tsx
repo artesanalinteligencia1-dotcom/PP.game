@@ -4,6 +4,8 @@ import { CUSTOM_LAUNCHER_ID, analyzeRocket, rocketToLauncher } from '../../engin
 import { useRocket } from '../../store/rocket'
 import { TECH, missingRocketTech } from '../../engine/campaign'
 import { CR3BPView, L2_ORBIT, routeSchematic } from '../threebody/CR3BPView'
+import { MarsPlan } from '../mars/MarsPlan'
+import { LandingPanel } from '../mars/LandingPanel'
 import type { Design, DesignReport } from '../../engine/types'
 import { fmt } from '../../i18n/en'
 import { useGame } from '../../store/game'
@@ -43,7 +45,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
               title={tx(`component.${o.id}.name`, o.name)}
               stats={[
                 o.altitudeKm[0] === o.altitudeKm[1] ? (o.body === 'sun' ? t('orbit.interplanetary') : `${fmt(o.altitudeKm[0])} km`) : `${o.altitudeKm[0]}–${o.altitudeKm[1]} km`,
-                o.insertionDv ? t('orbit.insertionDv', { dv: o.insertionDv }) : t('orbit.directInsertion'),
+                o.surface ? t('orbit.landing.title') : o.insertionDv ? t('orbit.insertionDv', { dv: o.insertionDv }) : t('orbit.directInsertion'),
               ]}
             >
               {tx(`component.${o.id}.description`, o.description)}
@@ -94,8 +96,8 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
       </Section>
       {routesFor(orbit.id).length > 0 && (
         <Section
-          title={t('orbit.route.title')}
-          hint={t('orbit.route.hint')}
+          title={t(orbit.body === 'mars' ? 'orbit.route.mars.title' : 'orbit.route.title')}
+          hint={t(orbit.body === 'mars' ? 'orbit.route.mars.hint' : 'orbit.route.hint')}
         >
           <Grid>
             {routesFor(orbit.id).map((r) => (
@@ -105,7 +107,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                 onClick={() => update({ routeId: r.id, tcmReserveDv: undefined })}
                 title={tx(`route.${orbit.id}.${r.id}.name`, r.name)}
                 stats={[
-                  t('orbit.route.arrivalBurn', { dv: r.insertionDv }),
+                  r.entryKms ? t('orbit.route.entry', { speed: fmt(r.entryKms, 1) }) : t('orbit.route.arrivalBurn', { dv: r.insertionDv }),
                   t('orbit.route.months', { months: fmt(r.transferMonths, 1) }),
                   t('orbit.route.corrections', { dv: r.tcmDv }),
                 ]}
@@ -132,6 +134,7 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
                   <span className="font-semibold text-sky-300">{t('orbit.realWorld')}</span>
                   {tx(`route.${orbit.id}.${route.id}.realWorld`, route.realWorld)}
                 </p>
+                {orbit.body === 'mars' && <MarsPlan design={design} report={report} route={route} />}
                 {orbit.id === 'em_l2_halo' && (
                   <div className="overflow-hidden rounded-xl border border-slate-800">
                     <CR3BPView label={t('orbit.cr3bp.label')}>
@@ -151,6 +154,11 @@ export function OrbitTab({ design, report }: { design: Design; report: DesignRep
               </div>
             )
           })()}
+        </Section>
+      )}
+      {orbit.surface && (
+        <Section title={t('orbit.landing.title')} hint={t('orbit.landing.hint')}>
+          <LandingPanel design={design} report={report} />
         </Section>
       )}
       <Section title={t('orbit.launcher.title')} hint={t('orbit.launcher.hint')}>

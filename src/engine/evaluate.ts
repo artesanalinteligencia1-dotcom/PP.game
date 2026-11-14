@@ -32,7 +32,9 @@ import {
   getThermal,
   launchers,
 } from './catalog/components'
-import { defaultTcmReserve, getRoute } from './catalog/routes'
+import { defaultTcmReserve, getRoute, marsCruiseDays } from './catalog/routes'
+import { DEFAULT_LANDING, analyzeEdl, isLandingDesign } from './edl'
+import { marsDelayMin, nextWindowMonth } from './mars'
 import { TRL_COST_FACTOR, TRL_MONTHS, launchCapacityKg, resolveLauncher, successProbability } from './launch'
 import {
   MINUTES_PER_DAY,
@@ -61,7 +63,11 @@ import type {
 const POINTING_RANK: Record<PointingLevel, number> = { coarse: 0, fine: 1, precise: 2 }
 
 /** Monthly operations team cost by destination (M$/month). */
-export const OPS_BASE_M_PER_MONTH = { earth: 0.25, moon: 0.4, sun: 0.5 } as const
+export const OPS_BASE_M_PER_MONTH = { earth: 0.25, moon: 0.4, sun: 0.5, mars: 0.6 } as const
+/** Share of the operations team kept on the payroll while a finished spacecraft waits for its launch window. */
+export const WINDOW_WAIT_COST_SHARE = 0.5
+/** A window closer than this to the end of the build is at the mercy of any delay (months). */
+export const WINDOW_MARGIN_MONTHS = 3
 /** Coast/transfer time for chemical propulsion (months), before science starts. */
 const CHEMICAL_TRANSFER_MONTHS: Record<string, number> = { meo: 0.2, geo: 0.3, lunar_polar: 0.2, helio: 8 }
 /** Δv reserved for debris-avoidance manoeuvres in Earth orbits with drag (m/s). */
@@ -100,6 +106,9 @@ const ROLE_BY_CODE: Record<string, Role> = {
   LAUNCHER_NO_TARGET: 'lead',
   LAUNCHER_SUBORBITAL: 'lead',
   TCM_RESERVE_LOW: 'astrophysicist',
+  MARS_WINDOW_MISSED: 'lead',
+  MARS_WINDOW_TIGHT: 'lead',
+  EDL_ELLIPSE_WIDE: 'astrophysicist',
   RIDESHARE_ALTITUDE: 'astrophysicist',
   RIDESHARE_SCHEDULE: 'lead',
   NO_PAYLOAD: 'astrobiologist',
@@ -257,7 +266,19 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
     ? insertionDv + maintDv * designLife + orbit.disposalDv + (orbit.drag ? COLLISION_AVOIDANCE_DV : 0) + tcmReserveDv
     : 0
   const { propellantKg, tankKg } = propellantForDv(dryKg, totalDv, prop.ispS)
-  const wetKg = dryKg + tankKg + propellantKg
+  // Landing sites: what must reach the ground decides everything above it, up to the mass on the launch pad.
+  const edl = orbit.surface
+    ? analyzeEdl(isLandingDesign(design.landing) ? design.landing : DEFAULT_LANDING, Number.isFinite(propellantKg) ? dryKg + tankKg + propellantKg : dryKg, {
+        elevationKm: scenario.landingSiteKm,
+        entrySpeedKms: route?.entryKms,
+      })
+    : null
+  const wetKg = edl ? edl.launchKg : dryKg + tankKg + propellantKg
+  if (edl) {
+    for (const i of edl.issues) add(i.code, i.severity, 'mass', i.params)
+    const need = scenario.requirements.find((q) => q.kind === 'ellipseKmAtMost' && !q.optional)?.value
+    if (need !== undefined && edl.ellipseKm > need) add('EDL_ELLIPSE_WIDE', 'warn', 'risk', { ellipse: edl.ellipseKm, need })
+  }
   const capacityKg = launchCapacityKg(launcher, orbit)
 
   if (!hasProp && baseInsertionDv > 0) add('NO_PROPULSION_INSERTION', 'error', 'mass', { dv: baseInsertionDv, orbit: orbit.name })
@@ -330,18 +351,34 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
     add('LIFE_SHORT', 'warn', 'life', { life: lifeYears, required: scenario.requiredLifeYears, factor: limitingFactor })
   if (radiationLife - transferYears < designLife) add('RADIATION', 'warn', 'life', { years: radiationLife, dose: orbit.radiationKradYr, obc: obc.name })
 
+  // ---------- Schedule (numbers; its alerts are raised further down) ----------
+  // Cargo (with its racks and margin) is not spacecraft to integrate.
+  const cargoShareKg = cargoKg * (1 + STRUCTURE_FRACTION) * (1 + MASS_MARGIN)
+  const trlMonths = Math.max(0, ...payload.map((p) => TRL_MONTHS[p.inst.trl]), TRL_MONTHS[obc.trl])
+  const buildMonths =
+    DEV_BASE_MONTHS +
+    trlMonths +
+    DEV_MONTHS_PER_EXTRA_INSTRUMENT * Math.max(0, payload.length - 1) +
+    (DEV_MONTHS_PER_100KG * Math.max(0, dryKg - cargoShareKg)) / 100 +
+    (lowThrust ? DEV_MONTHS_ELECTRIC : 0) +
+    (edl?.devMonths ?? 0)
+  // A rideshare leaves on a fixed calendar: wait for the next flight.
+  const devMonths = launcher.rideshare ? Math.ceil(buildMonths / launcher.rideshare.everyMonths) * launcher.rideshare.everyMonths : buildMonths
+  // Mars: the planets line up only every ~26 months. A spacecraft that is not ready waits for the next window.
+  const window = scenario.launchWindow && orbit.launchTarget === 'tmi' ? scenario.launchWindow : null
+  const launchMonth = window ? nextWindowMonth(devMonths, window) : devMonths
+  const windowWaitMonths = launchMonth - devMonths
+
   // ---------- Cost ----------
   const instrumentsM = payload.reduce((s, p) => s + p.inst.costM * TRL_COST_FACTOR[p.inst.trl], 0)
   const busM =
-    area * array.costPerM2 + battery.costM + band.costM + antenna.costM + obc.costM + adcs.costM + prop.costM + thermal.costM + comp.costM
-  // Cargo (with its racks and margin) is not spacecraft to integrate.
-  const cargoShareKg = cargoKg * (1 + STRUCTURE_FRACTION) * (1 + MASS_MARGIN)
+    area * array.costPerM2 + battery.costM + band.costM + antenna.costM + obc.costM + adcs.costM + prop.costM + thermal.costM + comp.costM + (edl?.costM ?? 0)
   const integrationM =
     INTEGRATION_FIXED_M + INTEGRATION_M_PER_KG * Math.max(0, (Number.isFinite(tankKg) ? dryKg + tankKg : dryKg) - cargoShareKg)
   const launchM = launcher.costM + (launcher.costPerKgM ?? 0) * (Number.isFinite(wetKg) ? wetKg : 0)
   const opsBase = OPS_BASE_M_PER_MONTH[orbit.body]
   const stationM = stations.reduce((s, st) => s + st.costPerMonthM, 0)
-  const opsM = designLife * 12 * (opsBase + stationM) + transferMonths * opsBase
+  const opsM = designLife * 12 * (opsBase + stationM) + transferMonths * opsBase + windowWaitMonths * opsBase * WINDOW_WAIT_COST_SHARE
   const contingencyM = CONTINGENCY * (instrumentsM + busM + integrationM + launchM + opsM)
   const totalM = instrumentsM + busM + integrationM + launchM + opsM + contingencyM
   const sandbox = scenario.difficulty === 'sandbox'
@@ -349,17 +386,12 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   else if (!sandbox && totalM > 0.95 * scenario.budgetM) add('BUDGET_TIGHT', 'warn', 'cost', { total: totalM, budget: scenario.budgetM })
 
   // ---------- Schedule ----------
-  const trlMonths = Math.max(0, ...payload.map((p) => TRL_MONTHS[p.inst.trl]), TRL_MONTHS[obc.trl])
-  const buildMonths =
-    DEV_BASE_MONTHS +
-    trlMonths +
-    DEV_MONTHS_PER_EXTRA_INSTRUMENT * Math.max(0, payload.length - 1) +
-    (DEV_MONTHS_PER_100KG * Math.max(0, dryKg - cargoShareKg)) / 100 +
-    (lowThrust ? DEV_MONTHS_ELECTRIC : 0)
-  // A rideshare leaves on a fixed calendar: wait for the next flight.
-  const devMonths = launcher.rideshare ? Math.ceil(buildMonths / launcher.rideshare.everyMonths) * launcher.rideshare.everyMonths : buildMonths
   if (devMonths - buildMonths > 0.05) add('RIDESHARE_SCHEDULE', 'warn', 'schedule', { wait: devMonths - buildMonths, every: launcher.rideshare?.everyMonths ?? 0 })
-  if (devMonths > scenario.devMonths) add('LATE', 'warn', 'schedule', { months: devMonths, deadline: scenario.devMonths })
+  if (window && devMonths > window.firstMonth)
+    add('MARS_WINDOW_MISSED', 'warn', 'schedule', { ready: devMonths, missed: window.firstMonth, next: launchMonth, wait: windowWaitMonths, every: window.everyMonths })
+  else if (window && windowWaitMonths < WINDOW_MARGIN_MONTHS)
+    add('MARS_WINDOW_TIGHT', 'warn', 'schedule', { ready: devMonths, window: launchMonth, margin: windowWaitMonths, every: window.everyMonths })
+  else if (!window && devMonths > scenario.devMonths) add('LATE', 'warn', 'schedule', { months: devMonths, deadline: scenario.devMonths })
 
   // ---------- Science ----------
   const dataFactor = generatedGbDay > 0 ? deliveredGbDay / generatedGbDay : payload.length > 0 ? 1 : 0
@@ -371,6 +403,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   if (coldEnv && !thermal.coldCapable) riskFactors.push(0.95)
   if (radiationLife - transferYears < designLife) riskFactors.push(0.9)
   if (longEclipseDod !== undefined && longEclipseDod > LONG_ECLIPSE_MAX_DOD) riskFactors.push(0.85)
+  if (edl) riskFactors.push(edl.reliability)
   const trls: Trl[] = [...payload.map((p) => p.inst.trl), obc.trl]
   const successP = successProbability(launcher.reliability, trls, riskFactors)
 
@@ -404,8 +437,10 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
         return { ...base, met: totalM <= (r.value ?? Infinity), actual: totalM, target: r.value ?? 0 }
       case 'dvAtMost':
         return { ...base, met: hasProp && totalDv <= (r.value ?? Infinity), actual: totalDv, target: r.value ?? 0 }
+      case 'ellipseKmAtMost':
+        return { ...base, met: !!edl && edl.ellipseKm <= (r.value ?? Infinity), actual: edl ? edl.ellipseKm : '—', target: r.value ?? 0 }
       case 'arrivalByMonth':
-        return { ...base, met: devMonths + transferMonths <= (r.value ?? Infinity), actual: devMonths + transferMonths, target: r.value ?? 0 }
+        return { ...base, met: launchMonth + transferMonths <= (r.value ?? Infinity), actual: launchMonth + transferMonths, target: r.value ?? 0 }
     }
   })
 
@@ -468,10 +503,19 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
       contactMinDay: contactMin,
     },
     cost: { instrumentsM, busM, integrationM, launchM, opsM, contingencyM, totalM, budgetM: scenario.budgetM },
-    schedule: { devMonths, deadlineMonths: scenario.devMonths, transferMonths, routeId: route?.id ?? null, tcmReserveDv },
+    schedule: {
+      devMonths,
+      deadlineMonths: scenario.devMonths,
+      transferMonths,
+      routeId: route?.id ?? null,
+      tcmReserveDv,
+      ...(window ? { launchMonth, windowWaitMonths } : {}),
+      ...(orbit.body === 'mars' && route ? { arrivalDelayMin: marsDelayMin(marsCruiseDays(route), marsCruiseDays(route)) } : {}),
+    },
     life: { lifeYears, requiredYears: scenario.requiredLifeYears, limits, limitingFactor },
     science: { perYear: sciencePerYear, total: sciencePerYear * lifeYears, byInstrument },
     risk: { successProbability: successP, launchReliability: launcher.reliability },
+    ...(edl ? { edl } : {}),
     review,
     requirements,
     canLaunch: !review.some((r) => r.blocking),

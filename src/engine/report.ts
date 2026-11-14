@@ -1,4 +1,5 @@
 // Post-mission analysis: the three main causes of the result, with what to change next time.
+import { nextWindowMonth } from './mars'
 import type { MissionScore } from './score'
 import type { MissionState } from './simulate'
 import type { Scenario } from './types'
@@ -24,6 +25,8 @@ export function analyseMission(s: MissionState, score: MissionScore, scenario: S
 
   if (s.endReason === 'launch_failure') {
     causes.push({ code: 'CAUSE_LAUNCH_FAILURE', impact: -600, params: { reliability: Math.round(r.risk.launchReliability * 100) } })
+  } else if (s.endReason === 'landing_failure') {
+    causes.push({ code: 'CAUSE_LANDING_FAILURE', impact: -600, params: { reliability: Math.round((r.edl?.reliability ?? 0) * 100) } })
   } else if (s.endReason && s.endReason !== 'completed') {
     const lost = Math.max(0, lifeReq - life)
     causes.push({ code: `CAUSE_END_${s.endReason.toUpperCase()}`, impact: -150 - 200 * (lost / lifeReq), params: { life: Math.round(life * 10) / 10, required: lifeReq } })
@@ -48,8 +51,10 @@ export function analyseMission(s: MissionState, score: MissionScore, scenario: S
   const good = s.decisions.filter((d) => d.quality === 'good').length
   if (good >= 2) causes.push({ code: 'CAUSE_GOOD_DECISIONS', impact: 12 * good, params: { count: good } })
   if (score.actual.costM > scenario.budgetM) causes.push({ code: 'CAUSE_OVER_BUDGET', impact: -150, params: { cost: Math.round(score.actual.costM), budget: scenario.budgetM } })
-  const late = score.actual.devMonths - scenario.devMonths
-  if (late > 0) causes.push({ code: 'CAUSE_LATE', impact: -10 * late, params: { months: Math.round(late * 10) / 10, delay: s.launchDelayMonths } })
+  // Mars: being late means the next launch window (the score caps the loss at the 50 schedule points).
+  const window = s.report.schedule.launchMonth !== undefined ? scenario.launchWindow : undefined
+  const late = window ? nextWindowMonth(score.actual.devMonths, window) - window.firstMonth : score.actual.devMonths - scenario.devMonths
+  if (late > 0) causes.push({ code: 'CAUSE_LATE', impact: window ? -50 : -10 * late, params: { months: Math.round(late * 10) / 10, delay: s.launchDelayMonths } })
   if (s.boosterLanded === true) causes.push({ code: 'CAUSE_BOOSTER_LANDED', impact: 40, params: {} })
   if (s.boosterLanded === false) causes.push({ code: 'CAUSE_BOOSTER_LOST', impact: -30, params: {} })
   if (s.endReason === 'completed' && life >= lifeReq) causes.push({ code: 'CAUSE_COMPLETED', impact: 120, params: { life: Math.round(life * 10) / 10 } })
@@ -57,7 +62,7 @@ export function analyseMission(s: MissionState, score: MissionScore, scenario: S
     causes.push({ code: 'CAUSE_STRONG_DOWNLINK', impact: 60, params: { down: Math.round(r.data.downlinkGbDay * 10) / 10 } })
   }
   const lineScience = score.lines.find((l) => l.key === 'science')!
-  if (s.endReason !== 'launch_failure' && scenario.scoring !== 'cargo' && lineScience.points < lineScience.max * 0.6) {
+  if (s.endReason !== 'launch_failure' && s.endReason !== 'landing_failure' && scenario.scoring !== 'cargo' && lineScience.points < lineScience.max * 0.6) {
     causes.push({ code: 'CAUSE_LOW_SCIENCE', impact: -(lineScience.max - lineScience.points) * 0.6, params: { science: Math.round(s.science), target: scenario.scienceTarget } })
   }
 

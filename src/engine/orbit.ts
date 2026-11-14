@@ -4,6 +4,7 @@ import type { GroundStation, Orbit } from './types'
 export const BODY = {
   earth: { radiusKm: 6371, muKm3s2: 398600.4418 },
   moon: { radiusKm: 1737.4, muKm3s2: 4902.8 },
+  mars: { radiusKm: 3389.5, muKm3s2: 42828.4 },
 } as const
 
 export const MINUTES_PER_DAY = 1440
@@ -39,6 +40,9 @@ const CONTACT: Record<string, { passes: number; minutes: number; refAltKm?: numb
   lunar_polar: { passes: 1, minutes: 290 },
   helio: { passes: 1, minutes: 480 },
   em_l2_halo: { passes: 1, minutes: 480 },
+  mars_low: { passes: 1, minutes: 320 }, // Mars hides the spacecraft for a third of every orbit
+  mars_areo: { passes: 1, minutes: 480 },
+  mars_surface: { passes: 1, minutes: 30 }, // relay orbiter passes, forwarded by each deep-space antenna
 }
 
 /**
@@ -86,6 +90,8 @@ export function noPropulsionOrbitLifeYears(orbit: Orbit, altitudeKm: number): nu
   if (orbit.id === 'lunar_polar') return 0.3 // lumpy lunar gravity pulls low orbits into the surface
   if (orbit.id === 'em_l2_halo') return 0.1 // unstable (chaotic): drifts away within weeks
   if (orbit.id === 'geo') return 0.5 // drifts out of its assigned slot
+  if (orbit.surface) return Infinity
+  if (orbit.body === 'mars') return 1 // lumpy gravity and the thin upper air slowly change the orbit
   return Infinity
 }
 

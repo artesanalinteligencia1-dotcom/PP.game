@@ -130,7 +130,7 @@ export interface RocketReport {
 }
 
 /** Δv to reach each target from the ground, including ~1.5 km/s of gravity and drag losses (rounded, educational). */
-export const TARGET_DV: Record<LaunchTarget, number> = { leo: 9400, sso: 9900, gto: 11800, tli: 12600 }
+export const TARGET_DV: Record<LaunchTarget, number> = { leo: 9400, sso: 9900, gto: 11800, tli: 12600, tmi: 13000 }
 
 /** Share of the first stage's propellant kept for the landing burn when it is reusable. */
 export const LANDING_RESERVE = 0.1
@@ -274,7 +274,7 @@ function maxPayload(design: RocketDesign, s: StageParts[], dv: number): number {
   return Math.floor(lo / 10) * 10
 }
 
-const EMPTY_CAPACITY: Record<LaunchTarget, number> = { leo: 0, sso: 0, gto: 0, tli: 0 }
+const EMPTY_CAPACITY: Record<LaunchTarget, number> = { leo: 0, sso: 0, gto: 0, tli: 0, tmi: 0 }
 
 export function analyzeRocket(design: RocketDesign, payloadKg = 0): RocketReport {
   const issues: RocketIssue[] = []

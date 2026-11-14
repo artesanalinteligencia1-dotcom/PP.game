@@ -229,8 +229,65 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     the launch pad, win / tie / lose on the results. Changing the seed or flying a random one drops out of the challenge.
     Checked in the browser: the link opens the scenario with its banner. The results banner was not flown end to end
     (its verdict is unit-tested). 173 tests pass (`tests/challenge.test.ts` is new).
+23. Mars, delivery a (2026-11-13): the engine. `src/engine/mars.ts` (pure, docs/model.md §22): Mars' orbit, the synodic
+    period (779.9 days = 25.6 months between windows), the minimum-energy trip (259 days), the phase angle on launch day
+    (44°), the Earth-Mars distance and the one-way radio delay over time (4.4 to 21 minutes), solar conjunctions, the
+    capture burn from the arrival speed (`marsCaptureDv`), the areostationary altitude and `transferView()` (positions of
+    Earth, Mars and the spacecraft on any day). New launch target `tmi` (13 000 m/s from the ground; catalog launchers:
+    M-2 320 kg, R-2 220, R-3 1 950, H-3 2 800; the player's rocket gets it from its parts), central body `mars`, two
+    orbits (`mars_low` 250-500 km, `mars_areo` 17 030 km) and their routes in `catalog/routes.ts`: minimum energy
+    (8.5 months, 2 100 m/s), capture + aerobraking (13.5 months, 1 000 m/s), fast (7 months, 2 550 m/s).
+    - **Launch window:** `Scenario.launchWindow { firstMonth, everyMonths }`. `evaluateDesign` puts the launch in the first
+      window the spacecraft is ready for (`schedule.launchMonth`, `windowWaitMonths`); waiting costs half the operations
+      team; review codes `MARS_WINDOW_MISSED` and `MARS_WINDOW_TIGHT` (less than 3 months of margin) replace `LATE`.
+    - **Flight:** a pre-launch slip longer than the margin moves the launch to the next window (score: 0 of 50 schedule
+      points, arrival bonus lost); the capture burn is logged with the radio delay; aerobraking can meet a dust storm
+      (decision: raise the orbit for 3 weeks and 8 m/s, or hold and risk the arrays); every conjunction is a two-week
+      blackout with a decision (keep observing and store, or instruments off). `MissionState.blackoutUntil` is new and
+      optional, so older saved flights still load.
+24. Mars, delivery b (2026-11-13): the first playable Act 3 contract, "Red Horizon" (`mars_orbiter`, scenario and
+    contract; needs Lunar Pathfinder and 300 prestige, pays 220 M). An orbiter for one Martian year: water-ice mapping,
+    0.5 GB/day, 420 M, window in month 30. The Stranded and Breathing Mars cards stay as previews (deliveries c and d).
+    UI: Orbit tab → "Route to Mars" with the window on the project calendar, the radio delay and the trip to scale
+    (`src/ui/mars/MarsPlan.tsx`, `MarsTransferView.tsx`); flight screen → the cruise around the Sun with Earth, Mars and
+    the spacecraft on the real day, the signal-delay readout, Mars in the orbit view; rocket workbench → capacity
+    "Towards Mars (TMI)". 84 new strings in en.json / es.json. Balance over 60 seeds: one instrument on the M-2 with
+    aerobraking is Outstanding 56/60; the base orbiter with Ka-band is Success or better 58/60 (the 2 failures are the
+    launcher). Checked in the browser in Spanish: Orbit tab for Red Horizon (routes, window, delay, transfer view), then
+    a flight to week 69 (cruise view, capture log, conjunction decision); no console errors. 192 tests pass
+    (`tests/mars.test.ts` is new, 19 tests).
+25. Mars, delivery c (2026-11-14): entry, descent and landing, and the "Stranded" mission.
+    - **Engine** `src/engine/edl.ts` (pure, docs/model.md §23). The budget is worked from the ground up: landed mass →
+      landing hardware and braking propellant (rocket equation on the parachute's terminal speed) → parachute → guidance
+      → aeroshell → cruise stage → mass on the pad (`analyzeEdl`). Three aeroshells (2.65 / 3.5 / 4.5 m), three
+      parachutes (11 / 16 / 21.5 m), three landing systems (airbags ≤ 550 kg, legs and retro-rockets ≤ 900 kg, sky crane
+      ≤ 1 300 kg) and guided entry (ellipse 100 km → 25 / 20 / 8 km). The physical limit is the ballistic coefficient
+      m / (Cd·A) against what the air at the site can stop (`betaMax`, thinner air at higher sites). Issue codes
+      `EDL_SHELL_TOO_SMALL`, `EDL_SHELL_MARGIN`, `EDL_CHUTE_TOO_SMALL`, `EDL_DESCENT_LIMIT`, plus `EDL_ELLIPSE_WIDE`
+      from the scenario. Checked against Curiosity and Phoenix in the tests.
+    - **Destination** `mars_surface` (`Orbit.surface`): no braking burn, twelve-hour nights (eclipse 0.5 of a sol), dust
+      on the panels (15 %/yr), data through relay passes. Routes: minimum energy (entry at 5.7 km/s) and fast (6.1 km/s,
+      heavier shield). `Design.landing`, `DesignReport.edl`, `Scenario.landingSiteKm`, requirement `ellipseKmAtMost`.
+      In `evaluateDesign` the launch mass of a lander is the landing budget; the landing system adds cost, months of
+      development and its own reliability.
+    - **Flight:** two weeks before entry a dust storm may ask for a decision (new entry settings for 2 M, or −10 % on
+      the landing); on arrival the landing is rolled (`landing_failure` ends the mission and delivers nothing: score,
+      report cause `CAUSE_LANDING_FAILURE`); the log says how the radio delay compares with the seven minutes.
+    - **"Stranded"** (`mars_stranded`, now `kind: 'orbital'`, after Red Horizon with 400 prestige, pays 300 M): land
+      300 kg of supplies within 25 km before month 34; the only window in time opens in month 25. The base design lands
+      100 km away until the entry is guided; the sky crane is the most precise and leaves half a month of margin;
+      500 kg of cargo needs the 3.5 m shell. Balance over 60 seeds with legs and guidance: Outstanding 42, window missed
+      10, lost at launch or landing 8.
+    - **UI:** Orbit tab → "Entry, descent and landing" (`src/ui/mars/LandingPanel.tsx`): landing system, aeroshell,
+      parachute, guided entry, the mass budget as a stacked bar, the load on the heat shield against its limit, and the
+      seven minutes drawn with the speed at each handover. 106 new strings in en.json / es.json.
+    Checked in the browser: the panel in Spanish and English; in English a flight lost at landing (seed 5, with the
+    storm decision) and one that lands and scores Outstanding (seed 6), both through the results screen; no console
+    errors. 209 tests pass (`tests/edl.test.ts` is new, 17 tests).
 
 ## Next exact step
+Mars delivery d ("Breathing Mars"); plan in CLOUD_NEXT.md, queue item 5. The general handoff (done / pending) is
+`HANDOFF.md` at the repo root. Older note, kept for history:
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
 replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
 tests the Windows installer from GitHub Actions (Desktop build → Artifacts).

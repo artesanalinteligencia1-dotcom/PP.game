@@ -28,7 +28,7 @@ import { boosterDiameterM } from '../../engine/rocketLayout'
 import { webglAvailable } from '../launch/three/support'
 import { Disclaimer, OptionCard, Pill, Section, Slider } from '../components'
 
-const TARGETS: LaunchTarget[] = ['leo', 'sso', 'gto', 'tli']
+const TARGETS: LaunchTarget[] = ['leo', 'sso', 'gto', 'tli', 'tmi']
 const PRESETS: RocketPreset[] = ['light', 'medium', 'reusable_medium', 'heavy']
 const RocketViewer3D = lazy(() => import('./RocketViewer3D'))
 const FUEL_COLOR = { kerosene: '#cbd5e1', methane: '#94a3b8', hydrogen: '#f97316' } as const
