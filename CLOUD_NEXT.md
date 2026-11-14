@@ -76,9 +76,13 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    parachute, airbags / legs / sky crane, guided entry, landing roll in flight.
    **(d) ✅ "Breathing Mars"** `src/engine/isru.ts` and `mars_oxygen`: an oxygen plant as the lander's payload, run by
    daylight, scored by the kilograms made.
-   **Next in the owner's queue: the robot guide** (PLAYBOOK §6c). Start by showing three coded variants of its look
-   behind a flag (rule 3.3: decide by showing), then give it lines through i18n: contextual hints on the design tabs,
-   "why did this fail?" on the results screen (the causes of `analyseMission` are already there), first-time tutorials.
+   **Robot guide** (PLAYBOOK §6c): delivery 1 ✅ (2026-11-14, PROGRESS item 27): three looks at `?guide=1` — Kuntur
+   (condor drone), Inti (sphere with an orbit halo), Chaska (CubeSat). **Waiting for the owner's choice.** Delivery 2,
+   once chosen: keep one look in `src/ui/guide/robots.tsx` and delete the others (rule 3.3: delete the losers), then a
+   `<Guide>` corner widget with a speech bubble that the screens feed with lines through i18n: contextual hints on the
+   design tabs (the review codes already say what is wrong and which levers fix it), "why did this fail?" on the
+   results screen (the causes of `analyseMission`), and a first-mission tutorial (a few steps, remembered in settings
+   so it shows once, with a "don't show again"). Lines are typed out on screen; voice only with a quoted cost.
    After it: one animated video per role, hosted by the robot (HyperFrames, local).
    Ideas left from a/b/c/d: a power source that works at night for big plants (a small fission reactor, as real plans
    propose); storing the oxygen (tanks, boil-off); Act 4 (terraforming, speculative); a lesson on launch windows (the phase angle, animated with `transferView`) and one on the

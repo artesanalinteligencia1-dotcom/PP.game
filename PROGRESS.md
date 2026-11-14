@@ -310,9 +310,22 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     conjunction, a slip absorbed by the window margin; 317 of 300 kg) and the results (Outstanding, 883); no console
     errors. 221 tests pass (`tests/isru.test.ts` is new, 12 tests).
 
+27. Robot guide, delivery 1 (2026-11-14): three candidate looks for the owner to choose from, behind `?guide=1`
+    (`src/ui/guide/GuidePreview.tsx`, lazy-loaded from `main.tsx`). `src/ui/guide/robots.tsx` draws them in SVG, no
+    image files, with the same five faces (calm, happy, thinking, worried, explaining) and a mouth that moves while a
+    line is typed out: **Kuntur** (a condor-shaped flying drone with solar-panel wings and the condor's white collar),
+    **Inti** (a floating sphere with an orbit for a halo and its own little moon), **Chaska** (a CubeSat with a screen
+    face, whisker antennas and panels for arms). Names are Quechua words; the designs are our own (no film robot).
+    Each card says three sample lines (first mission, a hint, why it failed) and lets the owner try every face;
+    EN / ES switch on the page. Animations are CSS (`guide-*` in `index.css`) and stop with reduced motion. 28 new
+    strings. Screenshot: `docs/screenshots/guide-variants.jpg`. Checked in the browser in English and Spanish: lines,
+    faces, typing, no console errors. 224 tests pass (`tests/guide.test.ts` is new: every look draws every face, still
+    robots never animate, the faces differ).
+
 ## Next exact step
-The robot guide (PLAYBOOK §6c): three coded variants of its look for the owner to choose from. The general handoff
-(done / pending) is `HANDOFF.md` at the repo root. Older note, kept for history:
+The owner chooses the robot guide's look at `?guide=1`. Then delivery 2: delete the two other looks, put the robot
+in the game (hints on the design tabs, "why it failed" on the results screen, first-mission tutorial). The general
+handoff (done / pending) is `HANDOFF.md` at the repo root. Older note, kept for history:
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
 replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
 tests the Windows installer from GitHub Actions (Desktop build → Artifacts).
