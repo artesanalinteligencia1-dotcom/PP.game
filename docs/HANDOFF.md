@@ -520,7 +520,7 @@ Al terminar el proyecto: un **texto detallado tipo storytelling** de todos los p
 - Repositorio `artesanalinteligencia1-dotcom/PP.game`, rama `cloud/fase-1`, clon en `C:\PPgame\PP.game`. Producción:
   https://paulet-andes-to-orbit.vercel.app/ (rama `main`; se actualiza con un PR desde `cloud/fase-1`).
 - Servidor de desarrollo: configuración `paulet-dev` en `C:\PPgame\.claude\launch.json` (puerto 5173). Pruebas:
-  `npm test` dentro de `PP.game` (221 en verde). El `push` se hace desde la terminal del dueño (PLAYBOOK §3.7).
+  `npm test` dentro de `PP.game` (229 en verde). El `push` se hace desde la terminal del dueño (PLAYBOOK §3.7).
 
 ### 21.2 Hecho desde el addendum v6
 Juego base completo (2026-11-05); enlace público; idiomas EN/ES; taller del Ingeniero de cohetes (4 entregas);
@@ -534,5 +534,5 @@ planta de oxígeno y la misión "Respirar en Marte" / "Breathing Mars", 2026-11-
 - Hecho el 2026-11-14 (entrega c): aterrizaje (`src/engine/edl.ts`: escudo térmico, paracaídas, airbags / patas /
   grúa aérea, entrada guiada) y la misión "Stranded".
 - Hecho el 2026-11-14 (entrega d): planta de oxígeno (`src/engine/isru.ts`) y la misión "Breathing Mars".
-- Falta: terraformación (Acto 4, especulativo). Robot guía y videos por rol siguen pendientes
-  (PLAYBOOK §6c).
+- Falta: terraformación (Acto 4, especulativo). El robot guía es **Kuntur** (hecho el 2026-11-14);
+  los videos por rol siguen pendientes (PLAYBOOK §6c).

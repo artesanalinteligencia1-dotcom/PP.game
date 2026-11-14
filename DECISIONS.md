@@ -141,3 +141,15 @@
   so the captions stay visible).
 - **Work split to save tokens** (owner has Gemini): extraction by Gemini Flash (Antigravity, `GEMINI.md`), translation
   by Gemini in the chat (`docs/i18n/PROMPT_TRANSLATE.md`), review and engine refactor by Claude.
+
+## Robot guide (2026-11-14)
+- **Look: Kuntur** (owner's choice among three coded looks: Kuntur, a condor-shaped drone; Inti, a sphere with an orbit
+  halo; Chaska, a CubeSat). The other two were deleted (rule: decide by showing, then delete the losers). Names are
+  Quechua words; the design is our own, inspired by the idea of a helpful mission robot, not by any film character.
+- **Drawn in SVG in code, animated with CSS**: no image files, any size, five faces, stills with reduced motion. Rive
+  stays an option for richer expressions later.
+- **Text typed on screen, no voice** (voice would need ElevenLabs credits; only with a quoted cost).
+- **Closed by default on the design screen** (a face and a badge, opened by a click), open by itself only for the
+  tutorial and once per flight on the results: a guide that talks unasked becomes noise.
+- **Screens publish what Kuntur says** (`useGuideContent`), so new screens can use it without touching the dock; the
+  lines come from the review codes and mission causes that already exist, so they stay correct when the engine changes.

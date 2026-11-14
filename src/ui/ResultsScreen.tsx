@@ -4,6 +4,8 @@ import { audio, useMusic } from '../audio/audio'
 import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { getScenario } from '../engine/catalog'
+import { useGuideContent } from '../store/guide'
+import { resultsLines, resultsMood } from './guide/lines'
 import { analyseMission } from '../engine/report'
 import { scoreMission, type Rank } from '../engine/score'
 import { CAUSE_TEXT, END_REASON_LABEL, REQUIREMENT_LABEL, fmt, localName } from '../i18n/en'
@@ -53,6 +55,13 @@ export function ResultsScreen() {
   const score = useMemo(() => scoreMission(mission, scenario), [mission, scenario])
   const verdict = challenge ? challengeVerdict(challenge, mission.scenarioId, mission.seed, score.total) : null
   const analysis = useMemo(() => analyseMission(mission, score, scenario), [mission, score, scenario])
+  // Kuntur explains the result, opening by itself once per flight.
+  useGuideContent({
+    id: `results-${mission.seed}-${score.total}`,
+    mood: resultsMood(score.rank),
+    autoOpenKey: `results-${mission.scenarioId}-${mission.seed}-${score.total}-${mission.week}`,
+    lines: resultsLines(analysis.causes).map((l) => ({ title: l.title, text: l.text, mood: l.mood })),
+  })
   const [board, setBoard] = useState<BoardEntry[]>([])
   useMusic('results')
   const good = score.rank === 'Success' || score.rank === 'Outstanding'

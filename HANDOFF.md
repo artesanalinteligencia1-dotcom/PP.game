@@ -7,10 +7,9 @@ cuentas que **no comparten historial**: lo único que pasa de una sesión a otra
 Última actualización: 2026-11-14.
 
 ## Siguiente paso exacto
-**Esperando al dueño: elegir el aspecto del robot guía.** Las tres variantes (Kuntur, Inti, Chaska) se comparan en
-`?guide=1` (por ejemplo http://localhost:5173/?guide=1) y en `docs/screenshots/guide-variants.jpg`. Con la elección:
-entrega 2 del robot (quedarse con un aspecto, borrar los otros, ponerlo en el juego con pistas, "por qué falló" y
-tutorial de la primera misión). Detalle en `CLOUD_NEXT.md`, cola del juego definitivo, punto 5.
+**Un video animado por rol, presentado por Kuntur** (PLAYBOOK §6c): HyperFrames en local, sin costo; voz solo con
+el costo avisado y aprobado. Detalle en `CLOUD_NEXT.md`, cola del juego definitivo, punto 5. Antes de empezar:
+estimar el consumo y proponerlo al dueño en entregas.
 
 ## Dónde está cada cosa
 | Qué | Dónde |
@@ -26,7 +25,7 @@ tutorial de la primera misión). Detalle en `CLOUD_NEXT.md`, cola del juego defi
 | Tareas que necesitan al dueño o su PC | `LOCAL_TODO.md` |
 | Medios (intro, tráiler, música) | `C:\PPgame\{intro-a,trailer-final,trailer-test,soundtrack,media_raw,tools}` |
 | Servidor de desarrollo | configuración `paulet-dev` en `C:\PPgame\.claude\launch.json` (puerto 5173) |
-| Pruebas | `npm test` dentro de `PP.game` (224 en verde al 2026-11-14) |
+| Pruebas | `npm test` dentro de `PP.game` (229 en verde al 2026-11-14) |
 
 ## Reglas vigentes
 - Explicaciones al dueño en español; código, documentos técnicos y textos del juego en inglés. El juego se elige en
@@ -56,13 +55,14 @@ tutorial de la primera misión). Detalle en `CLOUD_NEXT.md`, cola del juego defi
 | 2026-11-13 | Marte, entrega b: contrato "Red Horizon" (orbitador), primer contrato jugable del Acto 3 |
 | 2026-11-14 | Marte, entrega c: entrada, descenso y aterrizaje (`src/engine/edl.ts`) y la misión "Stranded" (suministros a la superficie) |
 | 2026-11-14 | Marte, entrega d: planta de oxígeno (`src/engine/isru.ts`) y la misión "Breathing Mars". El Acto 3 queda jugable completo |
-| 2026-11-14 | Robot guía, entrega 1: tres aspectos para elegir en `?guide=1` (Kuntur, Inti, Chaska), con cinco caras y frases de ejemplo en inglés y español |
+| 2026-11-14 | Robot guía, entrega 1: tres aspectos para elegir (Kuntur, Inti, Chaska), con cinco caras y frases de ejemplo en inglés y español |
+| 2026-11-14 | Robot guía, entrega 2: el dueño eligió **Kuntur**. Da pistas en el diseño, explica el resultado de cada misión y guía la primera misión con un tutorial; se apaga o se repite en Ajustes |
 
 ## Pendiente (en orden)
-1. **Robot guía, entrega 2** (cuando el dueño elija el aspecto): quedarse con uno, ponerlo en el juego con pistas en
-   las pestañas de diseño, "¿por qué falló?" en los resultados y un tutorial de la primera misión (PLAYBOOK §6c).
-2. **Un video animado por rol** (Ingeniero de cohetes, Astrobiólogo y los demás), presentado por el robot guía
-   (HyperFrames, local).
+1. **Un video animado por rol** (Director de misión, Ingeniero de la nave, Astrofísico, Astrobiólogo e Ingeniero de
+   cohetes), presentado por Kuntur (HyperFrames, local).
+2. **Kuntur en más pantallas**: plataforma de lanzamiento, decisiones en vuelo, carrera, taller de cohetes y
+   laboratorio de astrobiología (ideas en `CLOUD_NEXT.md`).
 3. **Más calidad de animación y diseño** (PLAYBOOK §6c).
 4. **Multijugador**: marcador compartido y cooperativo en tiempo real de los 4 roles; ambos necesitan servidor.
 5. **Acto 4**: terraformación como gran desafío (especulativo, etiquetado como tal). Hoy es una tarjeta de avance en

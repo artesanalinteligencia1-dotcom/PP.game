@@ -13,6 +13,7 @@ import { FirstLightScreen } from './hub/FirstLightScreen'
 import { HomeScreen, MenuBackdrop } from './hub/HomeScreen'
 import { IntroScreen } from './hub/IntroScreen'
 import { LearnScreen } from './hub/LearnScreen'
+import { GuideDock } from './guide/GuideDock'
 import { MockScreen, mockFromUrl } from './mock/MockScreen'
 import { useT } from '../i18n'
 import { RocketScreen } from './rocket/RocketScreen'
@@ -116,6 +117,7 @@ export function App() {
                 ⚙
               </button>
             </div>
+            <GuideDock />
             {settingsOpen && <SettingsPanel onClose={() => openSettings(false)} />}
           </>
         )}

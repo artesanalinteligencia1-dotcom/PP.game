@@ -1,4 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { useGuideContent } from '../store/guide'
+import { useSettings } from '../store/settings'
+import { TUTORIAL, designHints, designMood } from './guide/lines'
 import { useMusic } from '../audio/audio'
 import { SpacecraftSprite } from './spacecraft/SpacecraftSprite'
 import { evaluateDesign } from '../engine/evaluate'
@@ -24,6 +27,48 @@ const TABS: { id: TabId; label: StringKey }[] = [
   { id: 'review', label: 'design.tab.review' },
 ]
 
+/** Kuntur on the design screen: the first-mission tutorial once, then hints about the review. */
+function useDesignGuide(report: ReturnType<typeof evaluateDesign>, tab: TabId, setTab: (t: TabId) => void) {
+  const t = useT()
+  const guideOn = useSettings((s) => s.guide)
+  const tutorialDone = useSettings((s) => s.tutorialDone)
+  const setSetting = useSettings((s) => s.set)
+  const [step, setStep] = useState(0)
+  const tutorial = guideOn && !tutorialDone
+  const finish = () => setSetting('tutorialDone', true)
+  const go = (k: number) => {
+    setStep(k)
+    setTab(TUTORIAL[k].tab)
+  }
+  const s = TUTORIAL[Math.min(step, TUTORIAL.length - 1)]
+  const last = step >= TUTORIAL.length - 1
+  const hints = designHints(report, tab)
+  const issues = report.review.filter((i) => i.severity !== 'ok').length
+  useGuideContent(
+    tutorial
+      ? {
+          id: `tutorial-${s.id}`,
+          mood: s.mood,
+          forceOpen: true,
+          lines: [{ title: t(`guide.tutorial.${s.id}.title` as StringKey), text: t(`guide.tutorial.${s.id}.text` as StringKey), mood: s.mood }],
+          progress: t('guide.dock.count', { i: step + 1, n: TUTORIAL.length }),
+          primary: { label: last ? t('guide.tutorial.go') : t('guide.tutorial.next'), run: () => (last ? finish() : go(step + 1)) },
+          secondary: last ? undefined : { label: t('guide.tutorial.skip'), run: finish },
+        }
+      : {
+          id: 'design',
+          mood: designMood(report),
+          badge: issues,
+          lines: hints.map((h) => ({
+            title: h.title,
+            text: h.text,
+            mood: h.mood,
+            action: h.tab ? { label: t('guide.hint.show', { tab: t(TABS.find((x) => x.id === h.tab)!.label) }), run: () => setTab(h.tab!) } : undefined,
+          })),
+        },
+  )
+}
+
 export function DesignScreen({ design }: { design: Design }) {
   const tab = useGame((s) => s.tab)
   const setTab = useGame((s) => s.setTab)
@@ -37,6 +82,7 @@ export function DesignScreen({ design }: { design: Design }) {
   const report = useMemo(() => evaluateDesign(design, scenario), [design, scenario])
   const blocking = report.review.filter((r) => r.blocking).length
   useMusic('design')
+  useDesignGuide(report, tab, setTab)
 
   return (
     <div className="min-h-full">

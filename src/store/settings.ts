@@ -12,10 +12,14 @@ export interface Settings {
   /** False until the player picks a language on the first boot (English is the default). */
   languageChosen: boolean
   uiSounds: boolean
+  /** Kuntur, the robot guide: hints while designing and an explanation after each mission. */
+  guide: boolean
+  /** The first-mission tutorial has been seen (or skipped). */
+  tutorialDone: boolean
 }
 
 const KEY = 'ppgame.settings.v1'
-export const DEFAULT_SETTINGS: Settings = { padLight: 'auto', motion: 'system', language: 'en', languageChosen: false, uiSounds: true }
+export const DEFAULT_SETTINGS: Settings = { padLight: 'auto', motion: 'system', language: 'en', languageChosen: false, uiSounds: true, guide: true, tutorialDone: false }
 
 function read(): Settings {
   try {
@@ -27,6 +31,8 @@ function read(): Settings {
       language: v.language === 'es' ? 'es' : 'en',
       languageChosen: v.languageChosen === true,
       uiSounds: v.uiSounds !== false,
+      guide: v.guide !== false,
+      tutorialDone: v.tutorialDone === true,
     }
   } catch {
     return { ...DEFAULT_SETTINGS }
@@ -41,9 +47,9 @@ export const useSettings = create<SettingsStore>((set, get) => ({
   ...(typeof window !== 'undefined' ? read() : DEFAULT_SETTINGS),
   set: (key, value) => {
     set({ [key]: value } as Partial<SettingsStore>)
-    const { padLight, motion, language, languageChosen, uiSounds } = get()
+    const { padLight, motion, language, languageChosen, uiSounds, guide, tutorialDone } = get()
     try {
-      localStorage.setItem(KEY, JSON.stringify({ padLight, motion, language, languageChosen, uiSounds }))
+      localStorage.setItem(KEY, JSON.stringify({ padLight, motion, language, languageChosen, uiSounds, guide, tutorialDone }))
     } catch {
       /* ignore */
     }

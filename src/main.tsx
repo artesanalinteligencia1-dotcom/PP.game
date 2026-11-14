@@ -4,7 +4,6 @@ import '@fontsource-variable/inter'
 import '@fontsource-variable/space-grotesk'
 import './index.css'
 import { App } from './ui/App'
-import { Stage } from './ui/shell/Stage'
 import { setupOffline } from './platform/offline'
 import { useSettings } from './store/settings'
 
@@ -17,21 +16,11 @@ const proto = new URLSearchParams(window.location.search).get('proto')
 const ProtoScreen = lazy(() => import('./ui/proto/ProtoScreen'))
 
 const scene3d = new URLSearchParams(window.location.search).get('scene3d')
-
-// Robot guide: the three candidate looks side by side, for the owner to choose (?guide=1).
-const guide = new URLSearchParams(window.location.search).get('guide')
-const GuidePreview = lazy(() => import('./ui/guide/GuidePreview'))
 const SceneDebug = lazy(() => import('./ui/launch/three/SceneDebug'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {guide ? (
-      <Stage>
-        <Suspense fallback={null}>
-          <GuidePreview />
-        </Suspense>
-      </Stage>
-    ) : scene3d ? (
+    {scene3d ? (
       <Suspense fallback={null}>
         <SceneDebug launcherId={scene3d} />
       </Suspense>

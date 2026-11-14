@@ -1,11 +1,10 @@
-// The robot guide: three candidate looks, each an SVG drawn in code (no image files), with the same five expressions.
-// Own designs: inspired by the idea of a helpful mission robot, not by any existing character.
+// The robot guide, Kuntur: an SVG drawn in code (no image files) with five expressions. Chosen by the owner on
+// 2026-11-14 over two other looks (a sphere with an orbit halo, a CubeSat). Our own design: inspired by the idea of
+// a helpful mission robot, not by any existing character.
 import type { CSSProperties, ReactNode } from 'react'
 
 export type GuideMood = 'idle' | 'happy' | 'thinking' | 'worried' | 'explaining'
 export const GUIDE_MOODS: GuideMood[] = ['idle', 'happy', 'thinking', 'worried', 'explaining']
-export type GuideVariant = 'kuntur' | 'inti' | 'chaska'
-export const GUIDE_VARIANTS: GuideVariant[] = ['kuntur', 'inti', 'chaska']
 
 export interface RobotProps {
   mood: GuideMood
@@ -130,105 +129,5 @@ export function Kuntur({ mood, talking, size = 200, still, title }: RobotProps) 
   )
 }
 
-/** Inti: a floating sphere with an orbit for a halo, a warm face screen and its own little moon. */
-export function Inti({ mood, talking, size = 200, still, title }: RobotProps) {
-  const tilt = { idle: -12, happy: -4, thinking: -26, worried: -12, explaining: -10 }[mood]
-  const antenna = mood === 'worried' ? '#ef4444' : '#f97316'
-  return (
-    <Svg size={size} title={title} still={still} mood={mood}>
-      <defs>
-        <radialGradient id="inti-shell" cx="0.35" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#334155" />
-          <stop offset="0.6" stopColor="#111c36" />
-          <stop offset="1" stopColor="#050a18" />
-        </radialGradient>
-        <radialGradient id="inti-glow">
-          <stop offset="0" stopColor="#fb923c" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#f97316" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <circle cx={100} cy={102} r={86} fill="url(#inti-glow)" className={still ? undefined : 'guide-glow'} />
-      {/* back half of the orbit, behind the sphere */}
-      <g style={hinge(100, 108, tilt)}>
-        <path d="M18 108 A82 22 0 0 1 182 108" fill="none" stroke="#f97316" strokeWidth={3} opacity={0.45} />
-      </g>
-      <line x1={100} y1={46} x2={100} y2={26} stroke="#94a3b8" strokeWidth={3} strokeLinecap="round" />
-      <circle cx={100} cy={22} r={6} fill={antenna} className={still ? undefined : 'guide-pulse'} />
-      <circle cx={100} cy={104} r={58} fill="url(#inti-shell)" stroke="#fb923c" strokeOpacity={0.5} strokeWidth={1.5} />
-      <path d="M62 76 A50 50 0 0 1 104 52" fill="none" stroke="#e2e8f0" strokeOpacity={0.35} strokeWidth={4} strokeLinecap="round" />
-      <circle cx={44} cy={104} r={5} fill="#1e293b" stroke="#fb923c" strokeWidth={1.5} />
-      <circle cx={156} cy={104} r={5} fill="#1e293b" stroke="#fb923c" strokeWidth={1.5} />
-      <rect x={60} y={86} width={80} height={36} rx={18} fill="#020617" stroke="#fb923c" strokeOpacity={0.6} strokeWidth={1.5} />
-      <Face mood={mood} talking={talking} x1={86} x2={114} y={101} r={5} color="#fdba74" still={still} mouthY={114} />
-      {/* front half of the orbit and the little moon riding it */}
-      <g style={hinge(100, 108, tilt)}>
-        <path d="M18 108 A82 22 0 0 0 182 108" fill="none" stroke="#f97316" strokeWidth={3} />
-        <g className={still ? undefined : 'guide-moon'} style={{ transformOrigin: '100px 108px' }}>
-          <circle cx={182} cy={108} r={6} fill="#e2e8f0" stroke="#f97316" strokeWidth={1.5} />
-        </g>
-      </g>
-      <Thought mood={mood} x={150} y={40} color="#fdba74" still={still} />
-    </Svg>
-  )
-}
-
-/** Chaska: a CubeSat that came back to help — a small cube with a screen face, whisker antennas and panels for arms. */
-export function Chaska({ mood, talking, size = 200, still, title }: RobotProps) {
-  const left = { idle: 30, happy: -40, thinking: 35, worried: -5, explaining: 25 }[mood]
-  const right = { idle: -30, happy: 40, thinking: -95, worried: 5, explaining: -20 }[mood]
-  const arm = (side: 1 | -1, deg: number) => {
-    const hx = side === 1 ? 140 : 60
-    const x = side === 1 ? 142 : 8
-    return (
-      <g style={hinge(hx, 98, deg)}>
-        <g className={still || mood !== 'explaining' || side === -1 ? undefined : 'guide-wave'} style={{ transformOrigin: `${hx}px 98px` }}>
-          <rect x={side === 1 ? 138 : 58} y={95} width={4} height={6} fill="#94a3b8" />
-          <rect x={x} y={86} width={50} height={24} rx={2} fill="#1e3a8a" stroke="#cbd5e1" strokeWidth={1.5} />
-          {[1, 2, 3, 4].map((i) => (
-            <line key={i} x1={x + i * 10} y1={86} x2={x + i * 10} y2={110} stroke="#60a5fa" strokeWidth={1} opacity={0.7} />
-          ))}
-          <line x1={x} y1={98} x2={x + 50} y2={98} stroke="#60a5fa" strokeWidth={1} opacity={0.7} />
-        </g>
-      </g>
-    )
-  }
-  return (
-    <Svg size={size} title={title} still={still} mood={mood}>
-      <defs>
-        <linearGradient id="chaska-foil" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#fde68a" />
-          <stop offset="0.5" stopColor="#d97706" />
-          <stop offset="1" stopColor="#fbbf24" />
-        </linearGradient>
-        <radialGradient id="chaska-jet">
-          <stop offset="0" stopColor="#5eead4" stopOpacity="0.7" />
-          <stop offset="1" stopColor="#14b8a6" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <ellipse cx={100} cy={160} rx={26} ry={10} fill="url(#chaska-jet)" className={still ? undefined : 'guide-glow'} />
-      {/* tape-measure antennas, like whiskers */}
-      <path d="M66 62 Q50 40 38 30" fill="none" stroke="#cbd5e1" strokeWidth={2} strokeLinecap="round" />
-      <path d="M134 62 Q150 40 162 30" fill="none" stroke="#cbd5e1" strokeWidth={2} strokeLinecap="round" />
-      <circle cx={38} cy={30} r={3} fill="#5eead4" className={still ? undefined : 'guide-pulse'} />
-      <circle cx={162} cy={30} r={3} fill="#5eead4" className={still ? undefined : 'guide-pulse'} />
-      {arm(-1, left)}
-      {arm(1, right)}
-      <rect x={60} y={60} width={80} height={86} rx={6} fill="url(#chaska-foil)" stroke="#e2e8f0" strokeWidth={2} />
-      {/* the aluminium rails of a CubeSat frame */}
-      {[60, 134].map((x) => (
-        <rect key={x} x={x} y={58} width={6} height={90} rx={2} fill="#cbd5e1" />
-      ))}
-      <rect x={70} y={70} width={60} height={46} rx={6} fill="#020617" stroke="#5eead4" strokeOpacity={0.6} strokeWidth={1.5} />
-      <Face mood={mood} talking={talking} x1={88} x2={112} y={88} r={5} color="#5eead4" still={still} mouthY={104} />
-      <rect x={72} y={122} width={56} height={16} rx={2} fill="#1e3a8a" stroke="#475569" />
-      {[1, 2, 3].map((i) => (
-        <line key={i} x1={72 + i * 14} y1={122} x2={72 + i * 14} y2={138} stroke="#60a5fa" strokeWidth={1} opacity={0.7} />
-      ))}
-      <Thought mood={mood} x={146} y={50} color="#5eead4" still={still} />
-    </Svg>
-  )
-}
-
-export const ROBOTS: Record<GuideVariant, (p: RobotProps) => ReactNode> = { kuntur: Kuntur, inti: Inti, chaska: Chaska }
-/** Each look's accent colour, for its speech bubble and its card. */
-export const GUIDE_ACCENT: Record<GuideVariant, string> = { kuntur: '#7dd3fc', inti: '#fb923c', chaska: '#5eead4' }
+/** Kuntur's colour, for its speech bubble. */
+export const GUIDE_ACCENT = '#7dd3fc'

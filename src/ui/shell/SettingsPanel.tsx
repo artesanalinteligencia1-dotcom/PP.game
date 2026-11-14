@@ -138,6 +138,24 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <Segmented<Lang> label={t('settings.language')} value={s.language} options={LANGUAGES.map((l) => [l, translate(l, `lang.${l}`)])} onChange={(v) => s.set('language', v)} />
         </Row>
 
+        <h3 className="hud-label mt-5">{t('settings.guideSection')}</h3>
+        <Row label={t('settings.guide')} hint={t('settings.guide.hint')}>
+          <Segmented label={t('settings.guide')} value={s.guide ? 'on' : 'off'} options={onOff} onChange={(v) => s.set('guide', v === 'on')} />
+        </Row>
+        <Row label={t('settings.tutorial')} hint={s.tutorialDone ? t('settings.tutorial.hint') : t('settings.tutorial.pending')}>
+          <button
+            type="button"
+            disabled={!s.tutorialDone}
+            onClick={() => {
+              s.set('tutorialDone', false)
+              s.set('guide', true)
+            }}
+            className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm hover:bg-slate-600 disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+          >
+            {t('settings.tutorial.repeat')}
+          </button>
+        </Row>
+
         <h3 className="hud-label mt-5">{t('settings.saveOffline')}</h3>
         <Row label={t('settings.careerSave')} hint={t('settings.careerSave.hint')}>
           <div className="flex flex-wrap items-center gap-2">

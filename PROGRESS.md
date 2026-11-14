@@ -322,10 +322,30 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     faces, typing, no console errors. 224 tests pass (`tests/guide.test.ts` is new: every look draws every face, still
     robots never animate, the faces differ).
 
+28. Robot guide, delivery 2 (2026-11-14): the owner chose **Kuntur**; Inti, Chaska and the `?guide=1` page are deleted.
+    Kuntur lives in the bottom-left corner of the design and results screens (`src/ui/guide/GuideDock.tsx`, mounted in
+    `App`); the screens tell it what to say through `useGuideContent` (`src/store/guide.ts`), and the lines are pure
+    functions in `src/ui/guide/lines.ts`.
+    - **Design screen, closed:** a small Kuntur whose face tells how the design is doing (worried = something blocks
+      the launch, thinking = warnings, happy = all green) and a badge with the number of issues. **Open:** one hint per
+      issue, blocking first and the open tab first among equals (`orderedIssues`), with the review's "why" and its
+      first lever, and a "Show me (tab)" button that opens the tab where the fix is (`tabFor`).
+    - **First-mission tutorial:** eight steps across the six tabs (each step opens its tab), shown the first time any
+      design screen opens, with "Skip the tutorial"; remembered in settings (`tutorialDone`).
+    - **Results screen:** opens by itself once per flight and explains the result, the causes that cost most first,
+      each with "What I would change", then what went well; face by rank.
+    - **Settings:** a "Robot guide" section: Kuntur on / off (`guide`) and "Repeat the tutorial".
+    - Text is typed out on screen (no voice); the mouth moves while it types; reduced motion shows it whole and stills
+      the robot. Hidden on the launch pad and in flight. 36 new strings, the preview's 27 removed.
+    Checked in the browser in Spanish: the tutorial's eight steps (each on its tab), the hints on an empty design
+    ("No instruments on board" → "Show me" opens Payload; then "Too heavy for the launcher", then "Over budget", each
+    followed to a launch), a full flight and the results opening by themselves (Outstanding, happy face), the Settings
+    section; a fresh tab has no console errors. Fixed on the way: React strict mode remounted the results screen and
+    the bubble forgot it was open (`lastId` in the store). 229 tests pass (`tests/guide.test.ts` rewritten).
+
 ## Next exact step
-The owner chooses the robot guide's look at `?guide=1`. Then delivery 2: delete the two other looks, put the robot
-in the game (hints on the design tabs, "why it failed" on the results screen, first-mission tutorial). The general
-handoff (done / pending) is `HANDOFF.md` at the repo root. Older note, kept for history:
+One animated video per role, hosted by Kuntur (PLAYBOOK §6c; HyperFrames, local). The general handoff (done /
+pending) is `HANDOFF.md` at the repo root. Older note, kept for history:
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
 replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
 tests the Windows installer from GitHub Actions (Desktop build → Artifacts).
