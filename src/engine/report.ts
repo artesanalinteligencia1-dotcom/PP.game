@@ -62,7 +62,12 @@ export function analyseMission(s: MissionState, score: MissionScore, scenario: S
     causes.push({ code: 'CAUSE_STRONG_DOWNLINK', impact: 60, params: { down: Math.round(r.data.downlinkGbDay * 10) / 10 } })
   }
   const lineScience = score.lines.find((l) => l.key === 'science')!
-  if (s.endReason !== 'launch_failure' && s.endReason !== 'landing_failure' && scenario.scoring !== 'cargo' && lineScience.points < lineScience.max * 0.6) {
+  if (scenario.scoring === 'oxygen' && s.endReason !== 'launch_failure' && s.endReason !== 'landing_failure') {
+    const target = scenario.requirements.find((q) => q.kind === 'oxygenKgAtLeast' && !q.optional)?.value ?? 1
+    const made = s.oxygenKg ?? 0
+    if (made < target) causes.push({ code: 'CAUSE_LOW_OXYGEN', impact: -200 * (1 - made / target), params: { made: Math.round(made), target, planned: Math.round(r.oxygen?.plannedKg ?? 0) } })
+  }
+  if (s.endReason !== 'launch_failure' && s.endReason !== 'landing_failure' && scenario.scoring !== 'cargo' && scenario.scoring !== 'oxygen' && lineScience.points < lineScience.max * 0.6) {
     causes.push({ code: 'CAUSE_LOW_SCIENCE', impact: -(lineScience.max - lineScience.points) * 0.6, params: { science: Math.round(s.science), target: scenario.scienceTarget } })
   }
 

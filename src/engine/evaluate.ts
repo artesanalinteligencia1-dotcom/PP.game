@@ -34,6 +34,7 @@ import {
 } from './catalog/components'
 import { defaultTcmReserve, getRoute, marsCruiseDays } from './catalog/routes'
 import { DEFAULT_LANDING, analyzeEdl, isLandingDesign } from './edl'
+import { OXYGEN_UNIT, SOLS_PER_YEAR, analyzeOxygen, isOxygenPlan } from './isru'
 import { marsDelayMin, nextWindowMonth } from './mars'
 import { TRL_COST_FACTOR, TRL_MONTHS, launchCapacityKg, resolveLauncher, successProbability } from './launch'
 import {
@@ -209,18 +210,22 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   const instPeakW = payload.reduce((s, p) => s + p.inst.powerW, 0)
   const busW = BUS_BASE_POWER_W + obc.powerW + adcs.powerW + antenna.powerW + thermal.powerW + prop.powerW + comp.powerW
   const txAvgW = band.txPowerW * (contactMin / MINUTES_PER_DAY)
-  const avgLoadW = busW + instAvgW + txAvgW
+  // Oxygen plant: it runs in daylight first, so only its hours after dark come out of the battery.
+  const oxygen = isOxygenPlan(design.oxygen) && design.oxygen.units > 0 ? analyzeOxygen(design.oxygen, { dayFraction: 1 - ecl, elevationKm: scenario.landingSiteKm }) : null
+  const baseLoadW = busW + instAvgW + txAvgW
+  const avgLoadW = baseLoadW + (oxygen?.avgW ?? 0)
   const peakLoadW = busW + instPeakW + band.txPowerW
   const safeLoadW = BUS_BASE_POWER_W + obc.powerW + 0.4 * adcs.powerW + thermal.powerW + prop.powerW
   const sunlitGenBolW = sunlitPowerW(area, array.efficiency, array.cosFactor, orbit.sunDistanceAu)
   const avgGenBolW = sunlitGenBolW * (1 - ecl)
-  const requiredW = requiredAveragePowerW(avgLoadW, ecl)
+  const requiredW = requiredAveragePowerW(baseLoadW, ecl) + (oxygen?.arrayNeedW ?? 0)
+  const nightNeedWh = baseLoadW * eclipseH + (oxygen?.nightEnergyWh ?? 0)
   const avgGenEolW = degrade(avgGenBolW, orbit.panelDegradation, designLife + transferYears)
   const marginBol = avgGenBolW / requiredW - 1
   const marginEol = avgGenEolW / requiredW - 1
   const cyclesPerYear = ecl > 0 ? MINUTES_PER_YEAR / periodMin : 0
   const dodLimit = cyclesPerYear > 1000 ? 0.3 : 0.6
-  const dodNominal = (avgLoadW * eclipseH) / battery.capacityWh
+  const dodNominal = nightNeedWh / battery.capacityWh
   const dodWorst = (peakLoadW * eclipseH) / battery.capacityWh
   const longEclipseDod = orbit.longEclipseH ? (safeLoadW * orbit.longEclipseH) / battery.capacityWh : undefined
 
@@ -228,11 +233,13 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   else if (marginEol < 0) add('POWER_EOL_NEGATIVE', 'warn', 'power', { gen: avgGenEolW, need: requiredW, years: designLife })
   else if (marginEol < 0.1) add('POWER_MARGIN_LOW', 'warn', 'power', { marginPct: marginEol * 100 })
   else if (marginEol > 1 && !lowThrust) add('POWER_OVERSIZED', 'warn', 'power', { marginPct: marginEol * 100 })
-  if (dodNominal > 1) add('BATTERY_DEPLETED', 'error', 'power', { need: avgLoadW * eclipseH, have: battery.capacityWh, eclipseMin })
+  if (dodNominal > 1) add('BATTERY_DEPLETED', 'error', 'power', { need: nightNeedWh, have: battery.capacityWh, eclipseMin })
   else if (dodNominal > dodLimit) add('BATTERY_DOD_HIGH', 'warn', 'power', { dodPct: dodNominal * 100, limitPct: dodLimit * 100, cycles: cyclesPerYear })
   if (dodNominal <= 1 && dodWorst > 1) add('BATTERY_WORST_CASE', 'warn', 'power', { peak: peakLoadW, eclipseMin, have: battery.capacityWh })
   if (longEclipseDod !== undefined && longEclipseDod > LONG_ECLIPSE_MAX_DOD)
     add('LONG_ECLIPSE_RISK', 'warn', 'power', { hours: orbit.longEclipseH ?? 0, need: safeLoadW * (orbit.longEclipseH ?? 0), have: battery.capacityWh })
+  if (oxygen && !orbit.surface) add('OXYGEN_NEEDS_SURFACE', 'error', 'science')
+  if (oxygen && oxygen.nightHours > 0.05) add('OXYGEN_NIGHT_RUN', 'warn', 'power', { hours: oxygen.nightHours, kwh: oxygen.nightEnergyWh / 1000, battery: battery.capacityWh / 1000 })
   if (lowThrust && sunlitGenBolW < safeLoadW + ELECTRIC_THRUST_POWER_W)
     add('ELECTRIC_UNDERPOWERED', 'error', 'power', { have: sunlitGenBolW, need: safeLoadW + ELECTRIC_THRUST_POWER_W })
 
@@ -242,6 +249,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
     [
     ...payload.map((p): MassItem => ({ label: p.inst.name, kg: p.inst.massKg, group: 'payload' })),
     { label: 'Cargo', kg: cargoKg, group: 'payload' },
+    { label: 'Oxygen plant', kg: oxygen?.massKg ?? 0, group: 'payload' },
     { label: `Solar array (${area.toFixed(1)} m²)`, kg: area > 0 ? area * array.kgPerM2 + array.fixedMassKg : 0, group: 'bus' },
     { label: battery.name, kg: battery.massKg, group: 'bus' },
     { label: `${band.name} radio`, kg: band.massKg, group: 'bus' },
@@ -253,7 +261,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
     { label: comp.name, kg: comp.massKg, group: 'bus' },
     ] satisfies MassItem[]
   ).filter((i) => i.kg > 0)
-  const instrumentsKg = payload.reduce((s, p) => s + p.inst.massKg, 0) + cargoKg
+  const instrumentsKg = payload.reduce((s, p) => s + p.inst.massKg, 0) + cargoKg + (oxygen?.massKg ?? 0)
   const subsystemsKg = items.filter((i) => i.group === 'bus').reduce((s, i) => s + i.kg, 0)
   const structureKg = STRUCTURE_FRACTION * (instrumentsKg + subsystemsKg)
   const marginKg = MASS_MARGIN * (instrumentsKg + subsystemsKg + structureKg)
@@ -324,7 +332,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
     return { id: inst.id, base: inst.science * relevance * dutyFactor * pointingFactor * lowSun * comp.scienceFactor }
   })
   if (orbit.lowSunAngle && payload.some((p) => OPTICAL_INSTRUMENTS.includes(p.inst.id))) add('LOW_SUN_OPTICAL', 'warn', 'science')
-  if (payload.length === 0 && cargoKg <= 0) add('NO_PAYLOAD', 'error', 'science')
+  if (payload.length === 0 && cargoKg <= 0 && !oxygen) add('NO_PAYLOAD', 'error', 'science')
   const coldEnv = orbit.body !== 'earth'
   if (coldEnv && !thermal.coldCapable) add('COLD_RISK', 'warn', 'life', { orbit: orbit.name })
 
@@ -354,7 +362,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   // ---------- Schedule (numbers; its alerts are raised further down) ----------
   // Cargo (with its racks and margin) is not spacecraft to integrate.
   const cargoShareKg = cargoKg * (1 + STRUCTURE_FRACTION) * (1 + MASS_MARGIN)
-  const trlMonths = Math.max(0, ...payload.map((p) => TRL_MONTHS[p.inst.trl]), TRL_MONTHS[obc.trl])
+  const trlMonths = Math.max(0, ...payload.map((p) => TRL_MONTHS[p.inst.trl]), TRL_MONTHS[obc.trl], oxygen ? TRL_MONTHS[OXYGEN_UNIT.trl] : 0)
   const buildMonths =
     DEV_BASE_MONTHS +
     trlMonths +
@@ -370,7 +378,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   const windowWaitMonths = launchMonth - devMonths
 
   // ---------- Cost ----------
-  const instrumentsM = payload.reduce((s, p) => s + p.inst.costM * TRL_COST_FACTOR[p.inst.trl], 0)
+  const instrumentsM = payload.reduce((s, p) => s + p.inst.costM * TRL_COST_FACTOR[p.inst.trl], 0) + (oxygen ? oxygen.costM * TRL_COST_FACTOR[OXYGEN_UNIT.trl] : 0)
   const busM =
     area * array.costPerM2 + battery.costM + band.costM + antenna.costM + obc.costM + adcs.costM + prop.costM + thermal.costM + comp.costM + (edl?.costM ?? 0)
   const integrationM =
@@ -404,8 +412,11 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
   if (radiationLife - transferYears < designLife) riskFactors.push(0.9)
   if (longEclipseDod !== undefined && longEclipseDod > LONG_ECLIPSE_MAX_DOD) riskFactors.push(0.85)
   if (edl) riskFactors.push(edl.reliability)
-  const trls: Trl[] = [...payload.map((p) => p.inst.trl), obc.trl]
+  const trls: Trl[] = [...payload.map((p) => p.inst.trl), obc.trl, ...(oxygen ? [OXYGEN_UNIT.trl] : [])]
   const successP = successProbability(launcher.reliability, trls, riskFactors)
+
+  // Oxygen planned over the mission: the plant's rate, held back if the arrays cannot feed it.
+  const plannedOxygenKg = oxygen && orbit.surface ? oxygen.kgPerSol * SOLS_PER_YEAR * Math.min(designLife, lifeYears) * Math.min(1, avgGenBolW / requiredW) : 0
 
   // ---------- Requirements ----------
   const requirements: RequirementResult[] = scenario.requirements.map((r) => {
@@ -437,6 +448,8 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
         return { ...base, met: totalM <= (r.value ?? Infinity), actual: totalM, target: r.value ?? 0 }
       case 'dvAtMost':
         return { ...base, met: hasProp && totalDv <= (r.value ?? Infinity), actual: totalDv, target: r.value ?? 0 }
+      case 'oxygenKgAtLeast':
+        return { ...base, met: plannedOxygenKg >= (r.value ?? 0), actual: plannedOxygenKg, target: r.value ?? 0 }
       case 'ellipseKmAtMost':
         return { ...base, met: !!edl && edl.ellipseKm <= (r.value ?? Infinity), actual: edl ? edl.ellipseKm : '—', target: r.value ?? 0 }
       case 'arrivalByMonth':
@@ -490,6 +503,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
       dodWorst,
       dodLimit,
       longEclipseDod,
+      ...(oxygen ? { requiredAvgW: requiredW } : {}),
     },
     data: {
       generatedGbDay,
@@ -516,6 +530,7 @@ export function evaluateDesign(design: Design, scenario: Scenario, opts: Evaluat
     science: { perYear: sciencePerYear, total: sciencePerYear * lifeYears, byInstrument },
     risk: { successProbability: successP, launchReliability: launcher.reliability },
     ...(edl ? { edl } : {}),
+    ...(oxygen ? { oxygen: { ...oxygen, plannedKg: plannedOxygenKg } } : {}),
     review,
     requirements,
     canLaunch: !review.some((r) => r.blocking),

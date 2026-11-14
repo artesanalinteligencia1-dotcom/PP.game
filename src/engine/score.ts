@@ -67,6 +67,8 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
   const window = r.schedule.launchMonth !== undefined ? scenario.launchWindow : undefined
   const launchMonth = window ? nextWindowMonth(devMonths, window) : devMonths
 
+  const madeKg = launched ? (s.oxygenKg ?? 0) : 0
+
   const requirements: ActualRequirement[] = scenario.requirements.map((req) => {
     const designed = r.requirements.find((x) => x.id === req.id)!
     const base = { id: req.id, kind: req.kind, optional: !!req.optional }
@@ -83,6 +85,8 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
         return { ...base, met: s.science >= (req.value ?? 0), actual: s.science, target: req.value ?? 0 }
       case 'costAtMost':
         return { ...base, met: costM <= (req.value ?? Infinity), actual: costM, target: req.value ?? 0 }
+      case 'oxygenKgAtLeast':
+        return { ...base, met: launched && madeKg >= (req.value ?? 0), actual: madeKg, target: req.value ?? 0 }
       case 'arrivalByMonth': {
         const arrival = launchMonth + r.schedule.transferMonths
         return { ...base, met: launched && arrival <= (req.value ?? Infinity), actual: arrival, target: req.value ?? 0 }
@@ -101,7 +105,9 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
   const cargo = scenario.scoring === 'cargo'
   const cargoTarget = scenario.requirements.find((q) => q.kind === 'cargoAtLeast' && !q.optional)?.value ?? 1
   const delivered = launched && lifeYears > 0 ? (s.design.cargoKg ?? 0) : 0
-  const science = !launched ? 0 : cargo ? 250 * Math.min(1, delivered / cargoTarget) : 250 * Math.min(1, s.science / scenario.scienceTarget)
+  const oxygen = scenario.scoring === 'oxygen'
+  const oxygenTarget = scenario.requirements.find((q) => q.kind === 'oxygenKgAtLeast' && !q.optional)?.value ?? 1
+  const science = !launched ? 0 : cargo ? 250 * Math.min(1, delivered / cargoTarget) : oxygen ? 250 * Math.min(1, madeKg / oxygenTarget) : 250 * Math.min(1, s.science / scenario.scienceTarget)
   // 3. Resource efficiency (150): launcher margin, EOL power margin, budget use
   const launchMargin = r.mass.capacityKg > 0 ? 1 - r.mass.wetKg / r.mass.capacityKg : 0
   const effLaunch = plateau(launchMargin, 0, 0.15, 0.35, 0.9, 0.4)
@@ -140,6 +146,8 @@ export function scoreMission(s: MissionState, scenario: Scenario): MissionScore 
     line('success', M('score.label.success'), success * soloRescale, 300 * soloRescale, M('score.detail.success', { met: metCount, total: mandatory.length })),
     cargo
       ? line('science', M('score.label.cargo'), science * soloRescale, 250 * soloRescale, M('score.detail.cargo', { delivered: Math.round(delivered), target: cargoTarget }))
+      : oxygen
+      ? line('science', M('score.label.oxygen'), science * soloRescale, 250 * soloRescale, M('score.detail.oxygen', { made: Math.round(madeKg), target: oxygenTarget }))
       : line('science', M('score.label.science'), science * soloRescale, 250 * soloRescale, M('score.detail.science', { science: fmt1(s.science), target: scenario.scienceTarget })),
     line('efficiency', M('score.label.efficiency'), efficiency * soloRescale, 150 * soloRescale, M('score.detail.efficiency', { launch: Math.round(launchMargin * 100), power: Math.round(r.power.marginEol * 100), budget: Math.round(used * 100) })),
     line('decisions', M('score.label.decisions'), decisions * soloRescale, 100 * soloRescale, M('score.detail.decisions', { warns, decisions: s.decisions.length })),

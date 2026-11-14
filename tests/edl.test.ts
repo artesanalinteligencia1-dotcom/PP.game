@@ -223,6 +223,6 @@ describe('landing: texts and career', () => {
     expect(contractStatus(fresh, c)).toBe('locked')
     const ready = { ...fresh, prestige: 400, completed: { mars_orbiter: { best: 800, rank: 'Success' as const, seed: 1, runs: 1 } } }
     expect(contractStatus(ready, c)).toBe('available')
-    expect(CONTRACTS.find((k) => k.id === 'mars_oxygen')!.kind).toBe('preview')
+    expect(CONTRACTS.find((k) => k.id === 'mars_terraform')!.kind).toBe('preview')
   })
 })

@@ -363,3 +363,29 @@ The budget is computed from the ground up, because every kilogram set down has t
 - Sources: NASA JPL mission pages and press kits for Mars Pathfinder, Mars Exploration Rovers, Phoenix, Mars Science
   Laboratory and Mars 2020 (entry masses, aeroshell and parachute sizes, landing ellipses); Braun & Manning, "Mars
   Exploration Entry, Descent and Landing Challenges" (2007) for the ballistic-coefficient limit; NASA Mars fact sheet.
+
+## 24. Oxygen from the Martian air (`src/engine/isru.ts`)
+- **Chemistry:** solid-oxide electrolysis, 2 CO2 → 2 CO + O2 at about 800 °C. One kilogram of O2 is held in
+  88.02 / 32.00 = 2.75 kg of CO2; the plant splits half of what it draws in, so it takes in 5.5 kg of CO2 per kilogram
+  of oxygen. The air is 95 % CO2 at ρ = 0.020 · exp(−h / 11.1) kg/m³: about 230 m³ of air per kilogram of oxygen at
+  −2.5 km.
+- **Plant unit (game values):** 50 kg, 500 W while running, 0.040 kg of O2 per hour, 8 M (× 1.5 for TRL 6, +9 months of
+  development). 12.5 kWh per kilogram. For comparison MOXIE: 17.1 kg, 300 W, up to 12 g/h (about 8 g/h typical, some
+  37 kWh/kg), 122 g in total over 16 runs (2021-2023). Up to 8 units.
+- **Production:** kg per sol = units × 0.040 × hours per sol; a sol is 24.66 h; 355.5 sols in an Earth year.
+- **Power:** the plant runs in daylight first (the lit half of the sol). Hours beyond that come from the battery:
+  night energy = running power × night hours. Arrays must supply, on average,
+  base load × (1 − e + e / 0.9) + plant power × (day share + night share / 0.9), with e = 0.5.
+  Battery depth of discharge = (base load × night hours + plant night energy) / capacity. With the largest battery in
+  the catalog (4 kWh) a plant cannot run far into the night, which is why real plans pair big plants with a small
+  fission reactor.
+- **Planned oxygen** = kg per sol × 355.5 × min(design life, expected life) × min(1, array power at the start / power
+  needed).
+- **In flight:** each week of operations adds kg per sol × 6.81 sols × min(1, power available / power needed) ×
+  throttle × storm factor, and nothing in safe mode. Power available falls 15 % per year (dust on the arrays).
+  Dust storm (about one a year): throttle to 40 % for three weeks, or keep full power (half the time the battery ages
+  0.15 and production still falls to 70 %). Dust devil (0.8 a year): arrays 8 % cleaner, up to +15 %.
+- **Score:** 250 points × min(1, oxygen made / oxygen required), in place of the science line.
+- Sources: NASA / MIT MOXIE results (Hecht et al., "Mars Oxygen ISRU Experiment (MOXIE)", Space Science Reviews 2021;
+  Hoffman et al., Science Advances 2022); NASA Mars 2020 mission pages; NASA Design Reference Architecture 5.0 for the
+  oxygen a crew ascent needs (about 25 tonnes) and the fission power proposed for it.

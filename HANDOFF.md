@@ -7,8 +7,9 @@ cuentas que **no comparten historial**: lo único que pasa de una sesión a otra
 Última actualización: 2026-11-14.
 
 ## Siguiente paso exacto
-**Marte, entrega d: "Breathing Mars"** (producir oxígeno a partir del CO₂ marciano). Punto de partida en
-`CLOUD_NEXT.md`, cola del juego definitivo, punto 5 (d). Antes de empezar: estimar el consumo y proponerla al dueño.
+**Robot guía:** mostrar al dueño 3 variantes de su aspecto hechas en código (detrás de un parámetro en la URL), para
+que elija una; después darle voz con textos en inglés y español. Punto de partida en `CLOUD_NEXT.md`, cola del juego
+definitivo, punto 5, y en `docs/PLAYBOOK.md` §6c. Antes de empezar: estimar el consumo y proponerlo al dueño.
 
 ## Dónde está cada cosa
 | Qué | Dónde |
@@ -24,7 +25,7 @@ cuentas que **no comparten historial**: lo único que pasa de una sesión a otra
 | Tareas que necesitan al dueño o su PC | `LOCAL_TODO.md` |
 | Medios (intro, tráiler, música) | `C:\PPgame\{intro-a,trailer-final,trailer-test,soundtrack,media_raw,tools}` |
 | Servidor de desarrollo | configuración `paulet-dev` en `C:\PPgame\.claude\launch.json` (puerto 5173) |
-| Pruebas | `npm test` dentro de `PP.game` (209 en verde al 2026-11-14) |
+| Pruebas | `npm test` dentro de `PP.game` (221 en verde al 2026-11-14) |
 
 ## Reglas vigentes
 - Explicaciones al dueño en español; código, documentos técnicos y textos del juego en inglés. El juego se elige en
@@ -53,18 +54,19 @@ cuentas que **no comparten historial**: lo único que pasa de una sesión a otra
 | 2026-11-13 | Marte, entrega a: motor (`src/engine/mars.ts`): ventanas cada 25,6 meses, viaje, retardo de radio, conjunción, aerofrenado |
 | 2026-11-13 | Marte, entrega b: contrato "Red Horizon" (orbitador), primer contrato jugable del Acto 3 |
 | 2026-11-14 | Marte, entrega c: entrada, descenso y aterrizaje (`src/engine/edl.ts`) y la misión "Stranded" (suministros a la superficie) |
+| 2026-11-14 | Marte, entrega d: planta de oxígeno (`src/engine/isru.ts`) y la misión "Breathing Mars". El Acto 3 queda jugable completo |
 
 ## Pendiente (en orden)
-1. **Marte, entrega d: "Breathing Mars"**: oxígeno a partir del CO₂ (referencia real: MOXIE). Hoy es una tarjeta de
-   avance en la carrera (`mars_oxygen`, `kind: 'preview'`).
-2. **Robot guía**: compañero que explica lo difícil (pistas, "¿por qué falló?", tutoriales). Decidir su aspecto
+1. **Robot guía**: compañero que explica lo difícil (pistas, "¿por qué falló?", tutoriales). Decidir su aspecto
    mostrando 3 variantes hechas en código (PLAYBOOK §6c).
-3. **Un video animado por rol** (Ingeniero de cohetes, Astrobiólogo y los demás), presentado por el robot guía
+2. **Un video animado por rol** (Ingeniero de cohetes, Astrobiólogo y los demás), presentado por el robot guía
    (HyperFrames, local).
-4. **Más calidad de animación y diseño** (PLAYBOOK §6c).
-5. **Multijugador**: marcador compartido y cooperativo en tiempo real de los 4 roles; ambos necesitan servidor.
-6. **Acto 4**: terraformación como gran desafío (especulativo, etiquetado como tal).
-7. Ideas sueltas anotadas en `CLOUD_NEXT.md` (punto 5): lección sobre ventanas de lanzamiento, Marte en 3D en la
-   vista de vuelo, sitio de aterrizaje elegible, comprobar que el aeroescudo cabe en la cofia.
-8. Del dueño (`LOCAL_TODO.md`): escuchar el audio nuevo, probar el instalador de Windows y la PWA sin conexión,
+3. **Más calidad de animación y diseño** (PLAYBOOK §6c).
+4. **Multijugador**: marcador compartido y cooperativo en tiempo real de los 4 roles; ambos necesitan servidor.
+5. **Acto 4**: terraformación como gran desafío (especulativo, etiquetado como tal). Hoy es una tarjeta de avance en
+   la carrera (`mars_terraform`).
+6. Ideas sueltas anotadas en `CLOUD_NEXT.md` (punto 5): lección sobre ventanas de lanzamiento, Marte en 3D en la
+   vista de vuelo, sitio de aterrizaje elegible, comprobar que el aeroescudo cabe en la cofia, una fuente de energía
+   nocturna para plantas de oxígeno grandes.
+7. Del dueño (`LOCAL_TODO.md`): escuchar el audio nuevo, probar el instalador de Windows y la PWA sin conexión,
    publicar a producción con un PR de `cloud/fase-1` a `main` cuando quiera.

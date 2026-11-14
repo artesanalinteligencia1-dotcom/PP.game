@@ -284,10 +284,35 @@ preview deployments; the public link updates when `cloud/fase-1` is merged into 
     Checked in the browser: the panel in Spanish and English; in English a flight lost at landing (seed 5, with the
     storm decision) and one that lands and scores Outstanding (seed 6), both through the results screen; no console
     errors. 209 tests pass (`tests/edl.test.ts` is new, 17 tests).
+26. Mars, delivery d (2026-11-14): "Breathing Mars", oxygen from the Martian air. Act 3 is fully playable.
+    - **Engine** `src/engine/isru.ts` (pure, docs/model.md §24). A plant of 0 to 8 units (50 kg, 500 W, 40 g of oxygen
+      per hour each, TRL 6) that runs a chosen number of hours per sol. `analyzeOxygen`: kg per sol and per year, energy
+      per kilogram (12.5 kWh), CO2 and Martian air drawn in (2 CO2 → 2 CO + O2, half of the CO2 split), the sols to make
+      its own mass in oxygen. It runs in daylight first: only the hours after dark come out of the battery
+      (`nightEnergyWh`), so `evaluateDesign` sizes the arrays with `power.requiredAvgW` and the battery with the night
+      share (the average-load formulas are untouched for every other design). `Design.oxygen`, `DesignReport.oxygen`
+      (with `plannedKg`), requirement `oxygenKgAtLeast`, `Scenario.scoring: 'oxygen'`, review codes
+      `OXYGEN_NIGHT_RUN` and `OXYGEN_NEEDS_SURFACE`.
+    - **Flight:** `MissionState.oxygenKg` grows every week of operations with the plant's rate × the power actually
+      available (dust on the arrays: 15 %/yr) × safe mode × storms. New surface events: a dust storm (decision:
+      throttle the plant to 40 % for three weeks, or keep full power and risk the battery) and a dust devil that cleans
+      the arrays (+8 % power, for any lander). Score line "Oxygen made" (250 points against the required kilograms),
+      report cause `CAUSE_LOW_OXYGEN`.
+    - **"Breathing Mars"** (`mars_oxygen`, now `kind: 'orbital'`, after Stranded with 500 prestige, pays 250 M):
+      300 kg of oxygen in one year on the surface, 420 M, window in month 36. The base design plans 284 kg, just
+      short; a plant sized exactly for 300 kg comes up short in flight, so the lesson is margin. Balance over 60 seeds
+      with 3 units, 12 h per sol and 20 m² of array: Outstanding 52, lost at launch or landing 8.
+    - **UI:** Payload tab → "Oxygen plant" (`src/ui/mars/OxygenPanel.tsx`): units, hours per sol, and what they give
+      (oxygen per sol and over the mission, power, energy per kilogram, air drawn in, mass payback, what the same oxygen
+      would weigh on the launch pad if brought from Earth); flight screen → "Oxygen made" gauge. 51 new strings.
+    Checked in the browser in English, through the interface: the panel, the sliders (3 units at 12 h on 12 m² of array
+    is blocked for power; at 8 h it plans 341 kg), then launch, a full flight on the bot (two dust storms, a
+    conjunction, a slip absorbed by the window margin; 317 of 300 kg) and the results (Outstanding, 883); no console
+    errors. 221 tests pass (`tests/isru.test.ts` is new, 12 tests).
 
 ## Next exact step
-Mars delivery d ("Breathing Mars"); plan in CLOUD_NEXT.md, queue item 5. The general handoff (done / pending) is
-`HANDOFF.md` at the repo root. Older note, kept for history:
+The robot guide (PLAYBOOK §6c): three coded variants of its look for the owner to choose from. The general handoff
+(done / pending) is `HANDOFF.md` at the repo root. Older note, kept for history:
 The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
 replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
 tests the Windows installer from GitHub Actions (Desktop build → Artifacts).

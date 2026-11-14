@@ -249,6 +249,16 @@ export const MESSAGES: Record<string, (p: P) => Message> = {
     why: t('review.msg.RIDESHARE_SCHEDULE.why', { every: n(p, 'every'), wait: n(p, 'wait', 1) }),
     levers: [t('review.msg.RIDESHARE_SCHEDULE.lever.0'), t('review.msg.RIDESHARE_SCHEDULE.lever.1')],
   }),
+  OXYGEN_NEEDS_SURFACE: () => ({
+    title: t('review.msg.OXYGEN_NEEDS_SURFACE.title'),
+    why: t('review.msg.OXYGEN_NEEDS_SURFACE.why'),
+    levers: [t('review.msg.OXYGEN_NEEDS_SURFACE.lever.0')],
+  }),
+  OXYGEN_NIGHT_RUN: (p) => ({
+    title: t('review.msg.OXYGEN_NIGHT_RUN.title'),
+    why: t('review.msg.OXYGEN_NIGHT_RUN.why', { hours: n(p, 'hours', 1), kwh: n(p, 'kwh', 1), battery: n(p, 'battery', 1) }),
+    levers: [t('review.msg.OXYGEN_NIGHT_RUN.lever.0'), t('review.msg.OXYGEN_NIGHT_RUN.lever.1')],
+  }),
   EDL_SHELL_TOO_SMALL: (p) => ({
     title: t('review.msg.EDL_SHELL_TOO_SMALL.title'),
     why: t('review.msg.EDL_SHELL_TOO_SMALL.why', { entry: n(p, 'entry'), diameter: n(p, 'diameter', 2), beta: n(p, 'beta'), max: n(p, 'max') }),
@@ -353,6 +363,7 @@ const REQUIREMENTS = [
   'dvAtMost',
   'arrivalByMonth',
   'ellipseKmAtMost',
+  'oxygenKgAtLeast',
 ] as const
 export const REQUIREMENT_LABEL: Record<string, string> = Object.defineProperties(
   {} as Record<string, string>,
@@ -398,6 +409,11 @@ export const CAUSE_TEXT: Record<string, (p: CP) => CauseMessage> = {
     title: t('cause.CAUSE_LAUNCH_FAILURE.title'),
     why: t('cause.CAUSE_LAUNCH_FAILURE.why', { reliability: String(p.reliability) }),
     change: t('cause.CAUSE_LAUNCH_FAILURE.change'),
+  }),
+  CAUSE_LOW_OXYGEN: (p) => ({
+    title: t('cause.CAUSE_LOW_OXYGEN.title'),
+    why: t('cause.CAUSE_LOW_OXYGEN.why', { made: String(p.made), target: String(p.target), planned: String(p.planned) }),
+    change: t('cause.CAUSE_LOW_OXYGEN.change'),
   }),
   CAUSE_LANDING_FAILURE: (p) => ({
     title: t('cause.CAUSE_LANDING_FAILURE.title'),

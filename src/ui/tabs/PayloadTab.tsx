@@ -1,6 +1,7 @@
 import { dataGbPerDay } from '../../engine/budget'
 import { instruments } from '../../engine/catalog'
-import type { Design, PointingLevel, Scenario } from '../../engine/types'
+import type { Design, DesignReport, PointingLevel, Scenario } from '../../engine/types'
+import { OxygenPanel } from '../mars/OxygenPanel'
 import { fmt } from '../../i18n/en'
 import { useGame } from '../../store/game'
 import { Pill, Section, Slider } from '../components'
@@ -12,7 +13,7 @@ const POINTING_LABEL: Record<PointingLevel, StringKey> = {
   precise: 'payload.pointing.precise',
 }
 
-export function PayloadTab({ design, scenario }: { design: Design; scenario: Scenario }) {
+export function PayloadTab({ design, scenario, report }: { design: Design; scenario: Scenario; report: DesignReport }) {
   const toggle = useGame((s) => s.toggleInstrument)
   const go = useGame((s) => s.go)
   const setDuty = useGame((s) => s.setDuty)
@@ -36,6 +37,7 @@ export function PayloadTab({ design, scenario }: { design: Design; scenario: Sce
           />
         </Section>
       )}
+      {(scenario.scoring === 'oxygen' || design.oxygen) && <OxygenPanel design={design} report={report} />}
       <button type="button" className="btn-secondary mb-3 px-3 py-1.5 text-sm" onClick={() => go('astro')}>
         {t('payload.openLab')}
       </button>

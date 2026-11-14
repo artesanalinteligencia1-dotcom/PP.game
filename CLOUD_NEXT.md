@@ -66,7 +66,7 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 4. Astrobiologist pad ✅ (2026-11-13): `src/engine/astrobio.ts`, `src/ui/astro/AstroScreen.tsx`, PROGRESS item 20. Ideas
    left: tie the lab's evidence score to the science of career contracts, lock worlds by act, a 3D view of the world,
    a lesson on biosignatures and false positives.
-5. Mars acts: deliveries a, b ✅ (2026-11-13, PROGRESS items 23 and 24) and c ✅ (2026-11-14, item 25); asynchronous multiplayer: challenge links ✅
+5. Mars acts: all four deliveries ✅ (a, b 2026-11-13; c, d 2026-11-14; PROGRESS items 23 to 26); asynchronous multiplayer: challenge links ✅
    (2026-11-13, PROGRESS item 22). Left for multiplayer: a shared leaderboard needs a server (out of scope for the
    offline game), real-time co-op of the 4 roles.
    Mars plan, in deliveries: **(a) ✅ engine** `src/engine/mars.ts`: Mars orbit, launch target `tmi`, windows every
@@ -74,14 +74,14 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    "Red Horizon" (`mars_orbiter`), added before the two preview cards, which stay as previews.
    **(c) ✅ landing** `src/engine/edl.ts` and "Stranded" (`mars_stranded`): destination `mars_surface`, heat shield,
    parachute, airbags / legs / sky crane, guided entry, landing roll in flight.
-   **(d) next: "Breathing Mars"** (oxygen from CO2; real reference MOXIE on Perseverance, 2021-2023). Start from: a
-   lander on `mars_surface` (delivery c) carrying an oxygen plant as its payload. Suggested model: the plant is an
-   instrument-like component with mass, power and a production rate (MOXIE: about 300 W for 6 to 10 g of O2 per hour);
-   power on the surface is the limit (night, dust on the panels, 43 % of Earth's sunlight), so the lesson is the energy
-   budget per kilogram of oxygen; score the kilograms produced over the mission (`scoring: 'cargo'`-like, or a new
-   `scoring: 'product'`); turn the `mars_oxygen` preview into `kind: 'orbital'` after `mars_stranded`. Before starting,
-   quote the expected usage to the owner.
-   Ideas left from a/b/c: a lesson on launch windows (the phase angle, animated with `transferView`) and one on the
+   **(d) ✅ "Breathing Mars"** `src/engine/isru.ts` and `mars_oxygen`: an oxygen plant as the lander's payload, run by
+   daylight, scored by the kilograms made.
+   **Next in the owner's queue: the robot guide** (PLAYBOOK §6c). Start by showing three coded variants of its look
+   behind a flag (rule 3.3: decide by showing), then give it lines through i18n: contextual hints on the design tabs,
+   "why did this fail?" on the results screen (the causes of `analyseMission` are already there), first-time tutorials.
+   After it: one animated video per role, hosted by the robot (HyperFrames, local).
+   Ideas left from a/b/c/d: a power source that works at night for big plants (a small fission reactor, as real plans
+   propose); storing the oxygen (tanks, boil-off); Act 4 (terraforming, speculative); a lesson on launch windows (the phase angle, animated with `transferView`) and one on the
    seven minutes; a 3D Mars in the flight view (reuse `WorldViewer3D`); a choice of landing site (`landingSiteKm` is
    fixed per scenario today); a check that the aeroshell fits the launcher's fairing; the `helio` flyby orbit moved to
    the `tmi` target; a bipropellant engine for big capture burns; an animated landing in 3D.

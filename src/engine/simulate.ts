@@ -8,6 +8,7 @@ import { COLLISION_AVOIDANCE_DV, evaluateDesign } from './evaluate'
 import { getScenario } from './catalog/scenarios'
 import { getRoute, marsCruiseDays } from './catalog/routes'
 import { EDL_MINUTES } from './edl'
+import { SOL_HOURS } from './isru'
 import { CONJUNCTION_BLACKOUT_WEEKS, conjunctionDays } from './mars'
 import { MINUTES_PER_YEAR, maintenanceDvPerYear, noPropulsionOrbitLifeYears, stationContactMinutes } from './orbit'
 import { mixSeed, rngNext } from './rng'
@@ -84,6 +85,9 @@ export interface MissionState {
   /** Three-body routes: correction Δv actually needed (drawn at launch; chaos makes it uncertain) and the reserve carried. */
   tcmNeed: number | null
   tcmReserve: number
+  /** Oxygen plant: kilograms made so far, and a dust storm holding production back until a week. */
+  oxygenKg?: number
+  dust?: { until: number; factor: number }
   /** Landers: multiplier on the chance of a safe landing (decisions before entry). */
   landingFactor?: number
   /** Mars: no radio link through this week (the Sun is between the two planets). */
@@ -119,6 +123,8 @@ export interface MissionState {
 }
 
 const WEEKS_PER_YEAR = 52
+const SOLS_PER_WEEK = (7 * 24) / SOL_HOURS
+const DUST_STORM_WEEKS = 3
 const DIFFICULTY_EVENT_FACTOR: Record<Difficulty, number> = { beginner: 0.5, engineer: 1, expert: 1.3, sandbox: 1 }
 const DIFFICULTY_LAUNCH_FACTOR: Record<Difficulty, number> = { beginner: 0.5, engineer: 1, expert: 1.2, sandbox: 1 }
 
@@ -133,6 +139,8 @@ export const EVENT_RATES = {
   science_opportunity: 0.8,
   lunar_eclipse: 2.0,
   chaotic_drift: 1.5,
+  dust_storm: 1.0,
+  cleaning_gust: 0.8,
 }
 type EventId = keyof typeof EVENT_RATES
 
@@ -321,6 +329,10 @@ function eventAllowed(s: MissionState, id: EventId): boolean {
       return activeStations(s).length > 0
     case 'micrometeoroid':
       return !orbit.surface
+    case 'dust_storm':
+      return !!s.report.oxygen && s.phase === 'operations'
+    case 'cleaning_gust':
+      return !!orbit.surface && s.phase === 'operations'
     default:
       return true
   }
@@ -332,7 +344,7 @@ function maybeEvent(s: MissionState) {
   const ids = (Object.keys(EVENT_RATES) as EventId[]).filter((id) => eventAllowed(s, id))
   const rates = ids.map((id) => {
     let r = EVENT_RATES[id] / WEEKS_PER_YEAR
-    if (id !== 'science_opportunity' && id !== 'lunar_eclipse') r *= f
+    if (id !== 'science_opportunity' && id !== 'lunar_eclipse' && id !== 'cleaning_gust') r *= f
     if (id === 'solar_flare' && orbit.radiationKradYr >= 5) r *= 1.5
     return r
   })
@@ -468,6 +480,25 @@ function triggerEvent(s: MissionState, id: EventId) {
       }
       return
     }
+    case 'cleaning_gust': {
+      s.panelFactor = Math.min(1.15, s.panelFactor * 1.08)
+      log(s, 'engineer', 'good', M('sim.gust'))
+      return
+    }
+    case 'dust_storm': {
+      s.pending = {
+        eventId: id,
+        week: s.week,
+        role: 'engineer',
+        title: M('sim.dustStorm.title'),
+        text: M('sim.dustStorm.text', { weeks: DUST_STORM_WEEKS }),
+        options: [
+          { id: 'throttle', label: M('sim.dustStorm.throttle'), hint: M('sim.dustStorm.throttle.hint'), quality: 'good', safe: true },
+          { id: 'full', label: M('sim.dustStorm.full'), hint: M('sim.dustStorm.full.hint'), quality: 'poor', bold: true },
+        ],
+      }
+      return
+    }
     case 'chaotic_drift': {
       s.pending = {
         eventId: id,
@@ -576,6 +607,18 @@ export function decide(s: MissionState, optionId: string, byBot = false) {
   s.pending = null
   const who = byBot ? ref('sim.who.bot', 'Bot') : ref('sim.who.you', 'You')
   switch (p.eventId as EventId | 'chaos_correction' | 'conjunction' | 'aerobrake_storm' | 'landing_storm') {
+    case 'cleaning_gust':
+      return
+    case 'dust_storm':
+      if (opt.id === 'throttle') {
+        s.dust = { until: s.week + DUST_STORM_WEEKS, factor: 0.4 }
+        log(s, p.role, 'info', M('sim.do.dustStorm.throttle', { who }))
+      } else if (rand(s) < 0.5) {
+        s.batteryWear += 0.15
+        s.dust = { until: s.week + DUST_STORM_WEEKS, factor: 0.7 }
+        log(s, p.role, 'bad', M('sim.do.dustStorm.drained', { who }))
+      } else log(s, p.role, 'good', M('sim.do.dustStorm.lucky', { who }))
+      return
     case 'landing_storm':
       if (opt.id === 'update') {
         s.reserveM -= 2
@@ -732,7 +775,7 @@ export function advanceWeek(s: MissionState) {
   s.doseKrad += orbit.radiationKradYr / WEEKS_PER_YEAR
   const years = s.week / WEEKS_PER_YEAR
   const powerNow = r.power.avgGenBolW * s.panelFactor * (1 - orbit.panelDegradation) ** years
-  const powerNeed = r.power.avgLoadW * (1 - r.power.eclipseFraction + r.power.eclipseFraction / 0.9)
+  const powerNeed = r.power.requiredAvgW ?? r.power.avgLoadW * (1 - r.power.eclipseFraction + r.power.eclipseFraction / 0.9)
   const powerRatio = powerNeed > 0 ? powerNow / powerNeed : 1
 
   if (s.doseKrad >= obc.radToleranceKrad) return end(s, 'radiation', 'engineer', M('sim.end.radiation', { dose: s.doseKrad.toFixed(1), obc: name(obc) }))
@@ -793,6 +836,12 @@ export function advanceWeek(s: MissionState) {
   const deliveredFraction = genWeek > 0 ? Math.min(1, delivered / genWeek) : 0
   const dutyScience = Math.sqrt(s.dutyFactor)
   s.science += (rawPerYear / WEEKS_PER_YEAR) * deliveredFraction * dutyScience * Math.min(1, powerRatio) * s.scienceFactor
+
+  // Oxygen plant: its rate, held back by safe mode, a throttled plant, short power or a dust storm.
+  if (r.oxygen) {
+    const storm = s.dust && s.week <= s.dust.until ? s.dust.factor : 1
+    s.oxygenKg = (s.oxygenKg ?? 0) + (inSafe ? 0 : r.oxygen.kgPerSol * SOLS_PER_WEEK * s.dutyFactor * Math.min(1, powerRatio) * storm)
+  }
 
   // Events, then end-of-plan check.
   if (conjunctionWeeks(s).includes(s.week)) conjunction(s)

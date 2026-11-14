@@ -13,7 +13,7 @@ Explanations to the owner are in Spanish; code, docs and in-game text in English
 - **Story:** Dr. Pedro Goicochea (fictional), a kid from Arequipa who grew up asking "how do you get up there?", inspired by
   Pedro Paulet (1874–1945), the Peruvian engineer who *claimed* a liquid-fuel engine test in Paris in the 1890s.
 - **Acts:** prologue Paulet-1 sounding rocket → Act 1 Earth orbit career (investors, tech tree) → Act 2 Moon / L2 / three-body
-  chaos → Act 3 Mars ("Red Horizon" orbiter and "Stranded" landing playable since 2026-11-14; "Breathing Mars" planned) → Act 4 (speculative, locked).
+  chaos → Act 3 Mars (playable since 2026-11-14: "Red Horizon" orbiter, "Stranded" landing, "Breathing Mars" oxygen plant) → Act 4 (speculative, locked).
 - **Goal of the owner:** a game you **download and play offline**, later **multiplayer**; this repo is the *base*.
 - **Name:** "Paulet: Andes to Orbit" — always from `src/brand.ts` (`GAME_NAME`, `GAME_SUBTITLE`, `GAME_TITLE`).
 

@@ -1,4 +1,5 @@
 import type { EdlReport, LandingDesign } from './edl'
+import type { OxygenPlan, OxygenReport } from './isru'
 import type { LaunchWindow } from './mars'
 import type { RocketDesign } from './rocket'
 // Pure engine types. No React, no DOM.
@@ -239,6 +240,8 @@ export interface Design {
   cargoKg?: number
   /** Landing sites: heat shield, parachute and descent system (see edl.ts). */
   landing?: LandingDesign
+  /** Landers: an oxygen plant that works the Martian air (see isru.ts). */
+  oxygen?: OxygenPlan
   /** Transfer route for three-body destinations (see catalog/routes.ts). */
   routeId?: string
   /** Trajectory-correction Δv reserve (m/s); defaults to twice the route's expected need. */
@@ -263,6 +266,7 @@ export interface Requirement {
     | 'dvAtMost'
     | 'arrivalByMonth'
     | 'ellipseKmAtMost'
+    | 'oxygenKgAtLeast'
   instrumentIds?: string[]
   orbitIds?: string[]
   propulsionIds?: string[]
@@ -292,7 +296,7 @@ export interface Scenario {
   /** Planetary missions: the launch can only happen in a window (project months). */
   launchWindow?: LaunchWindow
   /** 'cargo' contracts score delivered cargo instead of science. */
-  scoring?: 'science' | 'cargo'
+  scoring?: 'science' | 'cargo' | 'oxygen'
   /** Who pays for this contract (campaign). */
   client?: 'agency' | 'commercial' | 'foundation'
   /** Scenario-specific science opportunity event (empty instrument list = no opportunity). */
@@ -355,6 +359,8 @@ export interface PowerBreakdown {
   dodWorst: number
   dodLimit: number
   longEclipseDod?: number
+  /** Average power the arrays must supply when it is not simply the average load (an oxygen plant that runs by day). */
+  requiredAvgW?: number
 }
 
 export interface DataBreakdown {
@@ -410,6 +416,8 @@ export interface DesignReport {
   life: LifeBreakdown
   science: { perYear: number; total: number; byInstrument: { id: string; value: number }[] }
   risk: { successProbability: number; launchReliability: number }
+  /** Oxygen plant: its budget and the oxygen planned over the design life (kg). */
+  oxygen?: OxygenReport & { plannedKg: number }
   /** Landing sites: the entry, descent and landing budget. */
   edl?: EdlReport
   review: ReviewItem[]

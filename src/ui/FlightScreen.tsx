@@ -87,6 +87,7 @@ export function FlightScreen() {
   const powerRatio = last ? last.power / 100 : 1
   const logs = [...mission.log].reverse().slice(0, 40)
   const destination = getOrbit(mission.design.orbitId)
+  const oxygenTarget = scenario.requirements.find((q) => q.kind === 'oxygenKgAtLeast' && !q.optional)?.value ?? 1
   const marsRoute = destination.body === 'mars' ? getRoute(destination.id, mission.design.routeId) : null
 
   return (
@@ -213,13 +214,23 @@ export function FlightScreen() {
         {/* Gauges */}
         <section className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
           <h2 className="hud-label">{t('flight.status.title')}</h2>
-          <Gauge
-            label={t('flight.gauge.science')}
-            value={`${fmt(mission.science)} / ${scenario.scienceTarget}`}
-            fill={mission.science / scenario.scienceTarget}
-            tone="ok"
-            tip={t('flight.gauge.science.tip')}
-          />
+          {scenario.scoring === 'oxygen' ? (
+            <Gauge
+              label={t('flight.gauge.oxygen')}
+              value={`${fmt(mission.oxygenKg ?? 0)} / ${oxygenTarget} kg`}
+              fill={(mission.oxygenKg ?? 0) / oxygenTarget}
+              tone="ok"
+              tip={t('flight.gauge.oxygen.tip')}
+            />
+          ) : (
+            <Gauge
+              label={t('flight.gauge.science')}
+              value={`${fmt(mission.science)} / ${scenario.scienceTarget}`}
+              fill={mission.science / scenario.scienceTarget}
+              tone="ok"
+              tip={t('flight.gauge.science.tip')}
+            />
+          )}
           <Gauge
             label={t('flight.gauge.battery')}
             value={`${fmt(batteryHealth * 100)}%`}

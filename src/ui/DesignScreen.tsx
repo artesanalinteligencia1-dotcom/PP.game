@@ -90,7 +90,7 @@ export function DesignScreen({ design }: { design: Design }) {
         </aside>
         <main className="min-w-0">
           {tab === 'mission' && <MissionTab scenario={scenario} report={report} />}
-          {tab === 'payload' && <PayloadTab design={design} scenario={scenario} />}
+          {tab === 'payload' && <PayloadTab design={design} scenario={scenario} report={report} />}
           {tab === 'spacecraft' && <SpacecraftTab design={design} report={report} />}
           {tab === 'orbit' && <OrbitTab design={design} report={report} />}
           {tab === 'comms' && <CommsTab design={design} report={report} />}
