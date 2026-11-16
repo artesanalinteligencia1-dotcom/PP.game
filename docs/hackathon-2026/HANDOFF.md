@@ -5,7 +5,7 @@
 > fecha, actualiza "Pendiente" y "Siguiente paso exacto", y haz commit.
 > Explicaciones al dueño en español; código, textos del juego y entrega en inglés.
 
-Última actualización: 2026-11-15 (noche: nombre "Paulet: Andes to Orbit" en todo y revisión general final).
+Última actualización: 2026-11-16 (limpieza final hecha: este archivo ya no está en el repo del concurso; vive aquí, en `PP.game/docs/hackathon-2026/`).
 
 ---
 
@@ -285,6 +285,10 @@ La tarjeta, si se usa, la ingresa el dueño en la página del proveedor; nunca C
       El juego ya decía "Andes to Orbit".
 - [x] 2026-11-15 noche · **Demo `/deck/` centrada en cualquier pantalla:** en ventanas de menos de 1920×1080 (laptops
       de 1366×768, teléfonos) la diapositiva quedaba corrida y cortada; ahora se centra con `translate(-50%,-50%) scale()`.
+- [x] 2026-11-16 · **Celular y tableta en horizontal** (commit `3ee3281`): en vertical aparece "Gira tu dispositivo";
+      al primer toque, pantalla completa y bloqueo horizontal donde el navegador lo permite (Android Chrome; en iPhone
+      queda el aviso); el escenario se ajusta al área visible real (`visualViewport`); sin zoom por doble toque ni
+      recarga al deslizar; "Toca la pantalla para empezar" en pantallas táctiles. `game/src/ui/shell/Stage.tsx`.
 - [x] 2026-11-15 noche · **Revisión general final** (navegador, 1024×768): menú, Extras (7 elementos), elegir misión,
       taller (6 pestañas), plataforma, lanzamiento, vuelo con decisión, informe, Aprender, Datos de NASA, Legado,
       Banco de cohetes, Laboratorio, Intro, Caja de arena, Ajustes, Nueva carrera y Campaña, en español y en inglés:
@@ -495,7 +499,15 @@ La tarjeta, si se usa, la ingresa el dueño en la página del proveedor; nunca C
    - [x] **Resumen del proyecto nuevo** (1447 de 1500 caracteres, primera persona, con el toque creativo y lo técnico) en
      `docs/SUBMISSION.md` → High-Level Project Summary. **El dueño debe pegarlo** en la página del proyecto.
 
-32. [ ] **LIMPIEZA FINAL DEL REPO (hacer al final, después de las últimas modificaciones y de comprobar que el juego corre bien)** (pedido del dueño, 2026-11-15).
+32. [x] (2026-11-16) **Hecha.** Commit `5f864d0` en el repo del concurso (queda solo `README.md`, `.gitignore` y
+   `game/`); los 510 archivos internos se copiaron aquí (`docs/hackathon-2026/`, commit `12415cf` en `cloud/fase-1`, que
+   subió también los 4 commits locales pendientes del dueño). README público nuevo (qué es, cómo jugar, enlaces, fuentes
+   de NASA, créditos y uso de IA), `game/README.md` y `game/CREDITS.md` actualizados. Las copias locales de `media/` y
+   `docs/` siguen en el disco del dueño, ignoradas por git. Comprobado: tsc, 262 pruebas, build, y en Vercel el menú,
+   una misión, la demo `/deck/` y un video con subtítulos, sin errores de consola.
+   **Pendiente (paso 5): el dueño decide si se borran también del historial de git** (reescribir historial y force push).
+   Hoy los archivos borrados aún se ven en commits anteriores del repo público.
+   Texto original del punto: **LIMPIEZA FINAL DEL REPO (hacer al final, después de las últimas modificaciones y de comprobar que el juego corre bien)** (pedido del dueño, 2026-11-15).
    **PREGUNTAR AL DUEÑO ANTES DE EMPEZAR** (dicho por él el 2026-11-15 noche: es lo último de la hackathon y no se hace
    sin su visto bueno):
    - Este repo es público y debe quedar **solo con lo del juego**. `HANDOFF.md`, partes del `README.md` y otros archivos
