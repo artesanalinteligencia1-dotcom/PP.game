@@ -5,7 +5,7 @@
 > fecha, actualiza "Pendiente" y "Siguiente paso exacto", y haz commit.
 > Explicaciones al dueño en español; código, textos del juego y entrega en inglés.
 
-Última actualización: 2026-11-16 (historial de git del repo del concurso reescrito; falta el video viejo de la intro y el pedido a GitHub Support, ver punto 32).
+Última actualización: 2026-11-16 (historial de git del repo del concurso reescrito; incluido el video viejo de la intro; falta el pedido a GitHub Support, ver punto 32).
 
 ---
 
@@ -509,11 +509,12 @@ La tarjeta, si se usa, la ingresa el dueño en la página del proveedor; nunca C
    `fable-3d-wip` y `scene3d-realism` (local) y force push de `main` y `fable-3d-wip`. Quedan 42 commits en `main` (antes 67;
    se descartaron los que solo tocaban archivos internos); el contenido actual quedó idéntico (mismo árbol). Todos los
    identificadores de commit cambiaron (el de la limpieza ahora es `541723f`). tsc, 262 pruebas y build OK; Vercel y
-   `/deck/` responden 200. Respaldo del historial viejo completo: `C:\PPgameespaldo-paulet-spaceapps-historial-2026-11-16.bundle`
+   `/deck/` responden 200. Respaldo del historial viejo completo: `C:\PPgame
+espaldo-paulet-spaceapps-historial-2026-11-16.bundle`
    (480 MB, en la PC del dueño; no subirlo a ningún lado).
    **Pendiente:**
-   - `game/src/assets/video/intro.mp4` (intro vieja con Goicochea niño, regla de menores) **sigue en el historial**. Quitarlo
-     exige otro force push: el dueño debe aprobarlo de nuevo.
+   - Hecho (2026-11-16, segunda aprobación del dueño): `game/src/assets/video/intro.mp4` (intro vieja con Goicochea niño)
+     también se quitó de todo el historial; force push de nuevo. El commit de la limpieza ahora es `ad3c152`.
    - GitHub guarda en caché los commits viejos: siguen abriendo por enlace directo con su identificador (p. ej.
      `blob/3ee3281/HANDOFF.md`) y por el PR #1 (`fable-3d-wip`, ya fusionado). Para borrarlos del todo, el dueño tiene que
      pedirlo a GitHub Support (formulario "Remove sensitive data" / purgar caché y referencias del PR). No hay forks.
