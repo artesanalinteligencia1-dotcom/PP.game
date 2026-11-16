@@ -1,0 +1,34 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage" style="background:radial-gradient(ellipse at 60% 110%, #5a2412 0%, #1d0c06 50%, #070403 85%)">
+      <div class="k-kicker" id="hk-k" style="left:120px; top:110px">BREATHING MARS · THE REAL STORY</div>
+      <div class="k-title" id="hk-t" style="left:120px; top:160px; font-size:96px; width:820px">OXYGEN FROM<br>MARTIAN AIR</div>
+      <div class="k-panel" id="hk-e" style="left:960px; top:160px; width:400px; height:470px; border-color:#36d1ff">
+        <div class="k-head" style="color:#36d1ff">EARTH · A BOX OF AIR</div>
+        <svg id="hk-es" viewBox="0 0 400 420" style="position:absolute; left:0; top:50px; width:400px; height:420px"></svg>
+      </div>
+      <div class="k-panel" id="hk-m" style="left:1400px; top:160px; width:400px; height:470px; border-color:#f08a3c">
+        <div class="k-head" style="color:#f08a3c">MARS · SAME BOX</div>
+        <svg id="hk-ms" viewBox="0 0 400 420" style="position:absolute; left:0; top:50px; width:400px; height:420px"></svg>
+      </div>
+      <div class="k-label cream" id="hk-l1" style="left:960px; top:650px">LESS THAN 1% OF EARTH'S PRESSURE</div>
+      <div class="k-abs" id="hk-l2" style="left:960px; top:700px; font-size:40px; font-weight:600"><span style="color:#8a8f98">●</span> CO₂ ≈ 95% <span style="margin-left:24px; color:#36d1ff">●</span> O₂ ≈ 0.1%</div>
+      <div class="k-label" id="hk-l3" style="left:960px; top:770px">MOLECULE COUNTS ARE ILLUSTRATIVE</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    const r = K.rng(7), dots = (sel, n, col) => { let s = ""; for (let i = 0; i < n; i++) s += `<circle class="${sel.slice(1)}-d" cx="${(20 + r() * 360).toFixed(0)}" cy="${(20 + r() * 380).toFixed(0)}" r="5" fill="${col(i)}"/>`; document.querySelector(sel).innerHTML = s; };
+    dots("#hk-es", 220, (i) => (i % 5 === 0 ? "#36d1ff" : "#c9c2b2"));
+    dots("#hk-ms", 6, () => "#8a8f98");
+    K.fade(tl, "#hk-k", 0.2, 0.5, 0); K.blurIn(tl, "#hk-t", 0.35, 0.9);
+    K.fade(tl, "#hk-e", c("vo1", 0.6), 0.5, 30); K.fade(tl, "#hk-m", c("vo1", 1.0), 0.5, 30);
+    tl.fromTo(".hk-es-d", { opacity: 0 }, { opacity: 1, duration: 0.02, stagger: 0.006 }, c("vo1", 1.0));
+    tl.fromTo(".hk-ms-d", { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, stagger: 0.25 }, c("vo1", 2.4));
+    // the molecules jiggle (thermal motion)
+    document.querySelectorAll(".hk-es-d, .hk-ms-d").forEach((el, i) => tl.to(el, { x: (r() - 0.5) * 30, y: (r() - 0.5) * 30, duration: 1.2 + r(), yoyo: true, repeat: 6, ease: "sine.inOut" }, 0.5 + (i % 9) * 0.1));
+    K.fade(tl, "#hk-l1", c("vo1", 3.0), 0.5, 0); K.fade(tl, "#hk-l2", c("vo1", 3.6), 0.5, 0); K.fade(tl, "#hk-l3", c("vo1", 4.2), 0.5, 0);
+    K.exit(tl, "#hk-stage", "whip", c.dur);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

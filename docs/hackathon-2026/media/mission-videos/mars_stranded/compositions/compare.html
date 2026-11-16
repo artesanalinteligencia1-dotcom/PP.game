@@ -1,0 +1,52 @@
+<template>
+  <div id="root" data-composition-id="compare" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="compare-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="compare-kicker" style="left:140px; top:92px">YOUR MISSION VS. THE REAL ONE</div>
+      <div class="k-h2" id="compare-title" style="left:140px; top:136px">Perseverance, 18 February 2021</div>
+      <div class="k-photo" id="compare-photo" style="left:140px; top:262px; width:720px; height:478px">
+        <img id="compare-img" src="assets/pieces.jpg" alt="" style="object-position:45% 50%">
+        <div class="k-credit">Image: NASA/JPL-Caltech/UArizona · HiRISE</div>
+      </div>
+      <div class="k-abs" id="compare-row0" style="left:940px; top:262px; width:840px; height:150px">
+        <div class="k-label gold" style="left:0; top:0">ENTRY SPEED</div>
+        <div class="k-num" id="compare-val0" style="left:0; top:38px; font-size:88px">≈ 20,000 km/h</div>
+        <div class="k-label" style="right:0; top:86px; font-size:28px">top of the atmosphere</div>
+        <div class="k-abs" style="left:0; top:138px; width:840px; height:4px; background:#252a31"></div>
+        <div class="k-abs" id="compare-bar0" style="left:0; top:138px; width:840px; height:4px; background:#e0457b"></div>
+      </div>
+      <div class="k-abs" id="compare-row1" style="left:940px; top:428px; width:840px; height:150px">
+        <div class="k-label gold" style="left:0; top:0">PARACHUTE</div>
+        <div class="k-num" id="compare-val1" style="left:0; top:38px; font-size:88px">21.5 m wide</div>
+        <div class="k-label" style="right:0; top:86px; font-size:28px">opened near 1,500 km/h</div>
+        <div class="k-abs" style="left:0; top:138px; width:840px; height:4px; background:#252a31"></div>
+        <div class="k-abs" id="compare-bar1" style="left:0; top:138px; width:420px; height:4px; background:#d9b46a"></div>
+      </div>
+      <div class="k-abs" id="compare-row2" style="left:940px; top:594px; width:840px; height:150px">
+        <div class="k-label gold" style="left:0; top:0">TOUCHDOWN</div>
+        <div class="k-num" id="compare-val2" style="left:0; top:38px; font-size:88px">≈ 2.7 km/h</div>
+        <div class="k-label" style="right:0; top:86px; font-size:28px">slower than walking</div>
+        <div class="k-abs" style="left:0; top:138px; width:840px; height:4px; background:#252a31"></div>
+        <div class="k-abs" id="compare-bar2" style="left:0; top:138px; width:33px; height:4px; background:#7fd17a"></div>
+      </div>
+      <div class="k-panel" id="compare-yours" style="left:140px; top:772px; width:1640px; height:104px; border-color:#36d1ff">
+        <div class="k-label cyan" style="left:24px; top:8px; font-size:28px">YOUR DESIGN · COMPARE WITH YOUR MISSION REPORT</div>
+        <div class="k-abs" style="left:24px; top:48px; white-space:nowrap"><div class="k-chip" style="position:relative; display:inline-block; margin-right:18px; border-color:#36d1ff; color:#36d1ff">LANDING ERROR</div><div class="k-chip" style="position:relative; display:inline-block; margin-right:18px; border-color:#36d1ff; color:#36d1ff">RELAY PASSES</div><div class="k-chip" style="position:relative; display:inline-block; margin-right:18px; border-color:#36d1ff; color:#36d1ff">SUPPLIES DELIVERED</div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("compare");
+    K.enter(tl, "#compare-stage", "whip");
+    K.fade(tl, "#compare-kicker", 0.35); K.fade(tl, "#compare-title", 0.5, 0.6, 24);
+    K.photo(tl, "#compare-photo", 0.7); K.kb(tl, "#compare-img", 0.7, c.dur, { s: 1.0 }, { s: 1.14, x: -14 });
+    const t0 = c("vo8", 0.3), step = Math.max(1.1, (c.end("vo8") - c("vo8") - 0.8) / 3);
+    K.fade(tl, "#compare-row0", t0 + 0 * step, 0.5, 0, 30); K.grow(tl, "#compare-bar0", t0 + 0 * step + 0.15, 1.2);
+    K.fade(tl, "#compare-row1", t0 + 1 * step, 0.5, 0, 30); K.grow(tl, "#compare-bar1", t0 + 1 * step + 0.15, 1.2);
+    K.fade(tl, "#compare-row2", t0 + 2 * step, 0.5, 0, 30); K.grow(tl, "#compare-bar2", t0 + 2 * step + 0.15, 1.2);
+    K.fade(tl, "#compare-yours", c("vo9", -0.2), 0.6, 30);
+    tl.fromTo("#compare-yours .k-chip", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.18, ease: "back.out(2)" }, c("vo9", 0.3));
+    K.exit(tl, "#compare-stage", "zoom", c.dur);
+    window.__timelines["compare"] = tl;
+  </script>
+</template>

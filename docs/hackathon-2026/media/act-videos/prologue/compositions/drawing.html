@@ -1,0 +1,59 @@
+<template>
+  <div id="root" data-composition-id="drawing" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="dr-stage" class="k-stage" style="background:radial-gradient(ellipse at 35% 50%, #0f2238 0%, #08121f 60%, #04080e 100%)">
+      <div class="k-grid" style="background-size:40px 40px; opacity:.9"></div>
+      <div class="k-photo" id="dr-frame" style="left:150px; top:150px; width:700px; height:748px; border-color:#36d1ff; background:#f4f1ea">
+        <img id="dr-img" src="assets/avion-torpedo-nasa.jpg" alt="" style="object-fit:contain">
+        <div id="dr-scan" style="position:absolute; left:0; top:0; width:100%; height:6px; background:#36d1ff; box-shadow:0 0 26px 8px rgba(54,209,255,.7); opacity:0; z-index:2"></div>
+        <div class="k-credit" style="font-size:24px">PAULET'S DRAWING · REPRODUCED BY NASA, 1977</div>
+      </div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <g fill="none" stroke="#36d1ff" stroke-width="2.5">
+          <path class="dr-l" id="dr-l2" d="M 495 290 L 900 290"/>
+          <path class="dr-l" id="dr-l1" d="M 285 420 L 330 380 L 900 380"/>
+          <path class="dr-l" id="dr-l3" d="M 640 500 L 900 500"/>
+          <path class="dr-l" id="dr-l4" d="M 560 640 L 900 640"/>
+          <path class="dr-l" id="dr-l5" d="M 720 705 L 760 730 L 900 730"/>
+        </g>
+        <g fill="#36d1ff"><circle class="dr-d" cx="285" cy="420" r="7"/><circle class="dr-d" cx="495" cy="290" r="7"/><circle class="dr-d" cx="640" cy="500" r="7"/><circle class="dr-d" cx="560" cy="640" r="7"/><circle class="dr-d" cx="720" cy="705" r="7"/></g>
+      </svg>
+      <div class="k-label cyan" id="dr-t2" style="left:920px; top:272px">GLASS CABIN FOR THE PILOT</div>
+      <div class="k-label cyan" id="dr-t1" style="left:920px; top:362px">BANKS OF ROCKETS IN THE WINGS</div>
+      <div class="k-label cyan" id="dr-t3" style="left:920px; top:482px">WINGS SWEPT BACK · VERTICAL CLIMB</div>
+      <div class="k-label cyan" id="dr-t4" style="left:920px; top:622px">WINGS OPEN · HORIZONTAL FLIGHT</div>
+      <div class="k-label cyan" id="dr-t5" style="left:920px; top:712px">ROCKETS FIRING IN ROWS</div>
+      <div class="k-kicker" id="dr-k" style="left:920px; top:110px; color:#d9b46a">PEDRO PAULET'S DESIGN</div>
+      <div class="k-h2" id="dr-title" style="left:920px; top:150px; font-size:64px">THE AVION-TORPEDO</div>
+      <div class="k-abs" id="dr-time" style="left:920px; top:800px; width:760px; height:120px">
+        <div class="k-label" style="left:0; top:0">1890s</div>
+        <div class="k-label" style="right:0; top:0">2020s</div>
+        <div class="k-abs" style="left:0; top:50px; width:760px; height:4px; background:#252a31"></div>
+        <div class="k-abs" id="dr-bar" style="left:0; top:50px; width:760px; height:4px; background:#d9b46a"></div>
+        <div class="k-label gold" id="dr-paper" style="left:0; top:72px; font-weight:600">A CENTURY ON PAPER</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("drawing");
+    K.enter(tl, "#dr-stage", "wipe", { dur: 0.7 });
+    K.photo(tl, "#dr-frame", 0.3, "down");
+    tl.fromTo("#dr-scan", { opacity: 1, y: 0 }, { opacity: 1, y: 742, duration: 1.6, ease: "none" }, 0.5); tl.set("#dr-scan", { opacity: 0 }, 2.1);
+    K.kb(tl, "#dr-img", 0.3, c.dur, { s: 1.0 }, { s: 1.06, y: -8 });
+    K.fade(tl, "#dr-k", c("vo3", 0.2), 0.5); K.blurIn(tl, "#dr-title", c("vo3", 0.5), 0.8);
+    // the parts get named one by one while the voice describes the craft
+    const order = [2, 1, 3, 4, 5]; const t0 = c("vo3", 0.9), st = 0.62;
+    order.forEach((n, i) => {
+      K.draw(tl, "#dr-l" + n, t0 + i * st, 0.55, "power2.out");
+      tl.fromTo(document.querySelectorAll(".dr-d")[n - 1], { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.3, ease: "back.out(3)" }, t0 + i * st);
+      K.fade(tl, "#dr-t" + n, t0 + i * st + 0.35, 0.4, 0, -14);
+    });
+    // "a century on paper": labels step back, the timeline fills
+    tl.to([".dr-l", ".dr-d", "#dr-t1", "#dr-t2", "#dr-t3", "#dr-t4", "#dr-t5"], { opacity: 0.3, duration: 0.6 }, c("vo4", 1.1));
+    K.fade(tl, "#dr-time", c("vo4", 0), 0.5);
+    K.grow(tl, "#dr-bar", c("vo4", 0.3), 2.2);
+    tl.fromTo("#dr-paper", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.6 }, c("vo4", 1.4));
+    tl.to("#dr-img", { filter: "sepia(.6) brightness(.85)", duration: 1.6 }, c("vo4", 0.4));
+    K.exit(tl, "#dr-stage", "zoom", c.dur, { x: 495, y: 290 });
+    window.__timelines["drawing"] = tl;
+  </script>
+</template>

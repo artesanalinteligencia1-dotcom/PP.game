@@ -1,0 +1,53 @@
+<template>
+  <div id="root" data-composition-id="window" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="wi-stage" class="k-stage">
+      <div class="k-space"></div>
+      <div class="k-photo" id="wi-photo" style="left:90px; top:150px; width:760px; height:700px; border-color:#d9b46a">
+        <img id="wi-img" src="assets/act3-03.png" alt="" style="object-position:62% 50%">
+        <div class="k-ai">AI-GENERATED</div>
+      </div>
+      <div class="k-kicker" id="wi-k" style="left:940px; top:92px">EARTH AND MARS · REAL ORBITAL SPEEDS</div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <g transform="translate(1370 520)">
+          <circle r="150" fill="none" stroke="#2a6fb4" stroke-width="2" stroke-dasharray="6 8"/>
+          <circle r="229" fill="none" stroke="#b5532e" stroke-width="2" stroke-dasharray="6 8"/>
+          <circle r="22" fill="#f2b84b"/>
+          <path id="wi-hoh" fill="none" stroke="#d9b46a" stroke-width="3" opacity="0"/>
+          <circle id="wi-e" r="12" fill="#4a9be0"/><circle id="wi-m" r="10" fill="#d0643a"/>
+        </g>
+      </svg>
+      <div class="k-panel" id="wi-clock" style="left:940px; top:150px; width:300px; height:150px">
+        <div class="k-head">MONTHS</div>
+        <div class="k-num" id="wi-mo" style="left:24px; top:62px; font-size:76px">0</div>
+      </div>
+      <div class="k-chip" id="wi-w" style="left:1580px; top:170px; font-size:36px; border-color:#7fd17a; color:#7fd17a; opacity:0">LAUNCH WINDOW</div>
+      <div class="k-label" id="wi-n" style="left:940px; top:850px; line-height:1.4">A WINDOW OPENS WHEN MARS IS ~44° AHEAD OF EARTH<br>THE TRIP ON THE GOLD PATH TAKES ≈ 8.5 MONTHS</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("window");
+    // Earth: 12 months per orbit; Mars: 22.6 months. A Hohmann window opens when Mars leads Earth by ~44°.
+    const RE = 150, RM = 229, M = 54; const e0 = 0, m0 = 44;
+    const ang = (mo) => [e0 + 360 * mo / 12, m0 + 360 * mo / 22.6];
+    const pos = (a, r) => [r * Math.cos(a * Math.PI / 180), -r * Math.sin(a * Math.PI / 180)];
+    const set = (mo) => { const [a, b] = ang(mo); const pe = pos(a, RE), pm = pos(b, RM);
+      const E = document.querySelector("#wi-e"), Ma = document.querySelector("#wi-m"); E.setAttribute("cx", pe[0]); E.setAttribute("cy", pe[1]); Ma.setAttribute("cx", pm[0]); Ma.setAttribute("cy", pm[1]);
+      document.querySelector("#wi-mo").textContent = Math.floor(mo); };
+    // half of the Hohmann ellipse from Earth at departure to Mars' orbit on the far side
+    const hoh = (a0) => { const a = (RE + RM) / 2, ee = (RM - RE) / (RM + RE); let d = ""; for (let k = 0; k <= 60; k++) { const nu = Math.PI * k / 60; const r = a * (1 - ee * ee) / (1 + ee * Math.cos(nu)); const th = a0 * Math.PI / 180 + nu; d += (k ? " L " : "M ") + (r * Math.cos(th)).toFixed(1) + " " + (-r * Math.sin(th)).toFixed(1); } return d; };
+    set(0);
+    K.enter(tl, "#wi-stage", "rise");
+    K.photo(tl, "#wi-photo", 0.3); K.kb(tl, "#wi-img", 0.3, c.dur, { s: 1.0 }, { s: 1.1, x: -20 });
+    K.fade(tl, "#wi-k", 0.5, 0.5, 0); K.fade(tl, "#wi-clock", 0.6, 0.5, 0, 20);
+    const t0 = c("vo3", 0.2), D = c.end("vo3") - t0 + 0.6; const o = { mo: 0 };
+    tl.fromTo(o, { mo: 0 }, { mo: M, duration: D, ease: "none", onUpdate: () => set(o.mo) }, t0);
+    // windows at month 0 and month ~26 (synodic period 25.6 months)
+    [0, 25.6, 51.2].forEach((w) => { const t = t0 + D * w / M; if (w > M) return;
+      tl.set("#wi-hoh", { attr: { d: hoh(ang(w)[0]) } }, t);
+      tl.fromTo("#wi-hoh", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t); tl.to("#wi-hoh", { opacity: 0, duration: 0.6 }, t + 0.9);
+      tl.fromTo("#wi-w", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, t); tl.to("#wi-w", { opacity: 0.25, duration: 0.5 }, t + 1.0); });
+    K.fade(tl, "#wi-n", c("vo3", 2.6), 0.5, 0);
+    K.exit(tl, "#wi-stage", "zoom", c.dur, { x: 1370, y: 520 });
+    window.__timelines["window"] = tl;
+  </script>
+</template>

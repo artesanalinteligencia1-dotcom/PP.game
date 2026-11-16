@@ -1,0 +1,34 @@
+<template>
+  <div id="root" data-composition-id="hangar" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ha-stage" class="k-stage">
+      <div id="ha-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="ha-img" src="assets/act4-02.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-ai" style="right:40px; bottom:40px">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-photo" id="ha-draw" style="left:110px; top:110px; width:420px; height:450px; border-color:#36d1ff; background:#f4f1ea">
+        <img src="assets/avion-torpedo-nasa.jpg" alt="" style="object-fit:contain">
+        <div class="k-credit" style="font-size:24px">1902 DRAWING · REPRODUCED BY NASA</div>
+      </div>
+      <div class="k-panel" id="ha-pp" style="left:550px; top:100px; width:330px; height:370px"></div>
+      <div class="k-photo" id="ha-port" style="left:570px; top:118px; width:200px; height:246px; border-color:#e8e0cc">
+        <img src="assets/paulet-portrait.jpg" alt="" style="object-position:50% 25%">
+      </div>
+      <div class="k-label cream" id="ha-pl" style="left:570px; top:378px; font-weight:600">PEDRO PAULET</div>
+      <div class="k-label" id="ha-pl2" style="left:570px; top:416px">PUBLIC DOMAIN PHOTO</div>
+      <svg class="k-svg" viewBox="0 0 1920 1080"><path id="ha-arrow" d="M 540 470 C 700 520, 820 560, 960 560" fill="none" stroke="#36d1ff" stroke-width="4" stroke-dasharray="12 10"/></svg>
+      <div class="k-chip" id="ha-built" style="left:980px; top:530px; border-color:#36d1ff; color:#36d1ff; font-size:34px">BUILT FROM THE DRAWING</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hangar");
+    K.enter(tl, "#ha-stage", "wipe");
+    K.kb(tl, "#ha-img", 0, c.dur + 0.5, { s: 1.04, x: 30 }, { s: 1.14, x: -30, y: -10 });
+    K.photo(tl, "#ha-draw", c("vo3", 1.6), "down");
+    K.fade(tl, "#ha-pp", c("vo3", 2.1), 0.4, 0); tl.fromTo("#ha-port", { opacity: 0, rotation: 6, y: -20 }, { opacity: 1, rotation: 2, y: 0, duration: 0.6, ease: "power3.out" }, c("vo3", 2.2));
+    K.fade(tl, ["#ha-pl", "#ha-pl2"], c("vo3", 2.5), 0.4, 0);
+    K.draw(tl, "#ha-arrow", c("vo3", 3.6), 0.8);
+    K.pop(tl, "#ha-built", c("vo3", 4.2), 0.45);
+    K.exit(tl, "#ha-stage", "whip", c.dur);
+    window.__timelines["hangar"] = tl;
+  </script>
+</template>

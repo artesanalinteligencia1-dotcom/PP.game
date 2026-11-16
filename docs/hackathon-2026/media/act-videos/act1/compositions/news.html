@@ -1,0 +1,28 @@
+<template>
+  <div id="root" data-composition-id="news" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ne-stage" class="k-stage">
+      <div id="ne-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="ne-img" src="assets/act1-05.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-abs" id="ne-tick" style="left:0; top:960px; width:1920px; height:64px; background:#c43a2e; overflow:hidden">
+        <div class="k-abs" style="left:0; top:0; width:250px; height:64px; background:#0b0d10; color:#f4efe2; font-size:36px; font-weight:600; padding:10px 22px; letter-spacing:.12em; z-index:2">BREAKING</div>
+        <div class="k-abs" id="ne-crawl" style="left:270px; top:10px; white-space:nowrap; font-size:38px; font-weight:600; color:#fff; letter-spacing:.04em">A ROCKET FROM AREQUIPA? · SMALL TEAM LOSES ITS FIRST LAUNCH · "WE WILL FLY AGAIN," SAYS THE MISSION DIRECTOR · INVESTORS WAIT AND SEE · A ROCKET FROM AREQUIPA? ·</div>
+      </div>
+      <div class="k-panel ne-c" id="ne-c1" style="left:120px; top:140px; width:600px; height:104px; border-radius:18px; border-color:#8a8f98"><div class="k-abs" style="left:22px; top:14px; font-size:34px; line-height:1.15">rocket fuel: chicha morada?</div><div class="k-label" style="left:22px; top:62px; font-size:28px">♥ 2.4K · REPLY</div></div>
+      <div class="k-panel ne-c" id="ne-c2" style="left:1200px; top:260px; width:600px; height:104px; border-radius:18px; border-color:#8a8f98"><div class="k-abs" style="left:22px; top:14px; font-size:34px; line-height:1.15">is that a cuy in a spacesuit</div><div class="k-label" style="left:22px; top:62px; font-size:28px">♥ 5.1K · REPLY</div></div>
+      <div class="k-panel ne-c" id="ne-c3" style="left:180px; top:560px; width:600px; height:104px; border-radius:18px; border-color:#8a8f98"><div class="k-abs" style="left:22px; top:14px; font-size:34px; line-height:1.15">Arequipa to Mars, next stop</div><div class="k-label" style="left:22px; top:62px; font-size:28px">♥ 980 · REPLY</div></div>
+      <div class="k-panel ne-c" id="ne-c4" style="left:1150px; top:600px; width:640px; height:104px; border-radius:18px; border-color:#d9b46a"><div class="k-abs" style="left:22px; top:14px; font-size:34px; line-height:1.15; color:#d9b46a">don't laugh. try it yourself.</div><div class="k-label" style="left:22px; top:62px; font-size:28px">♥ 312 · REPLY</div></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("news");
+    K.enter(tl, "#ne-stage", "zoom");
+    K.kb(tl, "#ne-img", 0, c.dur + 0.5, { s: 1.06 }, { s: 1.16, y: -20 });
+    tl.fromTo("#ne-tick", { y: 80 }, { y: 0, duration: 0.5, ease: "power3.out" }, 0.3);
+    tl.fromTo("#ne-crawl", { x: 0 }, { x: -1500, duration: c.dur + 0.5, ease: "none" }, 0.3);
+    ["#ne-c1", "#ne-c2", "#ne-c3", "#ne-c4"].forEach((s, i) => tl.fromTo(s, { opacity: 0, scale: 0.7, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(2)" }, c("vo7", 1.2 + i * 0.5)));
+    K.exit(tl, "#ne-stage", "whip", c.dur);
+    window.__timelines["news"] = tl;
+  </script>
+</template>

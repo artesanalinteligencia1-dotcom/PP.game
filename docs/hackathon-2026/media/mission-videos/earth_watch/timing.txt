@@ -1,0 +1,22 @@
+earth_watch  total 75.83s
+
+[hook] start 0.0  dur 12.05
+   vo1      1.20 ->   6.66   Your satellite passes over the same place at the same local time, every time.
+   vo2      7.16 ->   8.85   Why does that matter?
+
+[history] start 12.05  dur 13.95
+   vo3      0.90 ->   7.13   In 1972, the first Landsat satellite began photographing the whole planet.
+   vo4      7.73 ->  12.55   The record is now more than fifty years long, the longest of its kind.
+
+[science] start 26.0  dur 20.25
+   vo5      1.00 ->   5.99   A sun-synchronous orbit turns with the seasons, about one degree a day,
+   vo6      6.29 ->  10.33   so the lighting stays the same and changes on the ground are real.
+   vo7     11.53 ->  15.11   Healthy leaves reflect near-infrared light strongly.
+   vo7b    15.51 ->  18.65   That lets us measure forest health from space.
+
+[compare] start 46.25  dur 16.35
+   vo8      0.80 ->   8.55   Landsat 9 flies at 705 kilometres and returns to each place every 16 days.
+   vo9      9.15 ->  15.15   Now compare your design. Every pixel is part of a story about forests and farms.
+
+[ending] start 62.6  dur 13.23
+   fra      1.00 ->   5.73   Life leaves fingerprints in colour. From orbit, the planet is a living map.

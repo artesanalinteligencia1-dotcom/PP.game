@@ -1,0 +1,21 @@
+act4  total 63.6s
+
+[homage] start 0.0  dur 14.58
+   vo1      1.20 ->   8.83   In 2018, a heavy rocket carried an unusual test payload: a car. It still orbits 
+   vo2      9.43 ->  12.98   The team from Arequipa chose a different payload.
+
+[hangar] start 14.58  dur 9.97
+   vo3      0.70 ->   6.66   The Paulet 1: Pedro Paulet's Avion-Torpedo, built piece by piece from his drawin
+   chi      7.16 ->   8.77   Every rivet where he drew it.
+
+[launch] start 24.55  dur 8.45
+   vo4      3.60 ->   7.25   Launch day. The whole of Arequipa holds its breath.
+
+[orbit] start 33.0  dur 8.6
+   vo5      0.90 ->   5.60   More than a century later, Paulet's Avion-Torpedo is in space.
+
+[letter] start 41.6  dur 8.5
+   goi      1.00 ->   4.64   Dear Pedro: we kept your promise. Now it belongs to them.
+
+[close] start 50.1  dur 13.5
+   vo6      1.00 ->   2.29   Your turn.

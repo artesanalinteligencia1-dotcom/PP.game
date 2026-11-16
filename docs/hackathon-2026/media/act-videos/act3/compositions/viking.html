@@ -1,0 +1,39 @@
+<template>
+  <div id="root" data-composition-id="viking" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="vi-stage" class="k-stage" style="background:#0b0807">
+      <div id="vi-a" style="position:absolute; inset:0; overflow:hidden">
+        <img id="vi-ai" src="assets/act3-01.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(10,6,4,.75) 0%, transparent 50%)"></div>
+      <div class="k-kicker" id="vi-k" style="left:120px; top:110px">ACT 3 · MARS</div>
+      <div class="k-title" id="vi-t" style="left:120px; top:160px; font-size:120px">THE<br>WINDOW</div>
+      <div class="k-year" id="vi-y" style="left:120px; top:470px; font-size:110px">20 JUL 1976</div>
+      <div id="vi-b" style="position:absolute; inset:0; background:rgba(8,6,5,.96); opacity:0; z-index:5">
+        <div class="k-kicker" style="left:120px; top:150px">VIKING 1 · FIRST PHOTOGRAPH FROM THE SURFACE OF MARS</div>
+        <div class="k-photo" id="vi-ph" style="left:120px; top:230px; width:1680px; height:598px; border-color:#d9b46a">
+          <img src="assets/viking1.jpg" alt="" style="object-fit:cover">
+          <div id="vi-scan" style="position:absolute; top:0; width:6px; height:100%; background:#f08a3c; box-shadow:0 0 24px 6px rgba(240,138,60,.7); z-index:2; left:0"></div>
+          <div class="k-credit">IMAGE: NASA / JPL · VIKING 1 LANDER, 1976</div>
+        </div>
+        <div class="k-label" id="vi-note" style="left:120px; top:850px">THE CAMERA SCANNED ONE VERTICAL LINE AT A TIME · ONE OF THE LANDER'S FOOTPADS AT RIGHT</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("viking");
+    K.kb(tl, "#vi-ai", 0, c("vo1", 4), { s: 1.04 }, { s: 1.14, x: -30 });
+    K.fade(tl, "#vi-k", 0.15, 0.5, 0);
+    tl.fromTo("#vi-t", { opacity: 0, x: -40, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, 0.0);
+    tl.fromTo("#vi-y", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.0, ease: "steps(11)" }, c("vo1", 0.2));
+    // the real picture arrives the way it did in 1976: line by line, left to right
+    const tb = c("vo1", 3.2), scan = c.end("vo1b") - tb - 0.4;
+    tl.to("#vi-b", { opacity: 1, duration: 0.6 }, tb - 0.4);
+    tl.fromTo("#vi-ph", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: scan, ease: "steps(90)" }, tb);
+    tl.fromTo("#vi-scan", { x: 0 }, { x: 1674, duration: scan, ease: "steps(90)" }, tb);
+    tl.set("#vi-scan", { opacity: 0 }, tb + scan);
+    K.fade(tl, "#vi-note", c("vo1b", 0), 0.5, 0);
+    K.exit(tl, "#vi-stage", "whip", c.dur);
+    window.__timelines["viking"] = tl;
+  </script>
+</template>

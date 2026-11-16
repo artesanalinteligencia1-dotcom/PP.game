@@ -1,0 +1,52 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-space"></div>
+      <div class="k-kicker" id="hi-k" style="left:120px; top:92px">FROM PEN AND PAPER TO REAL SPACECRAFT</div>
+      <div class="k-abs" id="hi-line" style="left:120px; top:200px; width:1680px; height:4px; background:#3a3f47"></div>
+      <div class="k-abs" id="hi-fill" style="left:120px; top:200px; width:1680px; height:4px; background:#d9b46a; transform-origin:0% 50%"></div>
+      <div class="k-year" id="hi-y1" style="left:120px; top:230px; font-size:90px">1772</div>
+      <div class="k-year" id="hi-y2" style="left:720px; top:230px; font-size:90px">2010</div>
+      <div class="k-year" id="hi-y3" style="left:1320px; top:230px; font-size:90px">2022</div>
+      <div class="k-photo" id="hi-p1" style="left:120px; top:360px; width:440px; height:568px; border-color:#e8e0cc">
+        <img src="assets/lagrange.jpg" alt="" style="object-position:50% 30%">
+        <div class="k-credit">LIBRARY OF CONGRESS</div>
+      </div>
+      <div class="k-panel" id="hi-p2" style="left:720px; top:360px; width:540px; height:568px">
+        <div class="k-head">ARTEMIS · TWO PROBES</div>
+        <svg viewBox="0 0 540 518" style="position:absolute; left:0; top:50px; width:540px; height:518px">
+          <circle cx="70" cy="250" r="34" fill="#2a6fb4"/><text x="40" y="320" style="fill:#7fb7ff; font-size:28px">EARTH</text>
+          <circle cx="370" cy="250" r="12" fill="#c9c2b2"/><text x="340" y="300" style="fill:#c9c2b2; font-size:28px">MOON</text>
+          <line x1="70" y1="250" x2="510" y2="250" stroke="#3a3f47" stroke-width="2" stroke-dasharray="6 8"/>
+          <ellipse cx="320" cy="250" rx="24" ry="58" fill="none" stroke="#f08a3c" stroke-width="2"/><text x="296" y="170" style="fill:#d9b46a; font-size:28px">L1</text>
+          <ellipse cx="430" cy="250" rx="28" ry="66" fill="none" stroke="#f08a3c" stroke-width="2"/><text x="418" y="164" style="fill:#d9b46a; font-size:28px">L2</text>
+          <circle id="hi-a1" r="7" fill="#fff4dc"/><circle id="hi-a2" r="7" fill="#fff4dc"/>
+          <text x="20" y="470" style="fill:#e8e0cc; font-size:28px">FIRST SPACECRAFT AT</text><text x="20" y="505" style="fill:#e8e0cc; font-size:28px">EARTH–MOON LAGRANGE POINTS</text>
+        </svg>
+      </div>
+      <div class="k-photo" id="hi-p3" style="left:1320px; top:360px; width:480px; height:568px; border-color:#d9b46a">
+        <img src="assets/jwst.jpg" alt="" style="object-position:60% 45%">
+        <div class="k-credit">ILLUSTRATION: NASA · JWST</div>
+      </div>
+      <div class="k-label gold" id="hi-l3" style="left:1320px; top:940px; font-weight:600">NEAR SUN–EARTH L2</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    K.enter(tl, "#hi-stage", "rise");
+    K.fade(tl, "#hi-k", 0.4, 0.5, 0);
+    tl.fromTo("#hi-fill", { scaleX: 0 }, { scaleX: 0.05, duration: 0.6 }, 0.6);
+    K.fade(tl, "#hi-y1", c("vo3", 0.2), 0.5, 0, -30); K.photo(tl, "#hi-p1", c("vo3", 0.6));
+    tl.to("#hi-fill", { scaleX: 0.4, duration: 1.0, ease: "power2.inOut" }, c("vo4", -0.2));
+    K.fade(tl, "#hi-y2", c("vo4", 0.4), 0.5, 0, -30); K.fade(tl, "#hi-p2", c("vo4", 0.8), 0.5, 30);
+    // two probes looping around L1 and L2
+    const loop = (sel, cx0, rx, ry, t0, n) => { const o = { a: 0 }; tl.fromTo(o, { a: 0 }, { a: 2 * Math.PI * n, duration: c.dur - t0, ease: "none", onUpdate: () => { const e = document.querySelector(sel); e.setAttribute("cx", cx0 + rx * Math.cos(o.a)); e.setAttribute("cy", 250 + ry * Math.sin(o.a)); } }, t0); };
+    loop("#hi-a1", 320, 24, 58, c("vo4", 1.0), 4); loop("#hi-a2", 430, 28, 66, c("vo4", 1.0), 3);
+    tl.to("#hi-fill", { scaleX: 0.75, duration: 1.0, ease: "power2.inOut" }, c("vo5", -0.2));
+    K.fade(tl, "#hi-y3", c("vo5", 0.4), 0.5, 0, -30); K.photo(tl, "#hi-p3", c("vo5", 0.8));
+    K.kb(tl, "#hi-p3 img", c("vo5", 0.8), c.dur, { s: 1.15 }, { s: 1.0 });
+    K.fade(tl, "#hi-l3", c("vo5", 3.0), 0.5, 0);
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

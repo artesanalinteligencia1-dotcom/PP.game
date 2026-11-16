@@ -1,0 +1,28 @@
+<template>
+  <div id="root" data-composition-id="ending" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ending-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-panel" id="ending-card" style="left:200px; top:120px; width:1520px; height:470px">
+        <div class="k-head">TRANSMISSION · ROBERTO</div>
+        <div class="k-photo" id="ending-photo" style="left:40px; top:92px; width:300px; height:334px; box-shadow:none"><img src="assets/kit/portraits/roberto.jpg" alt=""><div class="k-credit">AI-GENERATED</div></div>
+        <div class="k-label orange" id="ending-role" style="left:390px; top:92px; font-weight:600">ASTROPHYSICIST</div>
+        <div class="k-abs" id="ending-quote" style="left:390px; top:142px; width:1080px; font-size:60px; line-height:1.15; font-weight:600">“Thirty-six thousand kilometres away, and it still saves lives every season.”</div>
+      </div>
+      <div class="k-abs" id="ending-src" style="left:200px; top:624px; width:1520px; font-size:30px; line-height:1.45; color:#8a8f98; letter-spacing:.04em"><b style="color:#d9b46a; letter-spacing:.14em; font-weight:600">LEARN MORE</b><br>NASA: TIROS-1, the first weather satellite (1960) · NASA / NOAA: GOES-R series geostationary satellites · NASA: the Van Allen radiation belts</div>
+      <div class="k-abs" id="ending-credit" style="left:200px; top:780px; width:1520px; font-size:28px; line-height:1.35; color:#8a8f98; letter-spacing:.06em">Real images: NASA and NOAA / NASA, public domain · Animation: Paulet Delta-V · Narration: AI voice (Kokoro, open model, run locally) · Music: generated locally with ACE-Step 1.5 · Characters: AI-generated illustration</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("ending");
+    K.enter(tl, "#ending-stage", "zoom");
+    K.fade(tl, "#ending-card", 0.2, 0.7, 30);
+    tl.fromTo("#ending-photo img", { scale: 1.12 }, { scale: 1, duration: 1.2, ease: "power2.out" }, 0.4);
+    K.fade(tl, "#ending-role", 0.6, 0.4, 0);
+    tl.fromTo("#ending-quote", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: Math.max(1.5, (c.end("rob") - c("rob")) * 0.7), ease: "none" }, c("rob"));
+    K.fade(tl, "#ending-src", c("rob", 0.8), 0.6);
+    K.fade(tl, "#ending-credit", c("rob", 1.6), 0.6, 0);
+    tl.fromTo("#ending-card", { scale: 1 }, { scale: 1.03, duration: c.dur, ease: "none" }, 0.9);
+    tl.to("#ending-stage", { opacity: 0, duration: 1.0, ease: "power2.in" }, c.dur - 1.05);
+    window.__timelines["ending"] = tl;
+  </script>
+</template>

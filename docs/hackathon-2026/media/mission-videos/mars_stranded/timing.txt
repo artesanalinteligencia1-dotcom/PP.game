@@ -1,0 +1,21 @@
+mars_stranded  total 81.67s
+
+[hook] start 0.0  dur 16.65
+   vo1      1.20 ->   6.49   Landing on Mars takes about seven minutes, and nobody on Earth can help.
+   vo2      6.99 ->  14.25   Radio needs several minutes to cross the gap. By the time the first signal arriv
+
+[history] start 16.65  dur 22.82
+   vo3      0.80 ->   7.09   In 1997, Mars Pathfinder bounced to a stop inside giant airbags.
+   vo4      7.59 ->  14.83   In 2012, Curiosity was lowered on cables by a hovering rocket stage: the sky cra
+   vo5     15.33 ->  21.42   In 2021, Perseverance did it again, and photographed itself on the way down.
+
+[science] start 39.47  dur 15.66
+   vo6      0.90 ->   6.11   Heat shield, parachute, rockets: each step slows it down, all on its own.
+   vo7      6.71 ->  14.06   Afterwards, most data from the surface reaches Earth through orbiters passing ov
+
+[compare] start 55.13  dur 14.93
+   vo8      0.80 ->   7.84   Perseverance hit the air at about 20,000 kilometres per hour, and touched down s
+   vo9      8.44 ->  13.73   Now compare your design. In the game, your orbiter carries the call for help.
+
+[ending] start 70.06  dur 11.61
+   chi      1.00 ->   4.11   Nobody gets left behind. Not on Mars, not anywhere.

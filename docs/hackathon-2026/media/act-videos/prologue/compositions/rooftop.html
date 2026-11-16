@@ -1,0 +1,25 @@
+<template>
+  <div id="root" data-composition-id="rooftop" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ro-stage" class="k-stage">
+      <div id="ro-wrap" style="position:absolute; inset:0">
+        <video id="ro-vid" class="clip" src="assets/prologue-05.mp4" data-start="0" data-duration="9.9" muted playsinline style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover"></video>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(6,5,4,.55) 0%, transparent 38%)"></div>
+      <div class="k-ai" style="right:40px; bottom:40px">AI-GENERATED VIDEO (VEO)</div>
+      <div class="k-abs" id="ro-w1" style="left:120px; top:90px; font-size:62px; font-weight:600; letter-spacing:.06em">A SMALL INSTITUTE.</div>
+      <div class="k-abs" id="ro-w2" style="left:120px; top:166px; font-size:62px; font-weight:600; letter-spacing:.06em">AN OLD NOTEBOOK.</div>
+      <div class="k-abs" id="ro-w3" style="left:120px; top:242px; font-size:96px; font-weight:600; letter-spacing:.04em; color:#d9b46a; text-shadow:0 8px 40px rgba(0,0,0,.6)">A 130-YEAR PROMISE.</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("rooftop");
+    K.enter(tl, "#ro-stage", "iris", { x: 1100, y: 420 });
+    tl.fromTo("#ro-wrap", { scale: 1.02 }, { scale: 1.1, duration: c.dur + 0.5, ease: "none", transformOrigin: "55% 40%" }, 0);
+    K.blurIn(tl, "#ro-w1", c("vo8", 0.0), 0.6);
+    K.blurIn(tl, "#ro-w2", c("vo8", 1.45), 0.6);
+    tl.fromTo("#ro-w3", { opacity: 0, scale: 1.25, filter: "blur(14px)", transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.8, ease: "power4.out" }, c("vo8", 2.85));
+    tl.to(["#ro-w1", "#ro-w2"], { opacity: 0.55, duration: 0.6 }, c("vo8", 3.0));
+    K.exit(tl, "#ro-stage", "fade", c.dur);
+    window.__timelines["rooftop"] = tl;
+  </script>
+</template>

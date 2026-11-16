@@ -1,0 +1,37 @@
+{
+  "id": "act3",
+  "title": "Act 3 — The Window",
+  "music": "lagrange-b.mp3",
+  "musicVol": 0.22,
+  "sfx": [
+    { "src": "alert.mp3", "scene": "chute", "cue": "vo5", "off": 0.0, "dur": 1.2, "vol": 0.2 },
+    { "src": "countdown.mp3", "scene": "chute", "cue": "chi", "off": -0.4, "dur": 2.5, "vol": 0.18 }
+  ],
+  "scenes": [
+    { "id": "viking", "lead": 1.4, "tail": 1.2, "lines": [
+      { "id": "vo1", "v": "nar", "en": "July 20, 1976: Viking 1 sends the first photograph from the surface of Mars.", "tts": "July twentieth, nineteen seventy-six: Viking One sends the first photograph from the surface of Mars.", "es": "20 de julio de 1976: el Viking 1 envía la primera fotografía desde la superficie de Marte." },
+      { "id": "vo1b", "v": "nar", "gap": 0.4, "en": "It arrived line by line.", "es": "Llegó línea por línea." }
+    ] },
+    { "id": "salar", "lead": 0.7, "tail": 1.0, "lines": [
+      { "id": "vo2", "v": "nar", "en": "Franchesca's Andes look like Mars: high, dry, salty and full of sunlight. That's why she came.", "es": "Los Andes de Franchesca se parecen a Marte: altos, secos, salados y llenos de sol. Por eso vino." },
+      { "id": "fra", "v": "fra", "gap": 0.5, "en": "If life survives here, maybe it survived there.", "es": "Si la vida sobrevive aquí, quizás sobrevivió allá." }
+    ] },
+    { "id": "window", "lead": 0.6, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "Mars opens a window every 26 months. Miss it, and you wait two more years.", "tts": "Mars opens a window every twenty-six months. Miss it, and you wait two more years.", "es": "Marte abre una ventana cada 26 meses. Si la pierdes, esperas dos años más." }
+    ] },
+    { "id": "social", "lead": 0.6, "tail": 1.4, "min": 5.6, "lines": [
+      { "id": "vo4", "v": "nar", "en": "The whole country is watching.", "es": "Todo el país está mirando." }
+    ] },
+    { "id": "chute", "lead": 0.8, "tail": 1.0, "lines": [
+      { "id": "vo5", "v": "nar", "en": "A parachute tears in the test. Seven days to the window.", "es": "Un paracaídas se rompe en la prueba. Siete días para la ventana." },
+      { "id": "chi", "v": "chi", "gap": 0.5, "en": "Then we sew a new one. Tonight.", "es": "Entonces cosemos uno nuevo. Esta noche." }
+    ] },
+    { "id": "moxie", "lead": 0.6, "tail": 1.4, "lines": [
+      { "id": "vo6", "v": "nar", "en": "And they are not alone. On Mars, a small box on a rover made oxygen from the air:", "es": "Y no están solos. En Marte, una pequeña caja sobre un rover fabricó oxígeno del aire:" },
+      { "id": "vo6b", "v": "nar", "gap": 0.2, "en": "122 grams, between 2021 and 2023.", "tts": "one hundred and twenty-two grams, between twenty twenty-one and twenty twenty-three.", "es": "122 gramos, entre 2021 y 2023." }
+    ] },
+    { "id": "close", "lead": 1.0, "tail": 0, "min": 12.5, "lines": [
+      { "id": "vo7", "v": "nar", "en": "Land. Breathe. Stay.", "es": "Aterriza. Respira. Quédate." }
+    ] }
+  ]
+}

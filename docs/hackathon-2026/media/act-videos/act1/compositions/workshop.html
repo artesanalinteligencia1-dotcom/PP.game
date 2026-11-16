@@ -1,0 +1,37 @@
+<template>
+  <div id="root" data-composition-id="workshop" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="wo-stage" class="k-stage">
+      <div id="wo-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="wo-img" src="assets/act1-03.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-vig"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-panel" id="wo-p1" style="left:110px; top:110px; width:470px; height:200px; border-color:#f08a3c">
+        <div class="k-head" style="color:#f08a3c">CHICHO · MASS BUDGET</div>
+        <div class="k-num" id="wo-m" style="left:24px; top:72px; font-size:84px; color:#f08a3c">152.0</div>
+        <div class="k-label" style="left:280px; top:100px">KG</div>
+        <div class="k-label" id="wo-m2" style="left:24px; top:160px; font-size:28px">− 3.4 KG · LIGHTER BRACKETS</div>
+      </div>
+      <div class="k-panel" id="wo-p2" style="left:1340px; top:110px; width:470px; height:200px; border-color:#36d1ff">
+        <div class="k-head" style="color:#36d1ff">ROBERTO · DATA BUDGET</div>
+        <div class="k-num" id="wo-d" style="left:24px; top:72px; font-size:84px; color:#36d1ff">9.8</div>
+        <div class="k-label" style="left:200px; top:100px">GB / DAY</div>
+        <div class="k-label" id="wo-d2" style="left:24px; top:160px; font-size:28px">+ COMPRESSION · + ONE GROUND PASS</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("workshop");
+    K.enter(tl, "#wo-stage", "rise");
+    K.kb(tl, "#wo-img", 0, c.dur + 0.5, { s: 1.1, x: 30, y: 20 }, { s: 1.2, x: -30, y: -10 });
+    K.fade(tl, "#wo-p1", c("vo5", 0.2), 0.5, 0, -40);
+    K.count(tl, "#wo-m", 152.0, 148.6, c("vo5", 0.6), 2.2, (v) => v.toFixed(1));
+    K.fade(tl, "#wo-m2", c("vo5", 1.6), 0.4, 0);
+    K.fade(tl, "#wo-p2", c("vo5", 2.0), 0.5, 0, 40);
+    K.count(tl, "#wo-d", 9.8, 12.4, c("vo5", 2.4), 2.2, (v) => v.toFixed(1));
+    K.fade(tl, "#wo-d2", c("vo5", 3.3), 0.4, 0);
+    tl.to("#wo-p1", { boxShadow: "0 0 40px rgba(240,138,60,.55)", duration: 0.5, yoyo: true, repeat: 1 }, c("chi", 0.2));
+    K.exit(tl, "#wo-stage", "whip", c.dur);
+    window.__timelines["workshop"] = tl;
+  </script>
+</template>

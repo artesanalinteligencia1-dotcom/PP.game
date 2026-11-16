@@ -1,0 +1,21 @@
+lagrange_observatory  total 78.57s
+
+[hook] start 0.0  dur 12.35
+   vo1      1.20 ->   7.27   Between the Earth and the Moon there are five places where a spacecraft can almo
+   vo2      7.47 ->   9.95   where gravity and motion balance.
+
+[history] start 12.35  dur 23.98
+   vo3      0.80 ->   6.61   Joseph-Louis Lagrange found them with pen and paper in 1772.
+   vo4      7.11 ->  14.67   In 2010, two NASA probes called ARTEMIS became the first spacecraft to orbit Ear
+   vo5     15.17 ->  22.58   Since 2022, the James Webb Space Telescope has worked near a Lagrange point of t
+
+[science] start 36.33  dur 14.75
+   vo6      0.90 ->   5.91   These points are balanced, but not stable: like a ball resting on a saddle.
+   vo7      6.41 ->  13.15   So a spacecraft circles them on a halo orbit, and fires small thrusts every few 
+
+[compare] start 51.08  dur 15.75
+   vo8      0.80 ->   7.64   Webb works 1.5 million kilometres from Earth, behind a 6.5-metre golden mirror.
+   vo9      8.24 ->  14.55   Now compare your design: less fuel spent getting there means a longer life once 
+
+[ending] start 66.83  dur 11.74
+   rob      1.00 ->   4.24   Chaos is not the enemy. It is the rule we play by.

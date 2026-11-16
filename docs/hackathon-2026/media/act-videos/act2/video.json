@@ -1,0 +1,33 @@
+{
+  "id": "act2",
+  "title": "Act 2 — The Quiet Point",
+  "music": "quiet-orbit-a.mp3",
+  "musicVol": 0.22,
+  "sfx": [
+    { "src": "deploy.mp3", "scene": "close", "at": 1.6, "dur": 2.4, "vol": 0.3 }
+  ],
+  "scenes": [
+    { "id": "moon", "lead": 1.4, "tail": 1.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "July 20, 1969: humans walk on the Moon.", "tts": "July twentieth, nineteen sixty-nine: humans walk on the Moon.", "es": "20 de julio de 1969: los humanos caminan en la Luna." },
+      { "id": "vo1b", "v": "nar", "gap": 0.5, "en": "Half a century later, the team from Arequipa looks up at the same Moon.", "es": "Medio siglo después, el equipo de Arequipa mira la misma Luna." }
+    ] },
+    { "id": "tv", "lead": 0.7, "tail": 1.2, "lines": [
+      { "id": "vo2", "v": "nar", "en": "From jokes to morning TV. Now everyone expects more.", "es": "De los memes a la TV de la mañana. Ahora todos esperan más." }
+    ] },
+    { "id": "chaos", "lead": 0.8, "tail": 1.2, "lines": [
+      { "id": "vo3", "v": "nar", "en": "Between the Earth and the Moon there are quiet points, where gravity balances.", "es": "Entre la Tierra y la Luna hay puntos tranquilos, donde la gravedad se equilibra." },
+      { "id": "vo4", "v": "nar", "gap": 0.5, "en": "Getting there is chaos: two paths that start almost the same end up worlds apart.", "es": "Llegar es caos: dos rutas que empiezan casi iguales terminan muy lejos una de otra." },
+      { "id": "rob", "v": "rob", "gap": 0.5, "en": "Out here, small mistakes don't stay small.", "es": "Aquí afuera, los errores pequeños no se quedan pequeños." }
+    ] },
+    { "id": "mirror", "lead": 0.7, "tail": 1.2, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Their payload: a telescope with a golden mirror, to see the oldest light.", "es": "Su carga: un telescopio con espejo dorado, para ver la luz más antigua." },
+      { "id": "vo6", "v": "nar", "gap": 0.5, "en": "A real one has worked since 2022 near a quiet point of the Sun and the Earth.", "tts": "A real one has worked since twenty twenty-two near a quiet point of the Sun and the Earth.", "es": "Uno real trabaja desde 2022 cerca de un punto tranquilo del Sol y la Tierra." }
+    ] },
+    { "id": "budget", "lead": 0.6, "tail": 1.2, "lines": [
+      { "id": "vo7", "v": "nar", "en": "The investors are nervous. One small error and the route is lost. The budget says the same.", "es": "Los inversores están nerviosos. Un error mínimo y la ruta se pierde. El presupuesto dice lo mismo." }
+    ] },
+    { "id": "close", "lead": 1.0, "tail": 0, "min": 12.5, "lines": [
+      { "id": "vo8", "v": "nar", "en": "Choose the route. Respect the chaos.", "es": "Elige la ruta. Respeta el caos." }
+    ] }
+  ]
+}

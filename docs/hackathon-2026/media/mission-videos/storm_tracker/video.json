@@ -1,0 +1,44 @@
+{
+  "id": "storm_tracker",
+  "title": "Storm Tracker — the real story: the satellites that see hurricanes coming",
+  "music": "lagrange-a.mp3",
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "alert.mp3", "scene": "hook", "cue": "vo1", "off": 2.6, "dur": 1.2, "vol": 0.22 },
+    { "src": "orbit.mp3", "scene": "science", "at": 0.4, "dur": 2.4, "vol": 0.3 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.6, "tail": 3.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Before weather satellites, a hurricane could arrive with almost no warning.", "es": "Antes de los satélites meteorológicos, un huracán podía llegar casi sin aviso." }
+    ] },
+    { "id": "history", "lead": 1.0, "tail": 1.6, "lines": [
+      { "id": "vo2", "v": "nar", "en": "The first weather satellite sent its first cloud pictures in 1960.", "tts": "The first weather satellite sent its first cloud pictures in nineteen sixty.", "es": "El primer satélite meteorológico envió sus primeras imágenes de nubes en 1960." },
+      { "id": "vo3", "v": "nar", "gap": 0.9, "en": "Today, satellites in geostationary orbit hover over the same spot", "es": "Hoy, los satélites en órbita geoestacionaria se mantienen sobre el mismo punto" },
+      { "id": "vo3b", "v": "nar", "gap": 0.2, "en": "and watch storms grow minute by minute.", "es": "y ven crecer las tormentas minuto a minuto." }
+    ] },
+    { "id": "science", "lead": 1.4, "tail": 1.6, "lines": [
+      { "id": "vo4", "v": "nar", "en": "At 35,786 kilometres, a satellite circles once a day, exactly as Earth turns.", "tts": "At thirty-five thousand, seven hundred and eighty-six kilometres, a satellite circles once a day, exactly as Earth turns.", "es": "A 35 786 kilómetros, un satélite da una vuelta al día, exactamente como gira la Tierra." },
+      { "id": "vo5", "v": "nar", "gap": 0.8, "en": "The price: a long, costly climb, and more radiation than in low orbit.", "es": "El precio: un ascenso largo y costoso, y más radiación que en órbita baja." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "The GOES-R series, today's storm watchers",
+      "photo": { "src": "irma.jpg", "credit": "Image: NOAA / NASA · GOES-16", "pos": "70% 50%" },
+      "rows": [
+        { "label": "ALTITUDE", "value": "35,786 km", "note": "geostationary", "frac": 0.92 },
+        { "label": "HALF THE PLANET", "value": "every 10 min", "note": "full-disk image", "frac": 0.55, "color": "#d9b46a" },
+        { "label": "ONE STORM, CLOSE UP", "value": "every 30 s", "note": "rapid scan", "frac": 0.25, "color": "#36d1ff" }
+      ],
+      "yours": ["IMAGES PER HOUR", "LIFETIME", "GIGABYTES A DAY"],
+      "lines": [
+        { "id": "vo6", "v": "nar", "en": "A modern GOES satellite images half the planet every ten minutes, and a single storm every thirty seconds.", "tts": "A modern goes satellite images half the planet every ten minutes, and a single storm every thirty seconds.", "es": "Un satélite GOES moderno capta medio planeta cada diez minutos, y una sola tormenta cada treinta segundos." },
+        { "id": "vo7", "v": "nar", "gap": 0.6, "en": "Now look at your design. Every image is a warning that arrives in time.", "es": "Ahora mira tu diseño. Cada imagen es un aviso que llega a tiempo." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "rob", "lead": 1.0, "tail": 7.5,
+      "quote": "Thirty-six thousand kilometres away, and it still saves lives every season.",
+      "learn": "NASA: TIROS-1, the first weather satellite (1960) · NASA / NOAA: GOES-R series geostationary satellites · NASA: the Van Allen radiation belts",
+      "images": "Real images: NASA and NOAA / NASA, public domain",
+      "lines": [
+        { "id": "rob", "v": "rob", "cap": false, "en": "Thirty-six thousand kilometres away, and it still saves lives every season.", "es": "A treinta y seis mil kilómetros, y aun así salva vidas cada temporada." }
+      ] }
+  ]
+}

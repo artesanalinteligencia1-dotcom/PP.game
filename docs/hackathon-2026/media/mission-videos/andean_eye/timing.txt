@@ -1,0 +1,21 @@
+andean_eye  total 77.8s
+
+[hook] start 0.0  dur 12.22
+   vo1      1.40 ->   5.94   Peru holds about seventy percent of the world's tropical glaciers.
+   vo2      6.84 ->   9.42   Your satellite was built to watch them.
+
+[history] start 12.22  dur 16.35
+   vo3      1.00 ->   8.34   Satellite records show that Andean glaciers have lost a large share of their ice
+   vo4      9.04 ->  14.85   Their meltwater feeds rivers that millions of people depend on in the dry season
+
+[science] start 28.57  dur 18.75
+   vo5      1.00 ->   7.39   Clouds often hide the mountains, so scientists combine optical, thermal and rada
+   vo6      7.99 ->  15.13   NISAR, a radar satellite from NASA and India's space agency, maps ice and ground
+   vo6b    15.28 ->  17.35   through clouds, day and night.
+
+[compare] start 47.32  dur 17.72
+   vo7      0.80 ->  10.44   NISAR flies at 747 kilometres and sees the same ground every 12 days with a 12-m
+   vo8     11.04 ->  16.52   You did it on a foundation budget. Small missions can still watch big changes.
+
+[ending] start 65.04  dur 12.76
+   chi      1.00 ->   5.26   My father herded alpacas under that ice. Now we measure it from space.

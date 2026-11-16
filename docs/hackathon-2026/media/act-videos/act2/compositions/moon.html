@@ -1,0 +1,44 @@
+<template>
+  <div id="root" data-composition-id="moon" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="mo-stage" class="k-stage" style="background:#000">
+      <div id="mo-a" style="position:absolute; inset:0; overflow:hidden">
+        <img id="mo-ai" src="assets/act2-01.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      </div>
+      <div id="mo-b" style="position:absolute; inset:0; overflow:hidden; opacity:0">
+        <img id="mo-er" src="assets/earthrise.jpg" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; object-position:55% 52%">
+        <div class="k-credit" style="left:auto; right:40px; top:40px; bottom:auto">IMAGE: NASA · EARTHRISE, APOLLO 8, 1968</div>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.7) 0%, transparent 45%)"></div>
+      <div class="k-kicker" id="mo-k" style="left:120px; top:110px">ACT 2 · THE MOON</div>
+      <div class="k-title" id="mo-t" style="left:120px; top:160px; font-size:120px">THE QUIET<br>POINT</div>
+      <div class="k-year" id="mo-y" style="left:120px; top:470px; font-size:110px">20 JUL 1969</div>
+      <div class="k-photo" id="mo-boot" style="left:1340px; top:600px; width:460px; height:380px; border-color:#e8e0cc">
+        <img src="assets/bootprint.jpg" alt="" style="object-position:55% 60%">
+        <div class="k-credit">IMAGE: NASA · APOLLO 11</div>
+      </div>
+      <div class="k-abs" id="mo-dist" style="left:120px; top:640px; width:900px">
+        <div class="k-label gold">EARTH → MOON · AVERAGE DISTANCE</div>
+        <div class="k-num" id="mo-km" style="left:0; top:44px; font-size:96px">0 KM</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("moon");
+    K.kb(tl, "#mo-ai", 0, 4.2, { s: 1.04 }, { s: 1.14, x: -30 });
+    K.fade(tl, "#mo-k", 0.2, 0.5, 0);
+    tl.fromTo("#mo-t", { opacity: 0, x: -40, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, 0.0);
+    tl.fromTo("#mo-y", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.0, ease: "steps(11)" }, c("vo1", 0.2));
+    // the illustration gives way to the real photographs
+    tl.to("#mo-b", { opacity: 1, duration: 1.2, ease: "sine.inOut" }, c("vo1", 2.2));
+    K.kb(tl, "#mo-er", c("vo1", 2.2), c.dur, { s: 1.0, y: 20 }, { s: 1.15, y: -20 });
+    K.photo(tl, "#mo-boot", c("vo1", 2.8));
+    tl.fromTo("#mo-boot img", { scale: 1.25 }, { scale: 1.05, duration: 3.5, ease: "power2.out" }, c("vo1", 2.8));
+    // half a century later: the distance they now have to cross
+    tl.to(["#mo-y"], { opacity: 0.35, duration: 0.5 }, c("vo1b", 0));
+    K.fade(tl, "#mo-dist", c("vo1b", 0.4), 0.5, 0);
+    K.count(tl, "#mo-km", 0, 384400, c("vo1b", 0.6), 3.2, (v) => Math.round(v).toLocaleString("en-US") + " KM");
+    K.exit(tl, "#mo-stage", "whip", c.dur);
+    window.__timelines["moon"] = tl;
+  </script>
+</template>

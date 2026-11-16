@@ -1,0 +1,28 @@
+<template>
+  <div id="root" data-composition-id="close" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="cl-stage" class="k-stage">
+      <div id="cl-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="cl-img" src="assets/act1-09.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(4,5,8,.7) 0%, transparent 35%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-kicker" id="cl-k" style="left:120px; top:100px">ACT 1 · EARTH ORBIT · YOUR TURN</div>
+      <div class="k-title" id="cl-t" style="left:120px; top:150px; font-size:100px">DESIGN THE SATELLITE<br>THAT WILL NOT FAIL</div>
+      <div class="k-abs" id="cl-end" style="left:0; top:0; width:1920px; height:1080px; background:#0b0d10; opacity:0; z-index:6">
+        <div class="k-abs" style="left:0; width:1920px; top:380px; text-align:center; font-size:150px; font-weight:600; letter-spacing:.18em; color:#e8e0cc">PAUL<span style="color:#f08a3c">Ǝ</span>T</div>
+        <div class="k-abs" style="left:0; width:1920px; top:570px; text-align:center; font-size:44px; letter-spacing:.3em; color:#d9b46a; font-weight:600">ACT 1 · THREE FAILURES</div>
+        <div class="k-abs" style="left:0; width:1920px; top:880px; text-align:center; font-size:28px; letter-spacing:.06em; color:#8a8f98">Illustrations and clips: AI-generated (Google Gemini, Veo) · Real images: NASA NSSDCA, SpaceX (CC0) · Voice: AI (Kokoro, local) · Music: ACE-Step 1.5 (local)</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("close");
+    K.enter(tl, "#cl-stage", "fade", { dur: 0.8 });
+    K.kb(tl, "#cl-img", 0, c.dur, { s: 1.0, x: 0 }, { s: 1.14, x: -50, y: 20 });
+    K.fade(tl, "#cl-k", c("vo12", 0), 0.5, 0);
+    K.blurIn(tl, "#cl-t", c("vo12", 1.6), 0.9);
+    tl.to("#cl-end", { opacity: 1, duration: 0.8 }, c.end("vo12", 0.8));
+    tl.to("#cl-stage", { opacity: 0, duration: 0.8, ease: "power2.in" }, c.dur - 0.85);
+    window.__timelines["close"] = tl;
+  </script>
+</template>

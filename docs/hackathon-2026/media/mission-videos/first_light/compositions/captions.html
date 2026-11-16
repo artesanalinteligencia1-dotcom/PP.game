@@ -1,0 +1,23 @@
+<template>
+  <style>
+    @font-face { font-family: "Barlow Condensed"; font-weight: 500; src: url("assets/fonts/barlow-500.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: "Barlow Condensed", sans-serif; }
+    .cap { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); max-width: 1400px; padding: 10px 28px;
+      background: rgba(11,13,16,.82); color: #f4efe2; font-size: 46px; font-weight: 500; line-height: 1.2; text-align: center; border-radius: 4px; }
+  </style>
+  <div id="root" data-composition-id="captions" data-width="1920" data-height="1080" data-layout-allow-overlap>
+    <div id="cap1" class="cap clip" data-start="0.5" data-duration="3.73">You just crossed the line where space begins.</div>
+    <div id="cap2" class="cap clip" data-start="5.0" data-duration="3.05">How did humans first get here?</div>
+    <div id="cap3" class="cap clip" data-start="9.6" data-duration="7.45">Peruvian engineer Pedro Paulet claimed he tested a liquid-fuel engine in the 1890s.</div>
+    <div id="cap4" class="cap clip" data-start="17.0" data-duration="9.35">The first documented liquid-fuel rocket flight came in 1926: two and a half seconds, twelve and a half metres.</div>
+    <div id="cap5" class="cap clip" data-start="26.4" data-duration="6.02">A sounding rocket doesn't go into orbit. It climbs, coasts, and falls,</div>
+    <div id="cap6" class="cap clip" data-start="33.0" data-duration="6.32">giving experiments a few minutes of weightlessness and a look at the upper atmosphere.</div>
+    <div id="cap7" class="cap clip" data-start="41.5" data-duration="6.07">With the engine off, everything on board falls together, so it all floats.</div>
+    <div id="cap8" class="cap clip" data-start="50.0" data-duration="4.8">NASA has flown sounding rockets for science for decades.</div>
+    <div id="cap9" class="cap clip" data-start="58.0" data-duration="3.23">Yours just joined that tradition.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines["captions"] = tl;
+  </script>
+</template>

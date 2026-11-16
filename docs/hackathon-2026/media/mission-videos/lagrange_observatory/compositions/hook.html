@@ -1,0 +1,52 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage" style="background:#05070b">
+      <canvas id="hk-pot" width="960" height="540" style="position:absolute; left:0; top:0; width:1920px; height:1080px"></canvas>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <circle id="hk-earth" r="34" fill="#2a6fb4" stroke="#7fb7ff" stroke-width="3"/>
+        <circle id="hk-moon" r="14" fill="#c9c2b2"/>
+        <g id="hk-L"></g>
+      </svg>
+      <div class="k-kicker" id="hk-k" style="left:120px; top:110px">LAGRANGE OBSERVATORY · THE REAL STORY</div>
+      <div class="k-title" id="hk-t" style="left:120px; top:160px; font-size:96px; width:900px">PARKING WHERE<br>GRAVITY BALANCES</div>
+      <div class="k-label" id="hk-note" style="left:120px; top:960px">LINES OF EQUAL ENERGY IN THE EARTH–MOON SYSTEM · THEY TOUCH AT THE BALANCE POINTS · COMPUTED</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    // Effective potential of the circular restricted three-body problem (Earth–Moon, mu = 0.01215), rotating frame.
+    const mu = 0.01215, S = 540, cx = 960, cy = 560;
+    const om = (x, y) => 0.5 * (x * x + y * y) + (1 - mu) / Math.hypot(x + mu, y) + mu / Math.hypot(x - 1 + mu, y);
+    const cv = document.querySelector("#hk-pot"), g = cv.getContext("2d"), img = g.createImageData(960, 540);
+    // zero-velocity curves (lines of equal Jacobi energy): the classic picture, with the curves touching at L1, L2, L3
+    const levels = [3.30, 3.1883, 3.1722, 3.10, 3.0122, 3.0, 2.992].map((C) => C / 2), hot = 3.1883 / 2;
+    const V = new Float32Array(960 * 540);
+    for (let j = 0; j < 540; j++) for (let i = 0; i < 960; i++) V[j * 960 + i] = om((i * 2 - cx) / S, -(j * 2 - cy) / S);
+    for (let j = 1; j < 539; j++) for (let i = 1; i < 959; i++) {
+      const k = j * 960 + i, v = V[k], gx = (V[k + 1] - V[k - 1]) / 2, gy = (V[k + 960] - V[k - 960]) / 2, gm = Math.hypot(gx, gy) + 1e-9;
+      const r0 = Math.hypot(i * 2 - cx, j * 2 - cy) / 1100; let R = 6 + 14 * (1 - r0), G = 9 + 16 * (1 - r0), B = 16 + 30 * (1 - r0), A = 0;
+      for (const L of levels) { const d = Math.abs(v - L) / gm; if (d < 1.1) A = Math.max(A, (1.1 - d) / 1.1) * (L === hot ? 1 : 0.75); }
+      const q = k * 4, hc = A > 0 && Math.abs(v - hot) / gm < 1.1;
+      img.data[q] = R + A * ((hc ? 240 : 217) - R); img.data[q + 1] = G + A * ((hc ? 138 : 180) - G); img.data[q + 2] = B + A * ((hc ? 60 : 106) - B); img.data[q + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    // Lagrange points
+    const fx = (x) => x - (1 - mu) * (x + mu) / Math.abs(x + mu) ** 3 - mu * (x - 1 + mu) / Math.abs(x - 1 + mu) ** 3;
+    const root = (a, b) => { for (let k = 0; k < 80; k++) { const m = (a + b) / 2; if (fx(a) * fx(m) <= 0) b = m; else a = m; } return (a + b) / 2; };
+    const L = [[root(0.5, 0.98), 0], [root(1.01, 1.5), 0], [root(-1.5, -0.5), 0], [0.5 - mu, Math.sqrt(3) / 2], [0.5 - mu, -Math.sqrt(3) / 2]];
+    const P = (x, y) => [cx + x * S, cy - y * S];
+    let h = ""; L.forEach((p, i) => { const [X, Y] = P(p[0], p[1]); h += `<g class="hk-l" transform="translate(${X.toFixed(1)} ${Y.toFixed(1)})"><circle r="16" fill="none" stroke="#fff4dc" stroke-width="4"/><circle r="5" fill="#fff4dc"/><text x="22" y="-16" style="fill:#fff4dc; font-size:36px; font-weight:600">L${i + 1}</text></g>`; });
+    document.querySelector("#hk-L").innerHTML = h;
+    const E = P(-mu, 0), M = P(1 - mu, 0);
+    document.querySelector("#hk-earth").setAttribute("cx", E[0]); document.querySelector("#hk-earth").setAttribute("cy", E[1]);
+    document.querySelector("#hk-moon").setAttribute("cx", M[0]); document.querySelector("#hk-moon").setAttribute("cy", M[1]);
+    tl.fromTo("#hk-pot", { opacity: 0, scale: 1.08, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2.2, ease: "power2.out" }, 0);
+    tl.fromTo("#hk-pot", { scale: 1 }, { scale: 1.05, duration: c.dur, ease: "none" }, 2.2);
+    tl.fromTo(["#hk-earth", "#hk-moon"], { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.6, ease: "back.out(2)", stagger: 0.25 }, 0.5);
+    tl.fromTo(".hk-l", { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.5)", stagger: 0.45 }, c("vo1", 3.2));
+    K.fade(tl, "#hk-k", 0.4, 0.5, 0); K.blurIn(tl, "#hk-t", 0.6, 0.9);
+    K.fade(tl, "#hk-note", c("vo2", 0), 0.5, 0);
+    K.exit(tl, "#hk-stage", "zoom", c.dur, { x: P(L[1][0], 0)[0], y: cy });
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

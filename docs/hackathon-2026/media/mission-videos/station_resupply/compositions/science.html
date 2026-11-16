@@ -1,0 +1,110 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <!-- A: drag and reboost -->
+      <div id="sc-a" style="position:absolute; inset:0">
+        <div class="k-kicker" id="sc-ak" style="left:140px; top:70px">WHY THE STATION KEEPS SINKING</div>
+        <svg class="k-svg" viewBox="0 0 1920 1080">
+          <line id="sc-ax" x1="200" y1="220" x2="200" y2="680" stroke="#8a8f98" stroke-width="3"/>
+          <line id="sc-ay" x1="200" y1="680" x2="900" y2="680" stroke="#8a8f98" stroke-width="3"/>
+          <line x1="200" y1="300" x2="900" y2="300" stroke="#3a3f47" stroke-width="2" stroke-dasharray="4 10"/>
+          <line x1="200" y1="480" x2="900" y2="480" stroke="#3a3f47" stroke-width="2" stroke-dasharray="4 10"/>
+          <path id="sc-d1" d="M 200 310 C 280 340, 360 400, 420 470" fill="none" stroke="#f08a3c" stroke-width="6" stroke-linecap="round"/>
+          <path id="sc-r1" d="M 420 470 L 420 306" fill="none" stroke="#36d1ff" stroke-width="6" stroke-linecap="round"/>
+          <path id="sc-d2" d="M 420 306 C 500 336, 580 396, 650 474" fill="none" stroke="#f08a3c" stroke-width="6" stroke-linecap="round"/>
+          <path id="sc-r2" d="M 650 474 L 650 304" fill="none" stroke="#36d1ff" stroke-width="6" stroke-linecap="round"/>
+          <path id="sc-d3" d="M 650 304 C 730 334, 810 390, 890 468" fill="none" stroke="#f08a3c" stroke-width="6" stroke-linecap="round"/>
+          <path id="sc-arr" d="M 300 440 L 300 520 M 286 500 L 300 522 L 314 500" fill="none" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="k-label" id="sc-yl" style="left:200px; top:176px">STATION ALTITUDE</div>
+        <div class="k-label" id="sc-t1" style="left:104px; top:284px">HIGH</div>
+        <div class="k-label" id="sc-t2" style="left:112px; top:464px">LOW</div>
+        <div class="k-label" id="sc-xl" style="left:660px; top:694px">TIME (MONTHS) →</div>
+        <div class="k-label orange" id="sc-drag" style="left:226px; top:536px; font-weight:600">THIN AIR = DRAG</div>
+        <div class="k-label cyan" id="sc-re1" style="left:372px; top:248px; font-weight:600">REBOOST</div>
+        <div class="k-label cyan" id="sc-re2" style="left:602px; top:248px; font-weight:600">REBOOST</div>
+        <div class="k-label" id="sc-ill" style="left:200px; top:740px; font-size:28px">SHAPE OF THE CURVE IS ILLUSTRATIVE</div>
+        <div class="k-photo" id="sc-photo" style="left:980px; top:180px; width:800px; height:520px">
+          <img id="sc-img" src="assets/reboost.jpg" alt="" style="object-position:92% 30%">
+          <div class="k-credit">Image: NASA · a docked cargo ship fires its engines</div>
+        </div>
+        <div class="k-label cream" id="sc-pl" style="left:980px; top:716px">THE BURN THAT PUSHES THE STATION BACK UP</div>
+      </div>
+      <!-- B: catching up from a lower, faster orbit -->
+      <div id="sc-b" style="position:absolute; inset:0">
+        <div class="k-kicker" id="sc-bk" style="left:140px; top:70px">HOW A CARGO SHIP CATCHES THE STATION · NOT TO SCALE</div>
+        <svg class="k-svg" viewBox="0 0 1920 1080">
+          <defs><radialGradient id="sc-eg" cx=".38" cy=".35"><stop offset="0" stop-color="#5aa6e8"/><stop offset=".7" stop-color="#1f5fa8"/><stop offset="1" stop-color="#0d2c57"/></radialGradient></defs>
+          <circle cx="620" cy="470" r="150" fill="url(#sc-eg)" stroke="#9fd0ff" stroke-width="3"/>
+          <circle id="sc-o2" cx="620" cy="470" r="300" fill="none" stroke="#d9b46a" stroke-width="3"/>
+          <circle id="sc-o1" cx="620" cy="470" r="222" fill="none" stroke="#f08a3c" stroke-width="3" stroke-dasharray="8 8"/>
+          <path id="sc-tr" d="" fill="none" stroke="#f08a3c" stroke-width="5" stroke-linecap="round"/>
+          <g id="sc-stn"><rect x="-22" y="-5" width="44" height="10" fill="#d9b46a"/><rect x="-5" y="-14" width="10" height="28" fill="#fff4dc"/></g>
+          <g id="sc-cgo"><circle r="10" fill="#f08a3c" stroke="#fff4dc" stroke-width="3"/></g>
+        </svg>
+        <div class="k-label cream" style="left:566px; top:454px; font-weight:600">EARTH</div>
+        <div class="k-panel" id="sc-p1" style="left:1100px; top:190px; width:680px; height:170px; border-color:#d9b46a">
+          <div class="k-head">STATION · HIGHER ORBIT</div>
+          <div class="k-num" style="left:24px; top:70px; font-size:76px; color:#d9b46a">92 min</div>
+          <div class="k-label" style="left:290px; top:98px">PER LAP · ABOUT 400 KM UP</div>
+        </div>
+        <div class="k-panel" id="sc-p2" style="left:1100px; top:390px; width:680px; height:170px; border-color:#f08a3c">
+          <div class="k-head" style="color:#f08a3c">CARGO SHIP · LOWER ORBIT</div>
+          <div class="k-num" style="left:24px; top:70px; font-size:76px; color:#f08a3c">90 min</div>
+          <div class="k-label" style="left:290px; top:98px">PER LAP · FASTER</div>
+        </div>
+        <div class="k-abs" id="sc-gap" style="left:1100px; top:600px; width:680px">
+          <div class="k-label cream" style="left:0; top:0">DISTANCE BEHIND THE STATION</div>
+          <div class="k-abs" style="left:0; top:46px; width:680px; height:14px; background:#252a31"></div>
+          <div class="k-abs" id="sc-gbar" style="left:0; top:46px; width:680px; height:14px; background:#f08a3c"></div>
+        </div>
+        <div class="k-chip" id="sc-dock" style="left:1100px; top:690px; border-color:#7fd17a; color:#7fd17a; font-size:40px; padding:8px 26px">CAPTURED</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.enter(tl, "#sc-stage", "whip");
+    // A — the sawtooth grows as it is told
+    K.fade(tl, "#sc-ak", 0.4); K.draw(tl, ["#sc-ax", "#sc-ay"], 0.5, 0.6); K.fade(tl, ["#sc-yl", "#sc-t1", "#sc-t2", "#sc-xl"], 0.8, 0.4, 0);
+    const a0 = c("vo5", 0.4);
+    K.draw(tl, "#sc-d1", a0, 1.6, "power1.in"); K.fade(tl, "#sc-drag", a0 + 0.9, 0.4, 0); K.draw(tl, "#sc-arr", a0 + 1.0, 0.4);
+    const r0 = c("vo5", 3.4);
+    K.photo(tl, "#sc-photo", r0 - 0.5); K.kb(tl, "#sc-img", r0 - 0.5, c("vo6") - r0, { s: 1.0 }, { s: 1.16, x: -30 }); K.fade(tl, "#sc-pl", r0 + 0.2, 0.4, 0);
+    K.draw(tl, "#sc-r1", r0, 0.35, "power3.out"); K.pop(tl, "#sc-re1", r0 + 0.2, 0.35);
+    K.draw(tl, "#sc-d2", r0 + 0.5, 0.9, "power1.in"); K.draw(tl, "#sc-r2", r0 + 1.4, 0.3, "power3.out"); K.pop(tl, "#sc-re2", r0 + 1.55, 0.35);
+    K.draw(tl, "#sc-d3", r0 + 1.8, 0.9, "power1.in"); K.fade(tl, "#sc-ill", r0 + 1.0, 0.4, 0);
+    // push to B
+    const sw = c("vo6", -0.9);
+    tl.to("#sc-a", { y: -1080, filter: "blur(14px)", duration: 0.6, ease: "power3.inOut" }, sw);
+    tl.fromTo("#sc-b", { y: 1080, filter: "blur(14px)" }, { y: 0, filter: "blur(0px)", duration: 0.6, ease: "power3.inOut" }, sw);
+    // B — station on the outer ring, cargo ship on the inner one, closing the gap
+    const CX = 620, CY = 470, RS = 300, RC = 222, GAP0 = 78;
+    const stn = document.querySelector("#sc-stn"), cgo = document.querySelector("#sc-cgo"), tr = document.querySelector("#sc-tr"), gbar = document.querySelector("#sc-gbar");
+    const state = (u) => {
+      const th = -160 + 78 * u;                                   // station angle (deg)
+      const k = Math.min(1, u / 0.86), gap = GAP0 * (1 - k * k * (3 - 2 * k));
+      const m = Math.max(0, Math.min(1, (u - 0.52) / 0.34)), rc = RC + (RS - RC) * (m * m * (3 - 2 * m));
+      return { th, gap, rc };
+    };
+    let dpath = ""; for (let i = 0; i <= 40; i++) { const u = 0.52 + (0.34 * i) / 40; const s = state(u); const a = ((s.th - s.gap) * Math.PI) / 180; dpath += (i ? "L" : "M") + (CX + s.rc * Math.cos(a)).toFixed(1) + " " + (CY + s.rc * Math.sin(a)).toFixed(1) + " "; }
+    tr.setAttribute("d", dpath);
+    const o = { u: 0 };
+    const apply = (u) => {
+      const s = state(u); const a = (s.th * Math.PI) / 180, b = ((s.th - s.gap) * Math.PI) / 180;
+      stn.setAttribute("transform", `translate(${(CX + RS * Math.cos(a)).toFixed(1)} ${(CY + RS * Math.sin(a)).toFixed(1)}) rotate(${(s.th + 90).toFixed(1)})`);
+      cgo.setAttribute("transform", `translate(${(CX + s.rc * Math.cos(b)).toFixed(1)} ${(CY + s.rc * Math.sin(b)).toFixed(1)})`);
+      gbar.style.width = (680 * s.gap / GAP0).toFixed(1) + "px";
+    };
+    Object.defineProperty(o, "q", { get() { return this.u; }, set(v) { this.u = v; apply(v); } }); apply(0);
+    const b0 = sw + 0.5, bd = c.dur - b0 - 0.2;
+    K.fade(tl, "#sc-bk", b0); K.draw(tl, "#sc-o2", b0, 0.8); K.fade(tl, "#sc-p1", b0 + 0.2, 0.5, 0, 40);
+    tl.fromTo("#sc-o1", { opacity: 0 }, { opacity: 1, duration: 0.5 }, c("vo6", 0.8)); K.fade(tl, "#sc-p2", c("vo6", 0.8), 0.5, 0, 40); K.fade(tl, "#sc-gap", c("vo6", 1.2), 0.5, 0, 40);
+    tl.fromTo(o, { q: 0 }, { q: 1, duration: bd, ease: "none" }, b0);
+    K.draw(tl, "#sc-tr", b0 + bd * 0.52, bd * 0.34, "none");
+    K.pop(tl, "#sc-dock", b0 + bd * 0.88, 0.4);
+    K.exit(tl, "#sc-stage", "whip", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

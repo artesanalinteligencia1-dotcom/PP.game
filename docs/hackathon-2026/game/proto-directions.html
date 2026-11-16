@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Paulet · visual directions (prototype)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #05070c; color: #e2e8f0; font-family: 'Inter Variable', system-ui, sans-serif; min-height: 100vh; }
+  .picker { display: flex; gap: 8px; align-items: center; padding: 14px 24px; font-size: 13px; color: #94a3b8; }
+  .picker button { font: inherit; padding: 8px 14px; border-radius: 999px; border: 1px solid #334155; background: transparent; color: #cbd5e1; cursor: pointer; }
+  .picker button[aria-pressed='true'] { background: #f97316; border-color: #f97316; color: #0b0b0b; }
+  .picker .note { margin-left: auto; }
+  .stage { padding: 0 24px 24px; }
+  .frame { position: relative; width: 100%; min-height: max(660px, calc(100vh - 80px)); overflow: hidden; border-radius: 14px; display: grid; grid-template-rows: auto auto 1fr auto; }
+
+  .top { display: flex; align-items: flex-end; gap: 24px; padding: 2.2% 3% 1.2%; }
+  .eyebrow { font-size: 11px; letter-spacing: .28em; text-transform: uppercase; }
+  .title { font-size: clamp(26px, 3.2vw, 46px); line-height: 1; }
+  .sub { font-size: 14px; margin-top: 6px; }
+  .tabs { display: flex; gap: 4px; padding: 0 3%; }
+  .tab { font-size: 13px; padding: 9px 14px; }
+  .main { display: grid; grid-template-columns: 1.55fr 1fr; gap: 2%; padding: 1.6% 3%; min-height: 0; }
+  .card { padding: 22px 24px; position: relative; }
+  .goal { font-size: clamp(17px, 1.5vw, 22px); line-height: 1.4; max-width: 34ch; }
+  .reqs { list-style: none; margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; font-size: 14px; }
+  .reqs li { display: flex; gap: 10px; align-items: center; }
+  .mark { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; flex: none; }
+  .craft { position: absolute; right: 18px; bottom: 6px; width: 44%; }
+  .craft svg { width: 100%; height: auto; overflow: visible; }
+  .res-row { margin-top: 13px; }
+  .res-head { display: flex; justify-content: space-between; font-size: 13px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .bar { height: 8px; margin-top: 6px; position: relative; overflow: hidden; }
+  .bar i { position: absolute; inset: 0 auto 0 0; display: block; }
+  .big { display: flex; gap: 18px; margin-top: 18px; }
+  .big div { flex: 1; }
+  .big b { display: block; font-size: clamp(26px, 2.6vw, 38px); font-weight: 600; line-height: 1.05; }
+  .big span { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+  .values { display: flex; gap: 10px; margin-top: 14px; }
+  .values div { flex: 1; font-size: 12px; }
+  .bottom { display: flex; align-items: center; gap: 16px; padding: 1.4% 3% 2.4%; }
+  .kuntur { display: flex; align-items: center; gap: 14px; padding: 12px 18px; flex: 1; font-size: 15px; }
+  .kuntur .who { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .cta { padding: 14px 24px; font-size: 15px; font-weight: 600; white-space: nowrap; cursor: pointer; border: 0; font-family: inherit; }
+  .only { display: none; }
+  .ai-free { position: absolute; left: 3%; bottom: 8px; font-size: 10px; opacity: .55; letter-spacing: .1em; }
+
+  /* ---------- A · Mission control ---------- */
+  .t-a { background: #0a0d12; color: #e5e7eb; font-family: 'Inter Variable', sans-serif;
+         background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 48px 48px; }
+  .t-a .eyebrow { color: #fb923c; font-family: 'JetBrains Mono Variable', monospace; }
+  .t-a .title { font-family: 'Space Grotesk Variable', sans-serif; font-weight: 500; letter-spacing: -.02em; }
+  .t-a .sub { color: #94a3b8; }
+  .t-a .tabs { border-bottom: 1px solid #1f2937; }
+  .t-a .tab { color: #64748b; border-bottom: 2px solid transparent; }
+  .t-a .tab.on { color: #fff; border-color: #f97316; }
+  .t-a .card { background: #0f141bcc; border: 1px solid #1f2937; border-radius: 16px; backdrop-filter: blur(6px); }
+  .t-a .goal { font-family: 'Space Grotesk Variable', sans-serif; }
+  .t-a .mark.ok { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e66; }
+  .t-a .mark.no { border: 1px dashed #475569; color: transparent; }
+  .t-a .craft svg { color: #e5e7eb; } .t-a .craft .panel { fill: #1e3a5f; stroke: #60a5fa; } .t-a .craft .body { fill: #1f2937; stroke: #e5e7eb; } .t-a .craft .gold { fill: #f59e0b33; stroke: #f59e0b; }
+  .t-a .res-head { color: #94a3b8; font-family: 'JetBrains Mono Variable', monospace; font-size: 12px; } .t-a .res-head .num { color: #f8fafc; }
+  .t-a .bar { background: #1f2937; border-radius: 99px; } .t-a .bar i { background: #f97316; border-radius: 99px; } .t-a .bar i.cool { background: #38bdf8; } .t-a .bar i.full { background: #22c55e; }
+  .t-a .big b { font-family: 'Space Grotesk Variable', sans-serif; } .t-a .big span { color: #64748b; }
+  .t-a .values div i { display: block; height: 4px; border-radius: 9px; margin-top: 5px; background: #334155; position: relative; overflow: hidden; }
+  .t-a .values div i::after { content: ''; position: absolute; inset: 0; width: var(--v); background: var(--c); }
+  .t-a .kuntur { background: #0f141b; border: 1px solid #1f2937; border-radius: 14px; } .t-a .kuntur .who { color: #38bdf8; font-family: 'JetBrains Mono Variable', monospace; }
+  .t-a .cta { background: #f97316; color: #111; border-radius: 12px; }
+  .t-a .only-a { display: block; }
+
+  /* ---------- B · Paulet's notebook ---------- */
+  .t-b { background: #efe5d0; color: #2b2118; font-family: 'Inter Variable', sans-serif;
+         background-image: repeating-linear-gradient(#0000 0 31px, #8a6a4a18 31px 32px); }
+  .t-b::before { content: ''; position: absolute; inset: 0 0 auto; height: 10px; background:
+         repeating-linear-gradient(90deg, #b5452b 0 14px, #e0a43a 14px 28px, #2f5d73 28px 42px, #efe5d0 42px 48px); }
+  .t-b .eyebrow { color: #b5452b; }
+  .t-b .title { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -.01em; }
+  .t-b .sub { color: #6b5643; font-family: 'Fraunces', serif; font-style: italic; }
+  .t-b .tab { color: #7a6450; border-radius: 8px 8px 0 0; }
+  .t-b .tab.on { background: #fbf6ea; color: #2b2118; box-shadow: 0 -2px 0 #b5452b inset; }
+  .t-b .card { background: #fbf6ea; border-radius: 4px; box-shadow: 0 1px 0 #d8c8a8, 0 12px 30px -18px #5a3d2066; }
+  .t-b .card:first-child { transform: rotate(-.4deg); }
+  .t-b .goal { font-family: 'Fraunces', serif; }
+  .t-b .mark.ok { background: #2f5d73; color: #fbf6ea; } .t-b .mark.no { border: 1.5px solid #b59c7e; color: transparent; }
+  .t-b .craft svg { color: #2b2118; } .t-b .craft .panel { fill: #2f5d7322; stroke: #2b2118; } .t-b .craft .body { fill: #e0a43a33; stroke: #2b2118; } .t-b .craft .gold { fill: none; stroke: #b5452b; }
+  .t-b .res-head { color: #6b5643; } .t-b .res-head .num { color: #2b2118; font-weight: 600; }
+  .t-b .bar { height: 10px; background: #e7dcc4; border-radius: 3px; } .t-b .bar i { background: #b5452b; border-radius: 3px; } .t-b .bar i.cool { background: #2f5d73; } .t-b .bar i.full { background: #5b7f3a; }
+  .t-b .big b { font-family: 'Fraunces', serif; } .t-b .big span { color: #8a7259; }
+  .t-b .values div i { display: block; height: 10px; margin-top: 5px; background: #e7dcc4; border-radius: 2px; position: relative; overflow: hidden; }
+  .t-b .values div i::after { content: ''; position: absolute; inset: 0; width: var(--v); background: var(--cb); }
+  .t-b .kuntur { background: #2b2118; color: #fbf6ea; border-radius: 4px; } .t-b .kuntur .who { color: #e0a43a; }
+  .t-b .cta { background: #b5452b; color: #fbf6ea; border-radius: 4px; box-shadow: 0 3px 0 #7d2c1a; }
+  .t-b .only-b { display: block; }
+  .hand { font-family: 'Caveat', cursive; color: #b5452b; font-size: 24px; line-height: 1.1; position: absolute; }
+  .stamp { position: absolute; border: 3px solid #b5452b; color: #b5452b; font-weight: 700; letter-spacing: .14em; padding: 4px 10px; font-size: 13px; transform: rotate(-9deg); border-radius: 4px; opacity: .85; }
+
+  /* ---------- C · Blueprint ---------- */
+  .t-c { background: #0b2a4a; color: #e8f1ff; font-family: 'JetBrains Mono Variable', monospace;
+         background-image: linear-gradient(#ffffff14 1px, transparent 1px), linear-gradient(90deg, #ffffff14 1px, transparent 1px),
+                           linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+         background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px; }
+  .t-c .eyebrow { color: #7dd3fc; }
+  .t-c .title { font-family: 'Space Grotesk Variable', sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: .06em; }
+  .t-c .sub { color: #9cc3ea; }
+  .t-c .tab { color: #9cc3ea; border: 1px solid #ffffff2a; margin-right: -1px; }
+  .t-c .tab.on { background: #e8f1ff; color: #0b2a4a; }
+  .t-c .card { border: 1px solid #e8f1ffaa; background: #0b2a4acc; }
+  .t-c .card::before, .t-c .card::after { content: '+'; position: absolute; color: #7dd3fc; font-size: 16px; }
+  .t-c .card::before { top: -11px; left: -6px; } .t-c .card::after { bottom: -11px; right: -6px; }
+  .t-c .goal { font-family: 'Space Grotesk Variable', sans-serif; font-weight: 400; }
+  .t-c .reqs { font-size: 12.5px; }
+  .t-c .mark { border-radius: 2px; } .t-c .mark.ok { background: #7dd3fc; color: #0b2a4a; } .t-c .mark.no { border: 1px solid #9cc3ea; color: transparent; }
+  .t-c .craft svg { color: #e8f1ff; } .t-c .craft .panel, .t-c .craft .body, .t-c .craft .gold { fill: none; stroke: #e8f1ff; }
+  .t-c .res-head { color: #9cc3ea; font-size: 12px; } .t-c .res-head .num { color: #fff; }
+  .t-c .bar { height: 10px; border: 1px solid #9cc3ea88; background: repeating-linear-gradient(90deg, #0000 0 9px, #9cc3ea33 9px 10px); }
+  .t-c .bar i { background: #7dd3fc; } .t-c .bar i.cool { background: #e8f1ff; } .t-c .bar i.full { background: #fcd34d; }
+  .t-c .big b { font-family: 'Space Grotesk Variable', sans-serif; font-weight: 300; } .t-c .big span { color: #7dd3fc; }
+  .t-c .values div i { display: block; height: 6px; margin-top: 5px; border: 1px solid #9cc3ea88; position: relative; }
+  .t-c .values div i::after { content: ''; position: absolute; inset: 0; width: var(--v); background: #e8f1ff; }
+  .t-c .kuntur { border: 1px dashed #7dd3fc; } .t-c .kuntur .who { color: #fcd34d; }
+  .t-c .cta { background: #fcd34d; color: #0b2a4a; text-transform: uppercase; letter-spacing: .1em; font-family: inherit; }
+  .t-c .only-c { display: block; }
+  .dim { position: absolute; color: #7dd3fc; font-size: 11px; }
+  .scan { position: absolute; inset: 0 auto 0 0; width: 2px; background: #7dd3fc; box-shadow: 0 0 18px 4px #7dd3fc66; opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+  <div class="picker">
+    <span>Direction:</span>
+    <button data-t="a" aria-pressed="true">A · Mission control</button>
+    <button data-t="b" aria-pressed="false">B · Paulet's notebook</button>
+    <button data-t="c" aria-pressed="false">C · Blueprint</button>
+    <button id="replay">Replay animation</button>
+    <span class="note">Same screen, same data (Storm Tracker · Mission tab). Prototype only.</span>
+  </div>
+  <div class="stage">
+    <div id="frame" class="frame t-a">
+      <div class="scan only only-c" id="scan"></div>
+      <header class="top">
+        <div>
+          <p class="eyebrow">Mission 04 · Weather from geostationary orbit</p>
+          <h1 class="title">Storm Tracker</h1>
+          <p class="sub">Watch hurricanes form, from 36 000 km up.</p>
+        </div>
+      </header>
+      <nav class="tabs">
+        <span class="tab on">Mission</span><span class="tab">Payload</span><span class="tab">Spacecraft</span>
+        <span class="tab">Orbit &amp; launch</span><span class="tab">Ground &amp; comms</span><span class="tab">Review</span>
+      </nav>
+      <section class="main">
+        <article class="card a1">
+          <p class="eyebrow" style="margin-bottom:10px">What the client wants</p>
+          <p class="goal">A weather satellite that watches storms over the Atlantic for at least 5 years and sends 30 GB of data every day.</p>
+          <ul class="reqs">
+            <li><span class="mark ok">✓</span>Weather imager on board</li>
+            <li><span class="mark ok">✓</span>Geostationary orbit</li>
+            <li><span class="mark no">·</span>Lasts 5 years</li>
+            <li><span class="mark no">·</span>30 GB per day reach Earth</li>
+            <li><span class="mark ok">✓</span>Within $200 M</li>
+          </ul>
+          <div class="craft">
+            <svg viewBox="0 0 320 170" fill="none" stroke-width="2" stroke-linejoin="round">
+              <g class="draw">
+                <rect class="panel" x="6" y="58" width="96" height="44" />
+                <path class="panel" d="M30 58v44M54 58v44M78 58v44" />
+                <rect class="panel" x="218" y="58" width="96" height="44" />
+                <path class="panel" d="M242 58v44M266 58v44M290 58v44" />
+                <path class="body" d="M102 80h18M200 80h18" />
+                <rect class="body" x="120" y="44" width="80" height="76" rx="3" />
+                <rect class="gold" x="132" y="56" width="56" height="52" />
+                <path class="body" d="M160 44V26" /><path class="body" d="M140 26a20 10 0 0 1 40 0z" />
+                <circle class="body" cx="160" cy="132" r="9" /><path class="body" d="M160 120v3" />
+              </g>
+            </svg>
+          </div>
+          <span class="hand only only-b" style="right:44%;bottom:30px;transform:rotate(-4deg)">"From up there, the storm<br />never leaves your sight." — G.</span>
+          <span class="dim only only-c" style="right:22%;bottom:4px">← 3.2 m span →</span>
+          <span class="dim only only-c" style="right:46%;bottom:58px">[ imager ]─┐</span>
+        </article>
+        <aside class="card a2">
+          <p class="eyebrow">Spacecraft and budget</p>
+          <div class="res-row"><div class="res-head"><span>Mass / launcher</span><span class="num" data-n="287"> kg / 1 000</span></div><div class="bar"><i style="width:29%"></i></div></div>
+          <div class="res-row"><div class="res-head"><span>Power used / made</span><span class="num" data-n="90"> W / 127</span></div><div class="bar"><i class="cool" style="width:71%"></i></div></div>
+          <div class="res-row"><div class="res-head"><span>Data to Earth</span><span class="num" data-n="15"> / 30 GB a day</span></div><div class="bar"><i class="cool" style="width:50%"></i></div></div>
+          <div class="res-row"><div class="res-head"><span>Budget</span><span class="num" data-n="161" data-pre="$"> M / 200</span></div><div class="bar"><i style="width:80%"></i></div></div>
+          <div class="big">
+            <div><b class="num" data-n="82" data-suf="%">82%</b><span>Success chance</span></div>
+            <div><b class="num" data-n="3" data-suf=" / 5">3 / 5</b><span>Requirements met</span></div>
+          </div>
+          <div class="values">
+            <div style="--v:62%;--c:#38bdf8;--cb:#2f5d73">Rigor<i></i></div>
+            <div style="--v:35%;--c:#f97316;--cb:#b5452b">Audacity<i></i></div>
+            <div style="--v:48%;--c:#4ade80;--cb:#5b7f3a">Service<i></i></div>
+          </div>
+          <span class="stamp only only-b" style="right:18px;top:16px">Draft</span>
+        </aside>
+      </section>
+      <footer class="bottom">
+        <div class="kuntur a3">
+          <svg width="42" height="42" viewBox="0 0 42 42" aria-hidden="true" id="kuntur"><circle cx="21" cy="21" r="20" fill="#0ea5e9" opacity=".18" /><path d="M6 22c6-6 10-6 15-2 5-4 9-4 15 2-5-1-9 0-15 5-6-5-10-6-15-5z" fill="currentColor" /><circle cx="21" cy="17" r="3.4" fill="currentColor" /></svg>
+          <div><p class="who">Kuntur</p><p>A storm moves fast. In geostationary orbit your satellite never loses sight of it. Next: pick the imager.</p></div>
+        </div>
+        <button class="cta a4">Next: payload →</button>
+      </footer>
+    </div>
+  </div>
+<script type="module">
+  import '@fontsource-variable/inter'
+  import '@fontsource-variable/space-grotesk'
+  import '@fontsource-variable/jetbrains-mono'
+  import '@fontsource/caveat'
+  import { gsap } from 'gsap'
+
+  const frame = document.getElementById('frame')
+  let theme = 'a'
+
+  function play() {
+    gsap.killTweensOf('*')
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    tl.from('.top > div > *', { y: 24, opacity: 0, stagger: 0.08, duration: 0.6 })
+      .from('.tab', { y: -10, opacity: 0, stagger: 0.04, duration: 0.35 }, '<0.2')
+      .from('.card', { y: 30, opacity: 0, stagger: 0.12, duration: 0.7 }, '<0.1')
+      .from('.reqs li', { x: -12, opacity: 0, stagger: 0.06, duration: 0.4 }, '<0.3')
+      .from('.bar i', { scaleX: 0, transformOrigin: 'left', stagger: 0.08, duration: 0.9, ease: 'expo.out' }, '<0.1')
+    document.querySelectorAll('[data-n]').forEach((el) => {
+      const target = +el.dataset.n, pre = el.dataset.pre ?? '', suf = el.dataset.suf ?? el.textContent.replace(/^[\d$]+/, '')
+      el.dataset.suf = suf
+      const o = { v: 0 }
+      tl.to(o, { v: target, duration: 1.1, ease: 'power2.out', onUpdate: () => (el.textContent = pre + Math.round(o.v) + suf) }, '<')
+    })
+    tl.from('.kuntur', { y: 20, opacity: 0, duration: 0.5 }, '-=0.6')
+      .from('#kuntur path', { rotate: -18, transformOrigin: '50% 60%', duration: 0.5, ease: 'back.out(3)' }, '<0.1')
+      .from('.cta', { scale: 0.9, opacity: 0, duration: 0.4, ease: 'back.out(2)' }, '<0.1')
+    if (theme === 'b') {
+      const paths = frame.querySelectorAll('.draw > *')
+      paths.forEach((p) => { const L = p.getTotalLength?.() ?? 300; gsap.set(p, { strokeDasharray: L, strokeDashoffset: L }) })
+      tl.to(paths, { strokeDashoffset: 0, duration: 1.4, stagger: 0.06, ease: 'power1.inOut' }, 0.4)
+        .from('.hand', { opacity: 0, x: -10, duration: 0.6 }, '-=0.4')
+        .from('.stamp', { scale: 2.4, opacity: 0, duration: 0.35, ease: 'power4.in' }, '-=0.2')
+    } else if (theme === 'c') {
+      gsap.set('.draw > *', { strokeDasharray: 'none', strokeDashoffset: 0 })
+      tl.fromTo('#scan', { left: '0%', opacity: 1 }, { left: '100%', opacity: 0.2, duration: 1.6, ease: 'none' }, 0)
+        .from('.dim', { opacity: 0, duration: 0.3, stagger: 0.15 }, 0.9)
+    } else {
+      gsap.set('.draw > *', { strokeDasharray: 'none', strokeDashoffset: 0 })
+      tl.from('.craft', { y: 16, opacity: 0, duration: 0.8 }, 0.5)
+      gsap.to('.craft', { y: -6, duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 1.6 })
+    }
+  }
+
+  document.querySelectorAll('[data-t]').forEach((b) => b.addEventListener('click', () => {
+    theme = b.dataset.t
+    frame.className = 'frame t-' + theme
+    document.querySelectorAll('[data-t]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+    play()
+  }))
+  document.getElementById('replay').addEventListener('click', play)
+  play()
+</script>
+</body>
+</html>

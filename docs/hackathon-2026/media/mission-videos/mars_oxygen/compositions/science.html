@@ -1,0 +1,52 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="sc-k" style="left:120px; top:92px">HOW MOXIE WORKS · SOLID OXIDE ELECTROLYSIS</div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <path id="sc-pipe" d="M 160 540 L 600 540 M 820 540 L 1100 540" stroke="#3a3f47" stroke-width="40" fill="none"/>
+        <g id="sc-comp"><rect x="600" y="420" width="220" height="240" rx="14" fill="#16191e" stroke="#36d1ff" stroke-width="3"/>
+          <g id="sc-fan" transform="translate(710 540)"><g id="sc-blades"><path d="M 0 0 L 70 -20 L 70 20 Z M 0 0 L -70 20 L -70 -20 Z M 0 0 L -20 -70 L 20 -70 Z M 0 0 L 20 70 L -20 70 Z" fill="#36d1ff" opacity=".7"/></g><circle r="12" fill="#e8e0cc"/></g>
+          <text x="618" y="700" style="fill:#36d1ff; font-weight:600">COMPRESSOR</text></g>
+        <g id="sc-cell"><rect id="sc-cr" x="1100" y="380" width="300" height="320" rx="14" fill="#2a1408" stroke="#f08a3c" stroke-width="3"/>
+          <line x1="1250" y1="400" x2="1250" y2="680" stroke="#d9b46a" stroke-width="10"/>
+          <text x="1114" y="740" style="fill:#f08a3c; font-weight:600">CERAMIC CELL · 800 °C</text></g>
+        <path d="M 1400 470 L 1700 360" stroke="#3a3f47" stroke-width="28" fill="none"/>
+        <path d="M 1400 610 L 1700 720" stroke="#3a3f47" stroke-width="28" fill="none"/>
+        <text x="1610" y="320" style="fill:#7fd17a; font-weight:600">O₂ OUT</text>
+        <text x="1600" y="790" style="fill:#8a8f98; font-weight:600">CO BACK TO THE AIR</text>
+        <text x="130" y="490" style="fill:#e8e0cc; font-weight:600">MARS AIR IN</text>
+        <g id="sc-mols"></g>
+        <text x="120" y="960" style="fill:#e8e0cc; font-size:44px; font-weight:600" id="sc-eq">2 CO₂  →  2 CO  +  O₂</text>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    // molecules: CO2 enters, gets squeezed, splits in the cell; O2 leaves up, CO leaves down
+    let m = ""; const N = 12;
+    for (let i = 0; i < N; i++) m += `<g class="sc-co2" id="sc-a${i}"><circle cx="0" cy="0" r="13" fill="#4b4b4b"/><circle cx="-22" cy="0" r="11" fill="#e0453c"/><circle cx="22" cy="0" r="11" fill="#e0453c"/></g>`
+      + `<g class="sc-o2" id="sc-o${i}" opacity="0"><circle cx="-10" cy="0" r="11" fill="#7fd17a"/><circle cx="10" cy="0" r="11" fill="#7fd17a"/></g>`
+      + `<g class="sc-co" id="sc-c${i}" opacity="0"><circle cx="-8" cy="0" r="13" fill="#4b4b4b"/><circle cx="12" cy="0" r="11" fill="#e0453c"/></g>`;
+    document.querySelector("#sc-mols").innerHTML = m;
+    K.enter(tl, "#sc-stage", "wipe");
+    K.fade(tl, "#sc-k", 0.4, 0.5, 0);
+    tl.fromTo("#sc-pipe", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
+    K.fade(tl, "#sc-comp", c("vo5", 0.6), 0.5, 20); K.fade(tl, "#sc-cell", c("vo5", 4.6), 0.5, 20);
+    tl.fromTo("#sc-blades", { rotation: 0, svgOrigin: "0 0" }, { rotation: 360 * 12, duration: c.dur, ease: "none" }, 0.6);
+    tl.fromTo("#sc-cr", { fill: "#2a1408" }, { fill: "#6a2a0c", duration: 0.6, yoyo: true, repeat: 9, ease: "sine.inOut" }, c("vo5", 5.0));
+    const t0 = c("vo5", 1.2), gap = (c.dur - t0 - 3.5) / N;
+    for (let i = 0; i < N; i++) {
+      const s = t0 + i * gap;
+      tl.fromTo("#sc-a" + i, { x: 160, y: 540, opacity: 0 }, { x: 600, y: 540, opacity: 1, duration: 1.2, ease: "none" }, s);
+      tl.to("#sc-a" + i, { x: 1250, y: 540, scale: 0.85, duration: 1.0, ease: "power1.in" }, s + 1.2);
+      tl.set("#sc-a" + i, { opacity: 0 }, s + 2.2);
+      const up = i % 2 === 0;
+      tl.fromTo((up ? "#sc-o" : "#sc-c") + i, { x: 1250, y: 540, opacity: 1 }, { x: 1700, y: up ? 360 : 720, duration: 1.3, ease: "power1.out" }, s + 2.2);
+      tl.to((up ? "#sc-o" : "#sc-c") + i, { opacity: 0, duration: 0.3 }, s + 3.3);
+    }
+    K.fade(tl, "#sc-eq", c("vo6", 0.2), 0.6, 0);
+    K.exit(tl, "#sc-stage", "fade", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

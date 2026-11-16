@@ -1,0 +1,21 @@
+lunar_pathfinder  total 75.28s
+
+[hook] start 0.0  dur 12.72
+   vo1      1.20 ->   7.52   Near the Moon's south pole, some crater floors have not seen sunlight in billion
+   vo2      8.02 ->  10.12   What could be hiding in the dark?
+
+[history] start 12.72  dur 17.67
+   vo3      0.80 ->   9.66   On October 9, 2009, NASA's LCROSS mission crashed its spent rocket stage into on
+   vo4     10.16 ->  16.07   In the plume of dust, it found water: about 155 kilograms.
+
+[science] start 30.39  dur 18.46
+   vo5      0.90 ->   3.72   Orbiters study the poles without landing.
+   vo6      4.12 ->  10.97   A laser measures the height of the ground. A neutron counter senses hydrogen, a 
+   vo7     11.47 ->  16.86   A thermometer found some of the coldest places ever measured in the solar system
+
+[compare] start 48.85  dur 14.47
+   vo8      0.80 ->   5.76   The Lunar Reconnaissance Orbiter has mapped the Moon since 2009.
+   vo9      6.36 ->  13.27   Now compare your design. Water there means drinking water, air and rocket fuel f
+
+[ending] start 63.32  dur 11.96
+   fra      1.00 ->   4.46   Where there is water, there are questions. Maybe even answers.

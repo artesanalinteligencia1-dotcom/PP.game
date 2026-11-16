@@ -1,0 +1,26 @@
+<template>
+  <div id="root" data-composition-id="orbit" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="or-stage" class="k-stage" style="background:#000">
+      <div id="or-wrap" style="position:absolute; inset:0">
+        <video id="or-vid" class="clip" src="assets/act4-04.mp4" data-start="0" data-duration="9.1" data-playback-rate="0.86" muted playsinline style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover"></video>
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED VIDEO (VEO)</div>
+      <div class="k-chip" id="or-spec" style="left:120px; top:110px; border-color:#36d1ff; color:#36d1ff">SPECULATIVE FUTURE</div>
+      <div class="k-abs" id="or-tel" style="left:120px; top:820px; width:1300px; height:80px">
+        <div class="k-chip" style="left:0; top:0">ORBIT 400 KM</div>
+        <div class="k-chip" style="left:260px; top:0">7.7 KM/S</div>
+        <div class="k-chip" style="left:450px; top:0">ONE LAP EVERY 92 MIN</div>
+        <div class="k-chip" style="left:830px; top:0">OVER THE ANDES</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("orbit");
+    K.enter(tl, "#or-stage", "fade", { dur: 0.8 });
+    tl.fromTo("#or-wrap", { scale: 1.0 }, { scale: 1.05, duration: c.dur + 0.5, ease: "none" }, 0);
+    K.pop(tl, "#or-spec", 0.6, 0.4);
+    tl.fromTo("#or-tel .k-chip", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.25, ease: "back.out(2)" }, c("vo5", 1.2));
+    K.exit(tl, "#or-stage", "fade", c.dur);
+    window.__timelines["orbit"] = tl;
+  </script>
+</template>

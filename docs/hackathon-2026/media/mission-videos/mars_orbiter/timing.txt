@@ -1,0 +1,21 @@
+mars_orbiter  total 84.97s
+
+[hook] start 0.0  dur 17.06
+   vo1      1.20 ->   8.77   July 1965: the first close-up pictures of Mars arrive on Earth as long lists of 
+   vo2      9.27 ->  14.66   The engineers couldn't wait for the computers. They coloured the numbers in by h
+
+[history] start 17.06  dur 21.79
+   vo3      0.80 ->   6.88   In 1971, Mariner 9 became the first spacecraft to orbit another planet.
+   vo4      7.48 ->  15.53   In 1999, Mars Climate Orbiter was lost: one team used pound-force, the other use
+   vo5     15.83 ->  20.39   It flew far too close to Mars and was never heard from again.
+
+[science] start 38.85  dur 17.1
+   vo6      0.90 ->   5.06   To stay at Mars, a spacecraft must brake as it arrives.
+   vo7      5.56 ->  15.50   Then, for five months, Mars Reconnaissance Orbiter dipped into the thin upper ai
+
+[compare] start 55.95  dur 16.24
+   vo8      0.80 ->  10.57   Since 2006 it has studied Mars from about 300 kilometres up, with a camera that 
+   vo9     11.17 ->  15.04   Now compare your design. And always check your units.
+
+[ending] start 72.19  dur 12.78
+   goi      1.00 ->   5.28   Paulet dreamed of rockets. We are reading the weather on another planet.

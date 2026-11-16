@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-composition-variables='[{"id":"apogeeKm","type":"string","label":"Your apogee (km)","default":"100+"},{"id":"microMin","type":"string","label":"Your minutes of weightlessness","default":"—"}]'>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>First Light — the real story</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0b0d10; }
+      #root { position: relative; width: 100%; height: 100%; background: #0b0d10; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="80" data-width="1920" data-height="1080">
+      <div id="hook" data-composition-id="hook" data-composition-src="compositions/hook.html" data-start="0" data-duration="9" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="notebook" data-composition-id="notebook" data-composition-src="compositions/notebook.html" data-start="9" data-duration="16" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="physics" data-composition-id="physics" data-composition-src="compositions/physics.html" data-start="25" data-duration="24" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="compare" data-composition-id="compare" data-composition-src="compositions/compare.html" data-start="49" data-duration="17" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="ending" data-composition-id="ending" data-composition-src="compositions/ending.html" data-start="66" data-duration="14" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080"></div>
+      <div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0" data-duration="80" data-track-index="2" data-track-kind="captions" data-width="1920" data-height="1080" data-hidden="true"></div>
+
+      <audio id="vo1" src="assets/vo/vo1.wav" data-start="0.5" data-duration="3.33" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo2" src="assets/vo/vo2.wav" data-start="5.0" data-duration="2.65" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo3" src="assets/vo/vo3.wav" data-start="9.6" data-duration="7.05" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo4" src="assets/vo/vo4.wav" data-start="17.0" data-duration="9.15" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo5" src="assets/vo/vo5.wav" data-start="26.4" data-duration="5.62" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo6" src="assets/vo/vo6.wav" data-start="33.0" data-duration="5.92" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo7" src="assets/vo/vo7.wav" data-start="41.5" data-duration="5.67" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo8" src="assets/vo/vo8.wav" data-start="50.0" data-duration="4.4" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo9" src="assets/vo/vo9.wav" data-start="58.0" data-duration="2.83" data-track-index="4" data-volume="1"></audio>
+      <audio id="vo-goi" src="assets/vo/goi.wav" data-start="67.2" data-duration="6.97" data-track-index="4" data-volume="1"></audio>
+      <audio id="music" src="assets/fire-b.mp3" data-start="0" data-duration="80" data-track-index="5" data-volume="0.2" data-fade-in="2" data-fade-out="4"></audio>
+      <audio id="sfx-liftoff" src="assets/liftoff.mp3" data-start="17.6" data-duration="4" data-track-index="6" data-volume="0.6" data-fade-out="1"></audio>
+      <audio id="sfx-staging" src="assets/staging.mp3" data-start="27" data-duration="3" data-track-index="7" data-volume="0.5"></audio>
+      <audio id="sfx-success" src="assets/success.mp3" data-start="58" data-duration="4" data-track-index="7" data-volume="0.5"></audio>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

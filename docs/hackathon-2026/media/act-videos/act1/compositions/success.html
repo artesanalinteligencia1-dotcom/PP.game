@@ -1,0 +1,25 @@
+<template>
+  <div id="root" data-composition-id="success" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="su-stage" class="k-stage">
+      <div id="su-wrap" style="position:absolute; inset:0">
+        <video id="su-vid" class="clip" src="assets/act1-08.mp4" data-start="0" data-duration="6.6" data-playback-rate="0.75" muted playsinline style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover"></video>
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED VIDEO (VEO)</div>
+      <div class="k-panel" id="su-hud" style="left:110px; top:110px; width:560px; height:220px; border-color:#7fd17a">
+        <div class="k-head" style="color:#7fd17a">FLIGHT 4 · TELEMETRY</div>
+        <div class="k-abs" id="su-o" style="left:24px; top:66px; font-size:72px; font-weight:600; color:#7fd17a">ORBIT ✓</div>
+        <div class="k-label" style="left:24px; top:160px">520 KM · 7.6 KM/S · SUN-SYNCHRONOUS</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("success");
+    K.enter(tl, "#su-stage", "iris", { x: 960, y: 420 });
+    tl.fromTo("#su-wrap", { scale: 1.02 }, { scale: 1.1, duration: c.dur + 0.5, ease: "none", transformOrigin: "35% 40%" }, 0);
+    tl.fromTo("#su-hud", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, c("vo11", 0));
+    tl.fromTo("#su-o", { scale: 1.6, opacity: 0, transformOrigin: "0% 50%" }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2)" }, c("vo11", 0.9));
+    tl.to("#su-hud", { boxShadow: "0 0 60px rgba(127,209,122,.55)", duration: 0.6, yoyo: true, repeat: 3 }, c("vo11", 1.2));
+    K.exit(tl, "#su-stage", "fade", c.dur);
+    window.__timelines["success"] = tl;
+  </script>
+</template>

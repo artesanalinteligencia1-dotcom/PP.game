@@ -1,0 +1,28 @@
+<template>
+  <div id="root" data-composition-id="close" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="cl-stage" class="k-stage">
+      <div id="cl-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="cl-img" src="assets/act3-07.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,4,8,.6) 0%, transparent 40%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-abs" id="cl-w1" style="left:120px; top:110px; font-size:110px; font-weight:600; letter-spacing:.06em">LAND.</div>
+      <div class="k-abs" id="cl-w2" style="left:480px; top:110px; font-size:110px; font-weight:600; letter-spacing:.06em">BREATHE.</div>
+      <div class="k-abs" id="cl-w3" style="left:1000px; top:110px; font-size:110px; font-weight:600; letter-spacing:.06em; color:#d9b46a">STAY.</div>
+      <div class="k-abs" id="cl-end" style="left:0; top:0; width:1920px; height:1080px; background:#0b0d10; opacity:0; z-index:6">
+        <div class="k-abs" style="left:0; width:1920px; top:380px; text-align:center; font-size:150px; font-weight:600; letter-spacing:.18em; color:#e8e0cc">PAUL<span style="color:#f08a3c">Ǝ</span>T</div>
+        <div class="k-abs" style="left:0; width:1920px; top:570px; text-align:center; font-size:44px; letter-spacing:.3em; color:#d9b46a; font-weight:600">ACT 3 · THE WINDOW</div>
+        <div class="k-abs" style="left:0; width:1920px; top:880px; text-align:center; font-size:28px; letter-spacing:.06em; color:#8a8f98">Illustrations and clips: AI-generated (Google Gemini, Veo) · Real images: NASA / JPL-Caltech · Voice: AI (Kokoro, local) · Music: ACE-Step 1.5 (local)</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("close");
+    K.enter(tl, "#cl-stage", "fade", { dur: 0.8 });
+    K.kb(tl, "#cl-img", 0, c.dur, { s: 1.02 }, { s: 1.14, y: 20 });
+    K.blurIn(tl, "#cl-w1", c("vo7", 0.0), 0.5); K.blurIn(tl, "#cl-w2", c("vo7", 0.6), 0.5); K.blurIn(tl, "#cl-w3", c("vo7", 1.2), 0.6);
+    tl.to("#cl-end", { opacity: 1, duration: 0.9 }, 5.6);
+    tl.to("#cl-stage", { opacity: 0, duration: 0.8, ease: "power2.in" }, c.dur - 0.85);
+    window.__timelines["close"] = tl;
+  </script>
+</template>

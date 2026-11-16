@@ -1,0 +1,36 @@
+<template>
+  <div id="root" data-composition-id="sputnik" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sp-stage" class="k-stage">
+      <div id="sp-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="sp-img" src="assets/act1-01.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(4,5,8,.82) 0%, rgba(4,5,8,.35) 45%, transparent 70%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-kicker" id="sp-k" style="left:120px; top:110px">ACT 1 · EARTH ORBIT</div>
+      <div class="k-title" id="sp-t" style="left:120px; top:160px; font-size:120px">THREE<br>FAILURES</div>
+      <div class="k-year" id="sp-y" style="left:120px; top:470px; font-size:120px">4 OCT 1957</div>
+      <div class="k-photo" id="sp-real" style="left:120px; top:620px; width:420px; height:300px; border-color:#e8e0cc">
+        <img src="assets/sputnik.jpg" alt="" style="object-position:70% 30%">
+        <div class="k-credit" style="font-size:24px">IMAGE: NASA NSSDCA · SPUTNIK 1</div>
+      </div>
+      <svg class="k-svg" viewBox="0 0 1920 1080"><g id="sp-wave" transform="translate(600 770)"></g></svg>
+      <div class="k-label cyan" id="sp-wl" style="left:600px; top:836px">RADIO · 20 MHZ · BEEP-BEEP-BEEP</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("sputnik");
+    // the beep as an oscilloscope trace: bursts every 0.6 s (0.3 s on, 0.3 s off), drawn bar by bar
+    let w = ""; for (let i = 0; i < 70; i++) { const on = (i % 12) < 6; const h = on ? 14 + ((i * 37) % 5) * 9 : 3; w += `<rect class="sp-b" x="${i * 9}" y="${-h}" width="5" height="${2 * h}" fill="${on ? "#36d1ff" : "#3a3f47"}"/>`; }
+    document.querySelector("#sp-wave").innerHTML = w;
+    K.kb(tl, "#sp-img", 0, c.dur + 0.5, { s: 1.04, x: 40 }, { s: 1.18, x: -60, y: 10 });
+    K.fade(tl, "#sp-k", 0.15, 0.5, 0);
+    tl.fromTo("#sp-t", { opacity: 0, x: -40, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, 0.0);
+    tl.fromTo("#sp-y", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.0, ease: "steps(10)" }, c("vo1", 0.2));
+    K.photo(tl, "#sp-real", c("vo1", 2.2));
+    tl.fromTo(".sp-b", { scaleY: 0, transformOrigin: "50% 50%" }, { scaleY: 1, duration: 0.25, stagger: 0.04, ease: "power2.out" }, c("vo1", -0.3));
+    for (let k = 0; k < 14; k++) tl.fromTo(".sp-b", { opacity: 1 }, { opacity: 0.45, duration: 0.3, ease: "none" }, c("vo1", -0.3) + k * 0.6);
+    K.fade(tl, "#sp-wl", c("vo1", 0.4), 0.5, 0);
+    K.exit(tl, "#sp-stage", "whip", c.dur);
+    window.__timelines["sputnik"] = tl;
+  </script>
+</template>

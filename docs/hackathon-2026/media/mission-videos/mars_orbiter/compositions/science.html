@@ -1,0 +1,60 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="sc-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <g transform="translate(700 560)">
+          <circle r="150" fill="none" stroke="#e8875a" stroke-width="26" opacity=".18"/>
+          <circle r="130" fill="#b5532e"/><circle r="130" fill="url(#sc-sh)"/>
+          <defs><radialGradient id="sc-sh" cx="35%" cy="35%" r="75%"><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient></defs>
+          <path id="sc-orb" fill="none" stroke="#36d1ff" stroke-width="3"/>
+          <path id="sc-ghost" fill="none" stroke="#36d1ff" stroke-width="2" opacity=".25"/>
+          <circle id="sc-sat" r="11" fill="#fff4dc"/>
+          <circle id="sc-glow" cx="-160" cy="0" r="24" fill="#ff9a50" opacity="0"/>
+        </g>
+        <text x="420" y="390" style="fill:#e8875a">THIN UPPER ATMOSPHERE (NOT TO SCALE)</text>
+      </svg>
+      <div class="k-kicker" id="sc-k" style="left:120px; top:92px">BRAKING AT MARS · AEROBRAKING</div>
+      <div class="k-panel" id="sc-p" style="left:1300px; top:250px; width:500px; height:420px">
+        <div class="k-head">ORBIT</div>
+        <div class="k-label" style="left:24px; top:76px">HIGHEST POINT</div>
+        <div class="k-num" id="sc-apo" style="left:24px; top:116px; font-size:84px">45,000 KM</div>
+        <div class="k-label" style="left:24px; top:236px">DIPS INTO THE AIR</div>
+        <div class="k-num" id="sc-dips" style="left:24px; top:276px; font-size:84px; color:#ff9a50">0</div>
+        <div class="k-label" style="left:24px; top:376px; font-size:28px">ILLUSTRATIVE VALUES</div>
+      </div>
+      <div class="k-chip" id="sc-brake" style="left:120px; top:160px; border-color:#f08a3c; color:#f08a3c">1 · ENGINE BURN TO BE CAPTURED</div>
+      <div class="k-chip" id="sc-aero" style="left:120px; top:220px; border-color:#ff9a50; color:#ff9a50">2 · THE AIR DOES THE REST</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.stars("#sc-stars", 120, 4);
+    // orbit with periapsis on the left (in the air) and a shrinking apoapsis to the right
+    const peri = 160; const ell = (apo) => { const a = (peri + apo) / 2, cxo = (apo - peri) / 2, b = Math.sqrt(peri * apo); let d = ""; for (let k = 0; k <= 120; k++) { const t = 2 * Math.PI * k / 120; d += (k ? " L " : "M ") + (cxo + a * Math.cos(t)).toFixed(1) + " " + (b * Math.sin(t)).toFixed(1); } return d; };
+    const st = { apo: 1100 };
+    const draw = () => document.querySelector("#sc-orb").setAttribute("d", ell(st.apo));
+    document.querySelector("#sc-ghost").setAttribute("d", ell(1100)); draw();
+    const pos = (u, apo) => { const a = (peri + apo) / 2, cxo = (apo - peri) / 2, b = Math.sqrt(peri * apo); return [cxo + a * Math.cos(u), b * Math.sin(u)]; };
+    K.enter(tl, "#sc-stage", "zoom");
+    K.fade(tl, "#sc-k", 0.4, 0.5, 0);
+    K.pop(tl, "#sc-brake", c("vo6", 0.6), 0.4);
+    K.fade(tl, "#sc-p", c("vo6", 1.0), 0.5, 0, 30);
+    // the spacecraft arrives on the big orbit, then the orbit shrinks dip after dip
+    const t0 = c("vo6", 0.4), t1 = c("vo7", 0.6), t2 = c.dur - 0.6, laps = 9;
+    const o = { u: Math.PI * 0.2 };
+    tl.fromTo(o, { u: Math.PI * 0.2 }, { u: Math.PI * 1, duration: t1 - t0, ease: "none", onUpdate: () => { const p = pos(o.u, 1100); const s = document.querySelector("#sc-sat"); s.setAttribute("cx", p[0]); s.setAttribute("cy", p[1]); } }, t0);
+    K.pop(tl, "#sc-aero", c("vo7", 0.6), 0.4);
+    const q = { k: 0 };
+    tl.fromTo(q, { k: 0 }, { k: laps, duration: t2 - t1, ease: "none", onUpdate: () => {
+      const lap = Math.floor(q.k), f = q.k - lap; st.apo = 1100 - (1100 - 330) * Math.min(1, lap / (laps - 1)); draw();
+      const p = pos(Math.PI + 2 * Math.PI * f, st.apo); const s = document.querySelector("#sc-sat"); s.setAttribute("cx", p[0]); s.setAttribute("cy", p[1]);
+      const g = document.querySelector("#sc-glow"); g.setAttribute("opacity", f < 0.08 || f > 0.92 ? 0.9 : 0);
+      document.querySelector("#sc-dips").textContent = String(lap);
+      document.querySelector("#sc-apo").textContent = (Math.round((45000 - (45000 - 450) * Math.min(1, lap / (laps - 1))) / 50) * 50).toLocaleString("en-US") + " KM";
+    } }, t1);
+    K.exit(tl, "#sc-stage", "fade", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

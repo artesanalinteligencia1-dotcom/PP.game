@@ -1,0 +1,46 @@
+{
+  "id": "mars_oxygen",
+  "title": "Breathing Mars — the real story: making oxygen from Martian air",
+  "music": "quiet-orbit-b.mp3",
+  "musicStart": 50,
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "deploy.mp3", "scene": "history", "cue": "vo3", "off": 1.0, "dur": 2, "vol": 0.25 },
+    { "src": "success.mp3", "scene": "compare", "cue": "vo8", "off": 0.2, "dur": 4, "vol": 0.28 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 2.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Martian air is about 95% carbon dioxide, and far too thin to breathe.", "tts": "Martian air is about ninety-five percent carbon dioxide, and far too thin to breathe.", "es": "El aire de Marte es cerca de 95 % dióxido de carbono, y demasiado tenue para respirar." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "Could we make our own oxygen there?", "es": "¿Podríamos fabricar nuestro propio oxígeno allá?" }
+    ] },
+    { "id": "history", "lead": 0.8, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "In 2021, a box the size of a car battery rode to Mars inside the Perseverance rover: MOXIE.", "tts": "In twenty twenty-one, a box the size of a car battery rode to Mars inside the Perseverance rover: Moxie.", "es": "En 2021, una caja del tamaño de una batería de auto viajó a Marte dentro del rover Perseverance: MOXIE." },
+      { "id": "vo4", "v": "nar", "gap": 0.5, "en": "Between 2021 and 2023 it ran 16 times and made 122 grams of oxygen, up to 12 grams an hour.", "tts": "Between twenty twenty-one and twenty twenty-three it ran sixteen times and made one hundred and twenty-two grams of oxygen, up to twelve grams an hour.", "es": "Entre 2021 y 2023 funcionó 16 veces y fabricó 122 gramos de oxígeno, hasta 12 gramos por hora." }
+    ] },
+    { "id": "science", "lead": 0.9, "tail": 1.6, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Inside, a compressor squeezes the thin air, and a ceramic cell heated to 800 degrees splits each carbon dioxide molecule.", "tts": "Inside, a compressor squeezes the thin air, and a ceramic cell heated to eight hundred degrees splits each carbon dioxide molecule.", "es": "Dentro, un compresor aprieta el aire tenue y una celda cerámica calentada a 800 grados separa cada molécula de dióxido de carbono." },
+      { "id": "vo6", "v": "nar", "gap": 0.5, "en": "Oxygen goes one way. Carbon monoxide goes back to the air.", "es": "El oxígeno sale por un lado. El monóxido de carbono vuelve al aire." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "kicker": "FROM A BOX TO A BASE",
+      "title": "How much oxygen do explorers need?",
+      "photo": { "src": "moxie-work.jpg", "credit": "Image: NASA/JPL-Caltech · MOXIE", "pos": "50% 45%" },
+      "rows": [
+        { "label": "MOXIE AT ITS BEST", "value": "12 g / hour", "note": "2021 – 2023 on Mars", "frac": 0.06, "color": "#7fd17a" },
+        { "label": "ONE PERSON BREATHES", "value": "≈ 0.84 kg / day", "note": "NASA planning value", "frac": 0.3, "color": "#d9b46a" },
+        { "label": "A ROCKET TO LEAVE MARS", "value": "≈ 25 tonnes", "note": "oxygen for the engines", "frac": 1.0, "color": "#f08a3c" }
+      ],
+      "yours": ["KG OF OXYGEN A DAY", "POWER USED", "CREW SUPPORTED"],
+      "lines": [
+        { "id": "vo7", "v": "nar", "en": "A person breathes under a kilogram of oxygen a day. A rocket leaving Mars needs about 25 tonnes.", "tts": "A person breathes under a kilogram of oxygen a day. A rocket leaving Mars needs about twenty-five tonnes.", "es": "Una persona respira menos de un kilo de oxígeno al día. Un cohete que deja Marte necesita unas 25 toneladas." },
+        { "id": "vo8", "v": "nar", "gap": 0.6, "en": "Now compare your plant. Every kilogram made there is a kilogram you don't carry from Earth.", "es": "Ahora compara tu planta. Cada kilo fabricado allá es un kilo que no cargas desde la Tierra." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "fra", "lead": 1.0, "tail": 7.5,
+      "quote": "We used to ask if Mars could hold life. Now we ask if it can help us live.",
+      "learn": "NASA/JPL: MOXIE final results (2023) · NASA: in-situ resource utilisation (ISRU) · NASA: Mars 2020 Perseverance rover",
+      "images": "Real images: NASA/JPL-Caltech, public domain",
+      "lines": [
+        { "id": "fra", "v": "fra", "cap": false, "en": "We used to ask if Mars could hold life. Now we ask if it can help us live.", "es": "Antes preguntábamos si Marte podía albergar vida. Ahora preguntamos si puede ayudarnos a vivir." }
+      ] }
+  ]
+}

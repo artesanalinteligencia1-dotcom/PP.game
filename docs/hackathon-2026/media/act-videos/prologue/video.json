@@ -1,0 +1,35 @@
+{
+  "id": "prologue",
+  "title": "Prologue — The Notebook",
+  "music": "misti-b.mp3",
+  "musicVol": 0.22,
+  "sfx": [
+    { "src": "deploy.mp3", "scene": "paris", "cue": "vo2", "off": 3.4, "dur": 1.2, "vol": 0.25 }
+  ],
+  "scenes": [
+    { "id": "paris", "lead": 1.2, "tail": 1.0, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Paris, the 1890s.", "tts": "Paris, the eighteen nineties.", "es": "París, la década de 1890." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "A young Peruvian engineer, Pedro Paulet, later claimed he fired a liquid-fuel rocket engine here.", "es": "Un joven ingeniero peruano, Pedro Paulet, afirmó después haber encendido aquí un motor cohete de combustible líquido." }
+    ] },
+    { "id": "drawing", "lead": 0.8, "tail": 1.2, "lines": [
+      { "id": "vo3", "v": "nar", "en": "He also drew a rocket craft of his own: the Avion-Torpedo.", "tts": "He also drew a rocket craft of his own: the Avion Torpedo.", "es": "También dibujó una nave cohete propia: el Avión-Torpedo." },
+      { "id": "vo4", "v": "nar", "gap": 0.6, "en": "For more than a century, it stayed on paper.", "es": "Durante más de un siglo, se quedó en el papel." }
+    ] },
+    { "id": "arequipa", "lead": 1.6, "tail": 1.0, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Arequipa, Peru. Three classmates wanted to go up there: Pedro, Chicho and Roberto.", "tts": "Arequipa, Peru. Three classmates wanted to go up there: Pedro, Chicho, and Roberto.", "es": "Arequipa, Perú. Tres compañeros querían llegar allá arriba: Pedro, Chicho y Roberto." }
+    ] },
+    { "id": "callao", "lead": 0.7, "tail": 0.6, "lines": [
+      { "id": "vo6", "v": "nar", "en": "Years later, on a salsa night in Callao, they met Franchesca,", "tts": "Years later, on a salsa night in Kah-yow, they met Franchesca,", "es": "Años después, en una noche de salsa en el Callao, conocieron a Franchesca," },
+      { "id": "vo7", "v": "nar", "gap": 0.2, "en": "an astrobiologist back from the United States, looking for life in the Andes.", "es": "una astrobióloga que volvía de Estados Unidos, buscando vida en los Andes." }
+    ] },
+    { "id": "napkin", "lead": 0.9, "tail": 1.4, "lines": [
+      { "id": "goi", "v": "goi", "en": "If Paulet started it, why don't we finish it?", "es": "Si Paulet lo empezó, ¿por qué no lo terminamos?" }
+    ] },
+    { "id": "rooftop", "lead": 0.8, "tail": 1.6, "lines": [
+      { "id": "vo8", "v": "nar", "en": "A small institute. An old notebook. A 130-year promise.", "tts": "A small institute. An old notebook. A hundred-and-thirty-year promise.", "es": "Un pequeño instituto. Un cuaderno viejo. Una promesa de 130 años." }
+    ] },
+    { "id": "seat", "lead": 1.2, "tail": 0, "min": 13, "lines": [
+      { "id": "kun", "en": "Kuntur: Your seat is ready. Let's fly.", "es": "Kuntur: Tu asiento está listo. A volar.", "dur": 3.4 }
+    ] }
+  ]
+}

@@ -1,0 +1,20 @@
+station_resupply  total 70.27s
+
+[hook] start 0.0  dur 10.04
+   vo1      1.60 ->   7.64   A station with people on board needs food, water, air and spare parts, all the t
+
+[history] start 10.04  dur 18.12
+   vo2      1.00 ->   7.76   People have lived aboard the International Space Station without a break since N
+   vo3      8.36 ->  12.65   Since 2012, private companies carry much of its cargo,
+   vo4     13.05 ->  15.92   and some boosters now fly back and land.
+
+[science] start 28.16  dur 14.36
+   vo5      1.00 ->   7.03   Even up there, a trace of air drags the station down, so it must be pushed back 
+   vo6      8.33 ->  12.56   To meet it, cargo ships start lower and faster, then catch up.
+
+[compare] start 42.52  dur 13.73
+   vo7      0.80 ->   7.19   The station weighs about 420 tonnes and circles Earth 16 times a day.
+   vo8      7.79 ->  12.53   Now check your delivery. Cheaper launches mean more science per dollar.
+
+[ending] start 56.25  dur 14.02
+   chi      1.00 ->   6.52   Reusing a rocket is like reusing a truck. Nobody throws away a truck after one t

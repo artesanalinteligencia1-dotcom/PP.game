@@ -1,0 +1,35 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage" style="background:#ece3cf">
+      <div id="hk-box" style="position:absolute; left:860px; top:60px; width:960px; height:960px; overflow:hidden"><div id="hk-nums" data-layout-ignore style="position:absolute; left:0; top:0; width:960px; font-family:'JetBrains Mono', monospace; font-size:22px; line-height:24px; color:#5a4a36; letter-spacing:.06em; white-space:pre"></div></div>
+      <div id="hk-paint" style="position:absolute; left:860px; top:60px; width:960px; height:960px; overflow:hidden">
+        <img id="hk-tv" src="assets/firsttv.jpg" alt="" style="position:absolute; left:0; top:0; width:960px; height:960px; object-fit:cover">
+        <div class="k-credit">IMAGE: NASA/JPL · MARINER 4 DATA, COLOURED BY HAND, 1965</div>
+      </div>
+      <div class="k-photo" id="hk-m4" style="left:120px; top:560px; width:520px; height:420px; border-color:#3a2a17">
+        <img src="assets/mariner4.jpg" alt="" style="object-position:50% 45%">
+        <div class="k-credit">IMAGE: NASA/JPL · MARINER 4 · FRAME 11</div>
+      </div>
+      <div class="k-kicker" id="hk-k" style="left:120px; top:110px; color:#b5532e">RED HORIZON · THE REAL STORY</div>
+      <div class="k-title" id="hk-t" style="left:120px; top:160px; font-size:96px; color:#2e2112; text-shadow:none; width:700px">GETTING TO MARS<br>AND STAYING</div>
+      <div class="k-label" id="hk-y" style="left:120px; top:400px; color:#5a4a36; font-size:34px; line-height:1.35">JULY 1965<br>FIRST CLOSE-UP OF ANOTHER PLANET</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    // columns of brightness values, like the printed strips the engineers coloured
+    const r = K.rng(1965); let t = "";
+    for (let row = 0; row < 48; row++) { let line = ""; for (let col = 0; col < 34; col++) line += String(Math.floor(r() * 64)).padStart(2, "0") + " "; t += line + "\n"; }
+    document.querySelector("#hk-nums").textContent = t;
+    K.fade(tl, "#hk-k", 0.2, 0.5, 0); K.blurIn(tl, "#hk-t", 0.3, 0.9);
+    tl.fromTo("#hk-box", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.0 }, 0.4);
+    tl.fromTo("#hk-nums", { y: 0 }, { y: -120, duration: c.dur, ease: "none" }, 1.4);
+    K.fade(tl, "#hk-y", c("vo1", 0.4), 0.5, 0);
+    K.photo(tl, "#hk-m4", c("vo1", 3.6), "up");
+    // "they coloured the numbers in by hand": pastel strokes sweep down over the numbers
+    tl.fromTo("#hk-paint", { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 3.4, ease: "steps(14)" }, c("vo2", 2.0));
+    K.kb(tl, "#hk-tv", c("vo2", 2.0), c.dur, { s: 1.0 }, { s: 1.1, y: -10 });
+    K.exit(tl, "#hk-stage", "whip", c.dur);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

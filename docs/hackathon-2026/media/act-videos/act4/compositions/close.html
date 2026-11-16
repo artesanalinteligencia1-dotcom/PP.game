@@ -1,0 +1,26 @@
+<template>
+  <div id="root" data-composition-id="close" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="cl-stage" class="k-stage">
+      <div id="cl-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="cl-img" src="assets/act4-06.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-abs" id="cl-w" style="left:0; width:1920px; top:130px; text-align:center; font-size:140px; font-weight:600; letter-spacing:.12em; color:#e8e0cc; text-shadow:0 8px 50px rgba(0,0,0,.7)">YOUR TURN.</div>
+      <div class="k-abs" id="cl-end" style="left:0; top:0; width:1920px; height:1080px; background:#0b0d10; opacity:0; z-index:6">
+        <div class="k-abs" style="left:0; width:1920px; top:340px; text-align:center; font-size:170px; font-weight:600; letter-spacing:.18em; color:#e8e0cc">PAUL<span style="color:#f08a3c">Ǝ</span>T</div>
+        <div class="k-abs" style="left:0; width:1920px; top:560px; text-align:center; font-size:52px; letter-spacing:.3em; color:#d9b46a; font-weight:600">ANDES TO ORBIT</div>
+        <div class="k-abs" style="left:0; width:1920px; top:650px; text-align:center; font-size:32px; letter-spacing:.2em; color:#36d1ff">ACT 4 · A SPECULATIVE FUTURE</div>
+        <div class="k-abs" style="left:0; width:1920px; top:860px; text-align:center; font-size:28px; letter-spacing:.06em; color:#8a8f98; line-height:1.5">Illustrations and clips: AI-generated (Google Gemini, Veo) · Paulet's drawing: reproduced by NASA (public domain)<br>Voice: AI (Kokoro, local) · Music: ACE-Step 1.5 (local) · Pedro Paulet's 1890s engine tests are his own claims</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("close");
+    K.enter(tl, "#cl-stage", "fade", { dur: 0.8 });
+    K.kb(tl, "#cl-img", 0, c.dur, { s: 1.0 }, { s: 1.22, y: 30 });
+    tl.fromTo("#cl-w", { opacity: 0, scale: 1.2, filter: "blur(14px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, c("vo6", 0));
+    tl.to("#cl-end", { opacity: 1, duration: 1.0 }, 4.6);
+    tl.to("#cl-stage", { opacity: 0, duration: 0.9, ease: "power2.in" }, c.dur - 0.95);
+    window.__timelines["close"] = tl;
+  </script>
+</template>

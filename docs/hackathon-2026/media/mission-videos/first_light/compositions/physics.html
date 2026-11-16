@@ -1,0 +1,99 @@
+<template>
+  <style>
+    @font-face { font-family: "Barlow Condensed"; font-weight: 500; src: url("assets/fonts/barlow-500.woff2") format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url("assets/fonts/barlow-600.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #0b0d10; font-family: "Barlow Condensed", sans-serif; color: #e8e0cc; }
+    #ph-panel { position: absolute; left: 120px; top: 110px; width: 1300px; height: 780px; border: 1px solid #3a3f47; background: rgba(22,25,30,.9); }
+    #ph-head { position: absolute; left: 0; right: 0; top: 0; height: 52px; background: #252a31; font-size: 28px; letter-spacing: .14em;
+      color: #d9b46a; padding: 10px 22px; font-weight: 600; }
+    #ph-tag { position: absolute; right: 22px; top: 12px; font-size: 28px; color: #8a8f98; letter-spacing: .12em; }
+    #ph-chart { position: absolute; left: 0; top: 52px; width: 1300px; height: 728px; }
+    .ph-lab { position: absolute; font-size: 30px; font-weight: 600; letter-spacing: .08em; opacity: 0; }
+    #ph-gauge { position: absolute; left: 1480px; top: 110px; width: 320px; height: 780px; border: 1px solid #3a3f47; background: rgba(22,25,30,.9); }
+    #ph-ghead { position: absolute; left: 0; right: 0; top: 0; height: 52px; background: #252a31; font-size: 28px; letter-spacing: .14em; color: #d9b46a; padding: 10px 22px; font-weight: 600; }
+    #ph-gval { position: absolute; left: 0; right: 0; top: 100px; text-align: center; font-size: 150px; font-weight: 600; line-height: 1; }
+    #ph-gunit { position: absolute; left: 0; right: 0; top: 260px; text-align: center; font-size: 30px; color: #8a8f98; letter-spacing: .12em; }
+    #ph-gbar { position: absolute; left: 140px; top: 330px; width: 40px; height: 380px; background: #1a1d22; border: 1px solid #3a3f47; }
+    #ph-gfill { position: absolute; left: 0; right: 0; bottom: 0; height: 100%; background: #f08a3c; transform-origin: 50% 100%; }
+    #ph-gstate { position: absolute; left: 0; right: 0; top: 724px; text-align: center; font-size: 28px; letter-spacing: .14em; color: #36d1ff; }
+  </style>
+  <div id="root" data-composition-id="physics" data-width="1920" data-height="1080" data-layout-allow-overlap>
+    <div id="ph-panel">
+      <div id="ph-head">SOUNDING ROCKET · ALTITUDE OVER TIME</div>
+      <div id="ph-tag">ILLUSTRATIVE FLIGHT · g = 9.81 m/s²</div>
+      <svg id="ph-chart" viewBox="0 0 1300 728">
+        <g id="ph-axes" stroke="#3a3f47" stroke-width="2">
+          <line x1="110" y1="640" x2="1250" y2="640"/><line x1="110" y1="640" x2="110" y2="40"/>
+        </g>
+        <g id="ph-grid" font-family="Barlow Condensed" font-size="28" fill="#8a8f98"></g>
+        <rect id="ph-band" x="0" y="0" width="0" height="0" fill="#36d1ff" opacity="0"/>
+        <line id="ph-karman" x1="110" x2="1250" y1="0" y2="0" stroke="#d9b46a" stroke-width="2" stroke-dasharray="10 8" opacity="0"/>
+        <path id="ph-burn" fill="none" stroke="#f08a3c" stroke-width="7" stroke-linecap="round"/>
+        <path id="ph-coast" fill="none" stroke="#e8e0cc" stroke-width="5" stroke-linecap="round"/>
+        <circle id="ph-dot" r="12" fill="#fff4dc"/>
+      </svg>
+      <div class="ph-lab" id="ph-l1" style="color:#f08a3c">THRUST · 60 s</div>
+      <div class="ph-lab" id="ph-l2">COAST · ENGINE OFF</div>
+      <div class="ph-lab" id="ph-l3" style="color:#d9b46a">APOGEE ≈ 180 KM</div>
+      <div class="ph-lab" id="ph-l4" style="color:#36d1ff">ABOVE 100 KM ≈ 4 MIN</div>
+    </div>
+    <div id="ph-gauge">
+      <div id="ph-ghead">FELT GRAVITY</div>
+      <div id="ph-gval"><span id="ph-gnum">1.0</span></div>
+      <div id="ph-gunit">× EARTH WEIGHT</div>
+      <div id="ph-gbar"><div id="ph-gfill"></div></div>
+      <div id="ph-gstate">ON THE PAD</div>
+    </div>
+  </div>
+  <script>
+    // Illustrative vertical flight: constant-acceleration burn for 60 s to 50 km at 1.6 km/s, then ballistic coast (no drag).
+    const G = 9.81, TB = 60, HB = 50000, VB = 1600, A = 2 * HB / (TB * TB);
+    const alt = (t) => t <= TB ? 0.5 * A * t * t : HB + VB * (t - TB) - 0.5 * G * (t - TB) ** 2;
+    const tApo = TB + VB / G, hApo = alt(tApo);
+    const tEnd = tApo + Math.sqrt(2 * hApo / G);
+    const X0 = 110, X1 = 1250, Y0 = 640, Y1 = 40, TMAX = 520, HMAX = 200000;
+    const sx = (t) => X0 + (X1 - X0) * t / TMAX, sy = (h) => Y0 - (Y0 - Y1) * h / HMAX;
+    const pts = (a, b) => { let d = ""; for (let i = 0; i <= 120; i++) { const t = a + (b - a) * i / 120; d += (i ? " L " : "M ") + sx(t).toFixed(1) + " " + sy(Math.max(0, alt(t))).toFixed(1); } return d; };
+    const burn = document.querySelector("#ph-burn"), coast = document.querySelector("#ph-coast");
+    burn.setAttribute("d", pts(0, TB)); coast.setAttribute("d", pts(TB, tEnd));
+    const grid = document.querySelector("#ph-grid");
+    [0, 50, 100, 150, 200].forEach((km) => { const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("x", 60); t.setAttribute("y", sy(km * 1000) + 7); t.textContent = km + " km"; grid.appendChild(t); });
+    [0, 120, 240, 360, 480].forEach((s) => { const t = document.createElementNS("http://www.w3.org/2000/svg", "text"); t.setAttribute("x", sx(s) - 12); t.setAttribute("y", 676); t.textContent = (s / 60) + " min"; grid.appendChild(t); });
+    // 100 km band (time spent above the Kármán line)
+    const up100 = TB + (VB - Math.sqrt(VB * VB - 2 * G * (100000 - HB))) / G, dn100 = 2 * tApo - up100;
+    const band = document.querySelector("#ph-band");
+    band.setAttribute("x", sx(up100)); band.setAttribute("width", sx(dn100) - sx(up100)); band.setAttribute("y", Y1); band.setAttribute("height", sy(100000) - Y1);
+    const kar = document.querySelector("#ph-karman"); kar.setAttribute("y1", sy(100000)); kar.setAttribute("y2", sy(100000));
+    const place = (id, x, y) => { const e = document.querySelector(id); e.style.left = x + "px"; e.style.top = (52 + y) + "px"; };
+    place("#ph-l1", sx(TB) + 26, sy(HB) - 10); place("#ph-l2", sx(130) - 250, sy(alt(130)) - 20);
+    place("#ph-l3", sx(tApo) - 90, sy(hApo) - 56); place("#ph-l4", sx(up100) + 20, sy(100000) + 14);
+
+    const tl = gsap.timeline({ paused: true });
+    const D = 16; // seconds of scene time for the whole flight
+    const k = D / tEnd;
+    tl.fromTo(["#ph-panel", "#ph-gauge"], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.15, ease: "power3.out" }, 0);
+    tl.fromTo(["#ph-axes", "#ph-grid"], { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.5);
+    const bl = burn.getTotalLength(), cl = coast.getTotalLength();
+    tl.fromTo(burn, { strokeDasharray: bl, strokeDashoffset: bl }, { strokeDashoffset: 0, duration: TB * k, ease: "none" }, 1.5);
+    tl.fromTo(coast, { strokeDasharray: cl, strokeDashoffset: cl }, { strokeDashoffset: 0, duration: (tEnd - TB) * k, ease: "none" }, 1.5 + TB * k);
+    const clock = { t: 0 };
+    const dot = document.querySelector("#ph-dot"), gnum = document.querySelector("#ph-gnum"), gstate = document.querySelector("#ph-gstate");
+    tl.fromTo(clock, { t: 0 }, { t: tEnd, duration: D, ease: "none", onUpdate: () => {
+      const t = clock.t, h = Math.max(0, alt(t));
+      dot.setAttribute("cx", sx(t)); dot.setAttribute("cy", sy(h));
+      const g = t <= 0.01 ? 1 : t <= TB ? 1 + A / G : (h < 60000 && t > tApo ? Math.min(8, 1 + (60000 - h) / 6000) : 0);
+      gnum.textContent = g.toFixed(1);
+      gsap.set("#ph-gfill", { scaleY: Math.min(1, g / 8) });
+      gstate.textContent = t <= 0.01 ? "ON THE PAD" : t <= TB ? "ENGINE BURNING" : g === 0 ? "WEIGHTLESS" : "RE-ENTRY";
+    } }, 1.5);
+    tl.fromTo("#ph-l1", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5 }, 1.5 + TB * k);
+    tl.fromTo("#ph-l2", { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5 }, 1.5 + 130 * k);
+    tl.fromTo("#ph-l3", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 1.5 + tApo * k);
+    tl.fromTo(kar, { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.5 + up100 * k);
+    tl.fromTo(band, { opacity: 0 }, { opacity: 0.16, duration: 0.8 }, 1.5 + up100 * k);
+    tl.fromTo("#ph-l4", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, 1.5 + dn100 * k);
+    tl.fromTo(["#ph-panel", "#ph-gauge"], { scale: 1 }, { scale: 1.035, duration: 23, ease: "none", transformOrigin: "50% 50%" }, 0.7);
+    tl.fromTo(band, { opacity: 0.16 }, { opacity: 0.3, duration: 1.2, yoyo: true, repeat: 3, ease: "sine.inOut" }, 18);
+    window.__timelines["physics"] = tl;
+  </script>
+</template>

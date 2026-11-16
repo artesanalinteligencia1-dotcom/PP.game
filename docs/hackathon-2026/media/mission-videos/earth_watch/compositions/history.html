@@ -1,0 +1,73 @@
+<template>
+  <style>
+    .hi-strip { position: absolute; top: 0; height: 100%; overflow: hidden; }
+    .hi-strip img { position: absolute; top: 0; height: 100%; width: 1100px; max-width: none; object-fit: cover; }
+    .hi-tick { position: absolute; top: 792px; width: 3px; height: 36px; background: #d9b46a; }
+    .hi-tl { position: absolute; top: 752px; font-size: 28px; letter-spacing: .08em; color: #e8e0cc; transform-origin: 50% 100%; white-space: nowrap; }
+  </style>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="hi-kicker" style="left:140px; top:70px">THE LONGEST RECORD OF ITS KIND</div>
+      <div class="k-photo" id="hi-photo" style="left:140px; top:130px; width:440px; height:570px">
+        <img id="hi-img" src="assets/landsat1.jpg" alt="" style="object-position:50% 30%">
+        <div class="k-credit">Image: NASA · Landsat 1, 1972</div>
+      </div>
+      <div class="k-photo" id="hi-mosaic" style="left:640px; top:130px; width:1100px; height:470px; border-color:#3a3f47">
+        <div id="hi-strips" style="position:absolute; inset:0"></div>
+        <img id="hi-after" src="assets/amazon-2012.jpg" alt="">
+        <div id="hi-scan" style="position:absolute; top:0; left:0; width:4px; height:100%; background:#f08a3c; box-shadow:0 0 22px 6px rgba(240,138,60,.8); z-index:2"></div>
+        <div class="k-credit">Image: NASA Earth Observatory</div>
+        <div class="k-ai" id="hi-place" style="background:rgba(0,0,0,.78)">RONDÔNIA, BRAZIL · <span id="hi-py">2000</span></div>
+      </div>
+      <div class="k-year" id="hi-year" style="left:640px; top:606px; font-size:132px">1972</div>
+      <div class="k-abs" id="hi-span" style="left:1000px; top:626px; width:760px">
+        <div class="k-num" id="hi-n" style="left:0; top:0; font-size:88px; color:#e8e0cc">0</div>
+        <div class="k-label cream" style="left:130px; top:14px">YEARS OF CONTINUOUS</div>
+        <div class="k-label cream" style="left:130px; top:52px">IMAGES OF EARTH’S LAND</div>
+      </div>
+      <div class="k-abs" id="hi-base" style="left:140px; top:808px; width:1640px; height:3px; background:#3a3f47"></div>
+      <div class="k-abs" id="hi-line" style="left:140px; top:807px; width:1640px; height:5px; background:#f08a3c"></div>
+      <div id="hi-ticks"></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    // mosaic: the 2000 image revealed swath by swath
+    const strips = document.querySelector("#hi-strips"); const NS = 7; let sh = "";
+    for (let i = 0; i < NS; i++) sh += `<div class="hi-strip" id="hi-s${i}" style="left:${(i * 1100) / NS}px; width:${1100 / NS + 1}px"><img src="assets/amazon-2000.jpg" alt="" style="left:${-(i * 1100) / NS}px"></div>`;
+    strips.innerHTML = sh;
+    // launches along the timeline (1972 → 2026)
+    const X = (y) => 140 + ((y - 1972) / 54) * 1640;
+    const L = [[1972, "L1"], [1975, "L2"], [1978, "L3"], [1982, "L4"], [1984, "L5"], [1999, "L7"], [2013, "L8"], [2021, "L9"]];
+    const ticks = document.querySelector("#hi-ticks"); let th = "";
+    L.forEach((l, i) => { th += `<div class="hi-tick" id="hi-t${i}" style="left:${X(l[0])}px"></div><div class="hi-tl" id="hi-l${i}" style="left:${X(l[0]) - (i === 4 ? -6 : i === 3 ? 22 : 8)}px">${l[1]}</div>`; });
+    th += `<div class="k-label" style="left:140px; top:832px; font-size:28px">1972</div><div class="k-label" style="left:1722px; top:832px; font-size:28px">2026</div>`;
+    ticks.innerHTML = th;
+
+    K.enter(tl, "#hi-stage", "iris", { x: 960, y: 540 });
+    K.fade(tl, "#hi-kicker", 0.2);
+    K.photo(tl, "#hi-photo", 0.15); K.kb(tl, "#hi-img", 0.15, c.dur, { s: 1.18, y: 30 }, { s: 1.0, y: 0 });
+    K.blurIn(tl, "#hi-year", c("vo3", 0.25), 0.7);
+    K.fade(tl, "#hi-base", 0.8, 0.5, 0); tl.set("#hi-line", { scaleX: 0, transformOrigin: "0% 50%" }, 0);
+    K.pop(tl, "#hi-t0", c("vo3", 0.6), 0.4); K.fade(tl, "#hi-l0", c("vo3", 0.7), 0.4, 8);
+    // "began photographing the whole planet": swaths fill in
+    const m0 = c("vo3", 2.6), md = 3.4;
+    K.fade(tl, "#hi-mosaic", m0 - 0.5, 0.5, 0);
+    for (let i = 0; i < NS; i++) tl.fromTo("#hi-s" + i, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: md / NS + 0.25, ease: "power2.inOut" }, m0 + (i * md) / NS);
+    tl.fromTo("#hi-scan", { x: 0, opacity: 1 }, { x: 1100, duration: md + 0.3, ease: "none" }, m0); tl.to("#hi-scan", { opacity: 0, duration: 0.2 }, m0 + md + 0.3);
+    K.fade(tl, "#hi-place", m0 + 0.8, 0.5, 0);
+    // "more than fifty years": the counter runs, the launches land, the forest changes
+    const y0 = c("vo4", 0.1), yd = 3.6; const yr = document.querySelector("#hi-year");
+    K.count(tl, "#hi-year", 1972, 2026, y0, yd, (v) => String(Math.round(v)));
+    tl.fromTo("#hi-line", { scaleX: 0 }, { scaleX: 1, duration: yd, ease: "power2.out" }, y0);
+    K.fade(tl, "#hi-span", y0, 0.5, 0, 30); K.count(tl, "#hi-n", 0, 54, y0, yd);
+    // power2.out: year reached at time fraction f = 1 - sqrt(1 - progress)
+    L.forEach((l, i) => { if (!i) return; const f = 1 - Math.sqrt(1 - (l[0] - 1972) / 54); K.pop(tl, "#hi-t" + i, y0 + f * yd, 0.35); K.fade(tl, "#hi-l" + i, y0 + f * yd + 0.05, 0.35, 8); });
+    tl.fromTo("#hi-after", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 2.2, ease: "power2.inOut" }, y0 + 1.6);
+    K.count(tl, "#hi-py", 2000, 2012, y0 + 1.6, 2.2, (v) => String(Math.round(v)));
+    tl.fromTo("#hi-mosaic", { scale: 1 }, { scale: 1.03, duration: c.dur - m0, ease: "none", transformOrigin: "50% 50%" }, m0);
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

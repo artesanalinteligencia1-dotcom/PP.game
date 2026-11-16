@@ -1,0 +1,21 @@
+mars_terraform  total 79.68s
+
+[hook] start 0.0  dur 13.8
+   vo1      1.20 ->   8.52   Billions of years ago, water flowed on Mars. Rivers built deltas, like this one 
+   vo2      9.02 ->  11.40   Where did all that water and air go?
+
+[history] start 13.8  dur 16.72
+   vo3      0.80 ->   8.63   Since 2014, NASA's MAVEN orbiter has measured how the Sun strips gas from the to
+   vo4      9.13 ->  15.32   Without a global magnetic shield, the solar wind carried much of the air away ov
+
+[science] start 30.52  dur 22.53
+   vo5      0.90 ->   4.61   To warm Mars, we would need a much thicker atmosphere.
+   vo6      5.11 ->  15.54   In 2018, a NASA-supported study added up all the carbon dioxide we could release
+   vo7     16.04 ->  20.93   Not enough. With today's technology, Mars cannot be terraformed.
+
+[compare] start 53.05  dur 14.32
+   vo8      0.80 ->   9.79   Earth's air presses about a thousand millibars. Mars today: about six. All the r
+   vo9     10.39 ->  13.12   Some dreams take more than one lifetime.
+
+[ending] start 67.37  dur 12.31
+   goi      1.00 ->   4.81   Paulet started with an engine. We will leave the next chapter to you.

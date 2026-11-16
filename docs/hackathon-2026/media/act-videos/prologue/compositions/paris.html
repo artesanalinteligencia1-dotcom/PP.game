@@ -1,0 +1,53 @@
+<template>
+  <div id="root" data-composition-id="paris" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="pa-stage" class="k-stage" style="background:radial-gradient(ellipse at 40% 45%, #2a2118 0%, #120e0a 55%, #060504 100%)">
+      <div class="k-grid" style="opacity:.35"></div>
+      <div id="pa-cam" style="position:absolute; inset:0">
+        <div id="pa-frame" class="k-abs" style="left:150px; top:120px; width:1120px; height:625px; box-shadow:0 40px 120px rgba(0,0,0,.75); transform:rotate(-1.6deg)">
+          <div id="pa-imgbox" style="position:absolute; inset:0; overflow:hidden">
+            <img id="pa-img" src="assets/prologue-01.png" alt="" style="position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; filter:sepia(.55) contrast(1.05)">
+            <div id="pa-glow" style="position:absolute; left:470px; top:250px; width:260px; height:260px; border-radius:50%; background:radial-gradient(circle, rgba(120,190,255,.85) 0%, rgba(80,150,255,.35) 35%, transparent 70%); mix-blend-mode:screen; opacity:0"></div>
+            <svg id="pa-scratch" class="k-svg" viewBox="0 0 1120 625" style="width:1120px; height:625px"></svg>
+            <div id="pa-flick" style="position:absolute; inset:0; background:#fff3d6; mix-blend-mode:overlay; opacity:0"></div>
+          </div>
+          <div class="k-ai">AI-GENERATED ILLUSTRATION</div>
+        </div>
+        <div class="k-photo" id="pa-portrait" style="left:1340px; top:150px; width:420px; height:517px; border-color:#e8e0cc; transform:rotate(2.2deg)">
+          <img src="assets/paulet-portrait.jpg" alt="" style="object-position:50% 30%">
+          <div class="k-credit">PUBLIC DOMAIN</div>
+        </div>
+        <div class="k-label cream" id="pa-name" style="left:1344px; top:694px; font-size:40px; font-weight:600; letter-spacing:.1em">PEDRO PAULET</div>
+        <div class="k-label" id="pa-dates" style="left:1344px; top:744px">1874 – 1945 · AREQUIPA, PERU</div>
+      </div>
+      <div class="k-kicker" id="pa-k" style="left:150px; top:56px">PROLOGUE · THE NOTEBOOK</div>
+      <div class="k-chip" id="pa-place" style="left:190px; top:690px; font-size:34px; padding:6px 20px">PARIS · 1890s</div>
+      <div class="k-stamp" id="pa-claim" style="left:780px; top:560px">CLAIMED</div>
+      <div class="k-vig"></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("paris");
+    // archival film: a few seeded scratches and a soft flicker
+    const r = K.rng(42); let s = "";
+    for (let i = 0; i < 7; i++) { const x = (r() * 1120).toFixed(0); s += `<line class="pa-sc" x1="${x}" y1="0" x2="${(+x + (r() - 0.5) * 30).toFixed(0)}" y2="625" stroke="#f6ead0" stroke-width="${(0.6 + r() * 1.4).toFixed(1)}" opacity="0"/>`; }
+    document.querySelector("#pa-scratch").innerHTML = s;
+    document.querySelectorAll(".pa-sc").forEach((el, i) => { for (let k = 0; k < 6; k++) { const t = 0.3 + r() * (c.dur - 1); tl.set(el, { opacity: 0.25 + r() * 0.35 }, t); tl.set(el, { opacity: 0 }, t + 0.08 + r() * 0.12); } });
+    for (let k = 0; k < 40; k++) { const t = k * (c.dur / 40); tl.set("#pa-flick", { opacity: 0.04 + r() * 0.1 }, t); }
+
+    tl.fromTo("#pa-frame", { y: 30, rotation: -3 }, { y: 0, rotation: -1.6, duration: 1.6, ease: "power3.out" }, 0);
+    K.kb(tl, "#pa-img", 0, c.dur + 0.5, { s: 1.0, x: 0, y: 0 }, { s: 1.16, x: -40, y: -10 });
+    tl.fromTo("#pa-cam", { scale: 1, transformOrigin: "40% 45%" }, { scale: 1.05, duration: c.dur + 0.5, ease: "none" }, 0);
+    K.fade(tl, "#pa-k", 0.4, 0.6, 0);
+    tl.fromTo("#pa-place", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.9, ease: "steps(13)" }, c("vo1", 0.1));
+    // the engine lights up blue while the voice says "fired a liquid-fuel rocket engine"
+    tl.fromTo("#pa-glow", { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 0.9, scale: 1.15, duration: 0.5, ease: "power2.out" }, c("vo2", 4.0));
+    tl.to("#pa-glow", { opacity: 0.45, scale: 0.95, duration: 0.35, yoyo: true, repeat: 5, ease: "sine.inOut" }, c("vo2", 4.5));
+    // the real man, on a public-domain portrait
+    tl.fromTo("#pa-portrait", { opacity: 0, x: 140, rotation: 8 }, { opacity: 1, x: 0, rotation: 2.2, duration: 0.9, ease: "power3.out" }, c("vo2", 1.0));
+    tl.fromTo("#pa-portrait img", { filter: "brightness(1.8) contrast(.6)" }, { filter: "brightness(1) contrast(1)", duration: 1.3 }, c("vo2", 1.0));
+    K.fade(tl, "#pa-name", c("vo2", 1.7), 0.5, 0, -20); K.fade(tl, "#pa-dates", c("vo2", 2.0), 0.5, 0, -20);
+    K.stamp(tl, "#pa-claim", c("vo2", 3.4));
+    K.exit(tl, "#pa-stage", "dim", c.dur);
+    window.__timelines["paris"] = tl;
+  </script>
+</template>

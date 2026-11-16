@@ -1,0 +1,27 @@
+<template>
+  <div id="root" data-composition-id="letter" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="le-stage" class="k-stage">
+      <div id="le-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="le-img" src="assets/act4-05.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(6,5,4,.78) 0%, transparent 46%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-abs" id="le-paper" style="left:110px; top:150px; width:760px; height:560px; background:linear-gradient(160deg, #efe5cc, #ddcca4); box-shadow:0 30px 80px rgba(0,0,0,.6); transform:rotate(-1.5deg)">
+        <div class="k-abs" style="left:56px; top:46px; font-family:'EB Garamond', serif; font-style:italic; font-size:34px; color:#5a4328">Arequipa, at dawn</div>
+        <div class="k-abs" id="le-txt" style="left:56px; top:120px; width:650px; font-family:'EB Garamond', serif; font-style:italic; font-size:58px; line-height:1.25; color:#2e2112">Dear Pedro:<br>we kept your promise.<br>Now it belongs to them.</div>
+        <div class="k-abs" id="le-sig" style="left:380px; top:450px; font-family:'EB Garamond', serif; font-style:italic; font-size:44px; color:#2e2112">— P. Goicochea</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("letter");
+    K.enter(tl, "#le-stage", "fade", { dur: 0.8 });
+    K.kb(tl, "#le-img", 0, c.dur + 0.5, { s: 1.04, x: 40 }, { s: 1.14, x: -20, y: -10 });
+    tl.fromTo("#le-paper", { opacity: 0, y: 40, rotation: -4 }, { opacity: 1, y: 0, rotation: -1.5, duration: 0.9, ease: "power3.out" }, 0.3);
+    // written by hand while he reads it
+    tl.fromTo("#le-txt", { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: (c.end("goi") - c("goi")) + 0.2, ease: "steps(3)" }, c("goi", 0));
+    tl.fromTo("#le-sig", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.9, ease: "power1.inOut" }, c.end("goi", 0.3));
+    K.exit(tl, "#le-stage", "fade", c.dur);
+    window.__timelines["letter"] = tl;
+  </script>
+</template>

@@ -1,0 +1,49 @@
+<template>
+  <div id="root" data-composition-id="arequipa" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="aq-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="aq-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <canvas id="aq-globe" width="1920" height="1080" style="position:absolute; left:0; top:0; width:1920px; height:1080px"></canvas>
+      <svg class="k-svg" viewBox="0 0 1920 1080"><g id="aq-pin"><circle id="aq-ring" r="34" fill="none" stroke="#f08a3c" stroke-width="4"/><circle r="9" fill="#f08a3c"/></g></svg>
+      <div class="k-label cream" id="aq-lab" style="left:0; top:0; font-size:40px; font-weight:600">AREQUIPA</div>
+      <div class="k-label" id="aq-lab2" style="left:0; top:0">2,335 M · UNDER EL MISTI</div>
+      <div id="aq-board" style="position:absolute; inset:0; overflow:hidden; opacity:0">
+        <img id="aq-img" src="assets/prologue-02.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div style="position:absolute; left:0; right:0; top:0; height:260px; background:linear-gradient(180deg, rgba(8,6,4,.78), transparent)"></div>
+        <div class="k-ai" style="right:40px; bottom:40px">AI-GENERATED ILLUSTRATION</div>
+        <div class="k-vig"></div>
+      </div>
+      <div class="k-chip" id="aq-n1" style="left:150px; top:120px; font-size:40px">PEDRO</div>
+      <div class="k-chip" id="aq-n2" style="left:390px; top:120px; font-size:40px">CHICHO</div>
+      <div class="k-chip" id="aq-n3" style="left:660px; top:120px; font-size:40px">ROBERTO</div>
+      <div class="k-kicker" id="aq-k" style="left:150px; top:66px">CLASSMATES · UNIVERSITY IN AREQUIPA</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("arequipa");
+    K.stars("#aq-stars", 160, 9);
+    const LAT = -16.41, LON = -71.54;
+    const g = K.globe("#aq-globe", { dist: 4.4, camLat: -6, camLon: -62, sunLat: -10, sunLon: -40, nightAmt: 0.6 });
+    const pin = g.marker(LAT, LON, { size: 0.012, color: "#f08a3c" });
+    const place = () => { const p = g.screen(LAT, LON, 1.01); document.querySelector("#aq-pin").setAttribute("transform", `translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})`);
+      gsap.set("#aq-lab", { x: p[0] + 50, y: p[1] - 50 }); gsap.set("#aq-lab2", { x: p[0] + 50, y: p[1] + 2 }); };
+    place();
+    K.enter(tl, "#aq-stage", "zoom", { dur: 0.6 });
+    // fly in from orbit to the city, the pin follows the city on screen
+    const cam = { dist: 4.4, camLat: -6, camLon: -62 };
+    tl.fromTo(cam, { dist: 4.4, camLat: -6, camLon: -62 }, { dist: 1.75, camLat: -16.4, camLon: -71.5, duration: 2.6, ease: "power2.inOut",
+      onUpdate: () => { g.set({ dist: cam.dist, camLat: cam.camLat, camLon: cam.camLon }); place(); } }, 0.1);
+    tl.fromTo("#aq-ring", { scale: 0.2, opacity: 1, transformOrigin: "0 0" }, { scale: 2.6, opacity: 0, duration: 1.1, repeat: 2, ease: "power1.out" }, 1.4);
+    tl.fromTo("#aq-pin", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.2);
+    K.fade(tl, "#aq-lab", c("vo5", 0), 0.5, 0, -16); K.fade(tl, "#aq-lab2", c("vo5", 0.25), 0.5, 0, -16);
+    // dissolve into the cork board of old photos and pan across it
+    const tb = c("vo5", 2.3);
+    tl.to(["#aq-lab", "#aq-lab2", "#aq-pin"], { opacity: 0, duration: 0.4 }, tb - 0.2);
+    tl.fromTo("#aq-board", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out" }, tb);
+    K.kb(tl, "#aq-img", tb, c.dur - tb + 0.6, { s: 1.12, x: 70, y: 10 }, { s: 1.22, x: -90, y: -20 });
+    K.fade(tl, "#aq-k", tb + 0.6, 0.5, 0);
+    ["#aq-n1", "#aq-n2", "#aq-n3"].forEach((n, i) => tl.fromTo(n, { opacity: 0, y: -26, rotation: -6 }, { opacity: 1, y: 0, rotation: [-3, 2, -1][i], duration: 0.45, ease: "back.out(2.2)" }, c("vo5", 4.0 + i * 0.5)));
+    K.exit(tl, "#aq-stage", "whip", c.dur);
+    window.__timelines["arequipa"] = tl;
+  </script>
+</template>

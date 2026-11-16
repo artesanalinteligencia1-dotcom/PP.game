@@ -1,0 +1,29 @@
+<template>
+  <div id="root" data-composition-id="chute" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="cu-stage" class="k-stage">
+      <div id="cu-wrap" style="position:absolute; inset:0">
+        <video id="cu-vid" class="clip" src="assets/act3-05.mp4" data-start="0" data-duration="8.6" data-playback-rate="0.9" muted playsinline style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover"></video>
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED VIDEO (VEO)</div>
+      <div class="k-panel" id="cu-p" style="left:110px; top:110px; width:560px; height:230px; border-color:#e0457b">
+        <div class="k-head" style="color:#e0457b">MARS LAUNCH WINDOW OPENS IN</div>
+        <div class="k-num" id="cu-d" style="left:24px; top:64px; font-size:110px; color:#e8e0cc">07</div>
+        <div class="k-label" style="left:190px; top:100px">DAYS</div>
+        <div class="k-label" id="cu-h" style="left:24px; top:184px">23 : 59 : 59</div>
+      </div>
+      <div class="k-stamp" id="cu-s" style="left:130px; top:380px; font-size:48px">WIND TUNNEL TEST · CANOPY TORN</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("chute");
+    K.enter(tl, "#cu-stage", "whip");
+    tl.fromTo("#cu-wrap", { scale: 1.0 }, { scale: 1.07, duration: c.dur + 0.5, ease: "none", transformOrigin: "30% 30%" }, 0);
+    K.fade(tl, "#cu-p", c("vo5", 1.6), 0.5, 0, -30);
+    K.count(tl, "#cu-h", 86399, 86399 - 9 * 60, c("vo5", 1.6), c.dur - c("vo5", 1.6), (v) => { const s = Math.round(v); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), q = s % 60; return `${String(h).padStart(2, "0")} : ${String(m).padStart(2, "0")} : ${String(q).padStart(2, "0")}`; });
+    K.stamp(tl, "#cu-s", c("vo5", 0.4));
+    tl.to("#cu-s", { opacity: 0.45, duration: 0.5 }, c("chi", 0));
+    tl.to("#cu-p", { borderColor: "#d9b46a", duration: 0.5 }, c("chi", 0.3));
+    K.exit(tl, "#cu-stage", "fade", c.dur);
+    window.__timelines["chute"] = tl;
+  </script>
+</template>

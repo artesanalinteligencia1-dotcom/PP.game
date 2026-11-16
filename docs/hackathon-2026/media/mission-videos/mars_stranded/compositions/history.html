@@ -1,0 +1,50 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="hi-k" style="left:120px; top:92px">THREE WAYS TO LAND ON MARS</div>
+      <div class="k-year" id="hi-y1" style="left:120px; top:150px; font-size:90px">1997</div>
+      <div class="k-year" id="hi-y2" style="left:700px; top:150px; font-size:90px">2012</div>
+      <div class="k-year" id="hi-y3" style="left:1280px; top:150px; font-size:90px">2021</div>
+      <div class="k-photo" id="hi-p1" style="left:120px; top:270px; width:540px; height:560px; border-color:#e8e0cc">
+        <img src="assets/airbags.jpg" alt="" style="object-position:55% 50%">
+        <div class="k-credit">IMAGE: NASA/JPL · PATHFINDER</div>
+      </div>
+      <div class="k-label cream" id="hi-c1" style="left:120px; top:850px; font-weight:600">AIRBAGS · BOUNCE AND ROLL</div>
+      <div class="k-panel" id="hi-p2" style="left:700px; top:270px; width:540px; height:560px">
+        <svg viewBox="0 0 540 560" style="position:absolute; left:0; top:0; width:540px; height:560px">
+          <rect x="190" y="80" width="160" height="70" rx="8" fill="#8a8f98"/>
+          <path d="M 200 150 L 170 200 M 340 150 L 370 200" stroke="#f08a3c" stroke-width="10"/>
+          <path id="hi-fl1" d="M 162 200 L 178 200 L 170 250 Z" fill="#ffb066"/><path id="hi-fl2" d="M 362 200 L 378 200 L 370 250 Z" fill="#ffb066"/>
+          <line id="hi-cab1" x1="240" y1="150" x2="240" y2="380" stroke="#e8e0cc" stroke-width="3"/><line id="hi-cab2" x1="300" y1="150" x2="300" y2="380" stroke="#e8e0cc" stroke-width="3"/>
+          <g id="hi-rov"><rect x="200" y="380" width="140" height="56" rx="6" fill="#d9cfb8"/><circle cx="215" cy="446" r="16" fill="#3a3f47"/><circle cx="270" cy="446" r="16" fill="#3a3f47"/><circle cx="325" cy="446" r="16" fill="#3a3f47"/></g>
+          <rect x="0" y="480" width="540" height="80" fill="#9c4526"/>
+          <text x="20" y="40" style="fill:#8a8f98; font-size:28px">SKY CRANE · DIAGRAM</text>
+        </svg>
+      </div>
+      <div class="k-label cream" id="hi-c2" style="left:700px; top:850px; font-weight:600">LOWERED ON CABLES · CURIOSITY</div>
+      <div class="k-photo" id="hi-p3" style="left:1280px; top:270px; width:520px; height:560px; border-color:#d9b46a">
+        <img src="assets/skycrane.jpg" alt="" style="object-position:30% 45%">
+        <div class="k-credit">IMAGE: NASA/JPL-CALTECH</div>
+      </div>
+      <div class="k-label cream" id="hi-c3" style="left:1280px; top:850px; font-weight:600">A SELFIE ON THE WAY DOWN</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    K.enter(tl, "#hi-stage", "rise");
+    K.fade(tl, "#hi-k", 0.4, 0.5, 0);
+    K.fade(tl, "#hi-y1", c("vo3", 0.1), 0.4, 0, -20); K.photo(tl, "#hi-p1", c("vo3", 0.4)); K.fade(tl, "#hi-c1", c("vo3", 2.2), 0.4, 0);
+    tl.fromTo("#hi-p1 img", { y: -40 }, { y: 0, duration: 1.2, ease: "bounce.out" }, c("vo3", 0.6));
+    K.fade(tl, "#hi-y2", c("vo4", 0.1), 0.4, 0, -20); K.fade(tl, "#hi-p2", c("vo4", 0.4), 0.5, 20);
+    tl.fromTo(["#hi-cab1", "#hi-cab2"], { attr: { y2: 160 } }, { attr: { y2: 380 }, duration: 3.0, ease: "power1.inOut" }, c("vo4", 1.4));
+    tl.fromTo("#hi-rov", { y: -220 }, { y: 0, duration: 3.0, ease: "power1.inOut" }, c("vo4", 1.4));
+    tl.fromTo(["#hi-fl1", "#hi-fl2"], { scaleY: 0.7, transformOrigin: "50% 0%" }, { scaleY: 1.2, duration: 0.15, yoyo: true, repeat: 40 }, c("vo4", 0.6));
+    K.fade(tl, "#hi-c2", c("vo4", 4.6), 0.4, 0);
+    K.fade(tl, "#hi-y3", c("vo5", 0.1), 0.4, 0, -20); K.photo(tl, "#hi-p3", c("vo5", 0.4));
+    K.kb(tl, "#hi-p3 img", c("vo5", 0.4), c.dur, { s: 1.25 }, { s: 1.0 });
+    K.fade(tl, "#hi-c3", c("vo5", 3.4), 0.4, 0);
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

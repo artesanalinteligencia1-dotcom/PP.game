@@ -1,0 +1,49 @@
+<template>
+  <div id="root" data-composition-id="mirror" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="mi-stage" class="k-stage">
+      <div id="mi-a" style="position:absolute; inset:0; overflow:hidden">
+        <img id="mi-lab" src="assets/act2-04.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      </div>
+      <div id="mi-b" style="position:absolute; inset:0; overflow:hidden; opacity:0">
+        <img id="mi-car" src="assets/carina.jpg" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; object-position:50% 60%">
+        <div class="k-credit" style="left:auto; right:40px; top:40px; bottom:auto">IMAGE: NASA, ESA, CSA, STSCI · WEBB, CARINA NEBULA</div>
+        <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.75) 0%, transparent 55%)"></div>
+      </div>
+      <div class="k-kicker" id="mi-k" style="left:120px; top:110px">THE PAYLOAD</div>
+      <div class="k-h2" id="mi-h" style="left:120px; top:156px; width:1300px">A golden mirror for the oldest light</div>
+      <div class="k-photo" id="mi-real" style="left:120px; top:420px; width:560px; height:488px; border-color:#d9b46a">
+        <img src="assets/webb-mirror.jpg" alt="" style="object-position:50% 40%">
+        <div class="k-credit">IMAGE: NASA · WEBB MIRROR</div>
+      </div>
+      <svg class="k-svg" viewBox="0 0 1920 1080" id="mi-dia">
+        <circle cx="820" cy="660" r="44" fill="#f2b84b"/><text x="790" y="740" style="fill:#d9b46a">SUN</text>
+        <line id="mi-ln" x1="864" y1="660" x2="1700" y2="660" stroke="#3a3f47" stroke-width="3" stroke-dasharray="10 10"/>
+        <circle cx="1460" cy="660" r="20" fill="#2a6fb4"/><text x="1420" y="720" style="fill:#7fb7ff">EARTH</text>
+        <g id="mi-l2"><path d="M 1640 648 L 1640 672 M 1628 660 L 1652 660" stroke="#d9b46a" stroke-width="4"/><text x="1610" y="625" style="fill:#d9b46a; font-weight:600">L2</text></g>
+        <path id="mi-arc" d="M 1462 690 Q 1550 760 1640 690" fill="none" stroke="#d9b46a" stroke-width="3"/>
+        <text id="mi-km" x="1440" y="800" style="fill:#e8e0cc">1.5 MILLION KM FROM EARTH</text><text x="1440" y="840" style="fill:#8a8f98">NOT TO SCALE</text>
+      </svg>
+      <div class="k-label gold" id="mi-since" style="left:780px; top:860px; font-weight:600">WORKING SINCE 2022 · NEAR SUN–EARTH L2</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("mirror");
+    K.enter(tl, "#mi-stage", "wipe");
+    K.kb(tl, "#mi-lab", 0, c("vo5", 3.4), { s: 1.04 }, { s: 1.14, x: -40 });
+    // "the oldest light": the lab dissolves into Webb's own picture of a star-forming cloud
+    tl.to("#mi-b", { opacity: 1, duration: 1.1, ease: "sine.inOut" }, c("vo5", 3.0));
+    K.kb(tl, "#mi-car", c("vo5", 3.0), c.dur, { s: 1.0 }, { s: 1.12, y: -30 });
+    K.fade(tl, "#mi-k", c("vo5", 3.3), 0.5, 0); K.blurIn(tl, "#mi-h", c("vo5", 3.5), 0.8);
+    // the real one: photo + where it works
+    K.photo(tl, "#mi-real", c("vo6", 0.1));
+    tl.fromTo("#mi-dia", { opacity: 0 }, { opacity: 1, duration: 0.6 }, c("vo6", 1.4));
+    K.draw(tl, "#mi-ln", c("vo6", 1.4), 1.0);
+    tl.fromTo("#mi-l2", { opacity: 0, scale: 0.3, transformOrigin: "1640px 660px" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.5)" }, c("vo6", 3.3));
+    K.draw(tl, "#mi-arc", c("vo6", 3.5), 0.8);
+    tl.fromTo("#mi-km", { opacity: 0 }, { opacity: 1, duration: 0.5 }, c("vo6", 3.9));
+    K.fade(tl, "#mi-since", c("vo6", 2.2), 0.5, 0);
+    K.exit(tl, "#mi-stage", "fade", c.dur);
+    window.__timelines["mirror"] = tl;
+  </script>
+</template>

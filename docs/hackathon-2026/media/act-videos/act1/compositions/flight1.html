@@ -1,0 +1,38 @@
+<template>
+  <div id="root" data-composition-id="flight1" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="f1-stage" class="k-stage">
+      <div id="f1-wrap" style="position:absolute; inset:0">
+        <video id="f1-vid" class="clip" src="assets/act1-04.mp4" data-start="0" data-duration="7.0" data-playback-rate="0.9" muted playsinline style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover"></video>
+      </div>
+      <div style="position:absolute; inset:0; background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.6) 100%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED VIDEO (VEO)</div>
+      <div class="k-panel" id="f1-hud" style="left:110px; top:110px; width:520px; height:250px; border-color:#3a3f47">
+        <div class="k-head">FLIGHT 1 · TELEMETRY</div>
+        <div class="k-label" style="left:24px; top:70px">T +</div>
+        <div class="k-num" id="f1-t" style="left:90px; top:58px; font-size:62px">00.0</div>
+        <div class="k-label" style="left:290px; top:70px">S</div>
+        <div class="k-label" style="left:24px; top:150px">ALTITUDE</div>
+        <div class="k-num" id="f1-a" style="left:200px; top:138px; font-size:62px">0.0</div>
+        <div class="k-label" style="left:390px; top:150px">KM</div>
+      </div>
+      <div class="k-stamp" id="f1-lost" style="left:150px; top:400px; font-size:64px">SIGNAL LOST</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("flight1");
+    K.enter(tl, "#f1-stage", "cut");
+    tl.fromTo("#f1-wrap", { scale: 1.0 }, { scale: 1.08, duration: c.dur + 0.5, ease: "none", transformOrigin: "30% 35%" }, 0);
+    // a shake on the blast
+    for (let k = 0; k < 8; k++) tl.to("#f1-wrap", { x: (k % 2 ? -1 : 1) * (14 - k * 1.6), y: (k % 2 ? 1 : -1) * (8 - k), duration: 0.05 }, 1.9 + k * 0.05);
+    tl.to("#f1-wrap", { x: 0, y: 0, duration: 0.1 }, 2.35);
+    K.fade(tl, "#f1-hud", 0.1, 0.4, 0, -30);
+    K.count(tl, "#f1-t", 21.0, 24.2, 0.1, 1.9, (v) => v.toFixed(1));
+    K.count(tl, "#f1-a", 2.1, 2.6, 0.1, 1.8, (v) => v.toFixed(1));
+    tl.to(["#f1-t", "#f1-a"], { color: "#e0457b", duration: 0.1 }, 1.95);
+    tl.to("#f1-hud", { borderColor: "#e0457b", duration: 0.1 }, 1.95);
+    K.stamp(tl, "#f1-lost", c("vo6", -0.6));
+    tl.to("#f1-wrap", { filter: "saturate(.4) brightness(.8)", duration: 1.6 }, c("vo6", 0));
+    K.exit(tl, "#f1-stage", "fade", c.dur);
+    window.__timelines["flight1"] = tl;
+  </script>
+</template>

@@ -1,0 +1,95 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="hi-kicker" style="left:140px; top:70px">A HOME IN ORBIT AND ITS DELIVERY TRUCKS</div>
+      <!-- 2000: people on board -->
+      <div class="k-abs" id="hi-c1" style="left:140px; top:170px; width:460px; height:540px">
+        <div class="k-label gold" style="left:0; top:0">CREW ON BOARD SINCE</div>
+        <div class="k-year" id="hi-y1" style="left:0; top:40px; font-size:120px">NOV 2000</div>
+        <div class="k-num" id="hi-n" style="left:0; top:230px; font-size:210px; color:#e8e0cc">0</div>
+        <div class="k-label cream" style="left:4px; top:440px">YEARS WITHOUT A BREAK</div>
+      </div>
+      <!-- 2012: first commercial cargo ship -->
+      <div class="k-photo" id="hi-photo" style="left:660px; top:170px; width:560px; height:420px">
+        <img id="hi-img" src="assets/dragon-2012.jpg" alt="" style="object-position:55% 60%">
+        <div class="k-credit">Image: NASA · May 2012</div>
+      </div>
+      <div class="k-abs" id="hi-c2" style="left:660px; top:610px; width:560px">
+        <div class="k-label gold" style="left:0; top:0; font-weight:600">2012</div>
+        <div class="k-label cream" style="left:0; top:40px">FIRST COMMERCIAL CARGO SHIP</div>
+        <div class="k-label cream" style="left:0; top:78px">ARRIVES AT THE STATION</div>
+      </div>
+      <!-- 2015: a booster flies back -->
+      <div class="k-panel" id="hi-pan" style="left:1280px; top:170px; width:500px; height:420px"></div>
+      <svg class="k-svg" id="hi-svg" viewBox="0 0 1920 1080">
+        <line id="hi-gnd" x1="1300" y1="560" x2="1760" y2="560" stroke="#8a8f98" stroke-width="3"/>
+        <rect id="hi-pad" x="1330" y="552" width="60" height="8" fill="#d9b46a"/>
+        <path id="hi-up" d="M 1360 552 C 1362 420, 1420 300, 1560 250" fill="none" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"/>
+        <path id="hi-s2" d="M 1560 250 C 1640 222, 1700 212, 1756 208" fill="none" stroke="#e8e0cc" stroke-width="3" stroke-dasharray="4 12" stroke-linecap="round"/>
+        <path id="hi-back" d="M 1560 250 C 1660 200, 1700 300, 1690 552" fill="none" stroke="#36d1ff" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 9"/>
+        <rect id="hi-pad2" x="1660" y="552" width="60" height="8" fill="#36d1ff"/>
+        <circle id="hi-sep" cx="1560" cy="250" r="9" fill="none" stroke="#e8e0cc" stroke-width="3"/>
+        <g id="hi-bst"><g id="hi-bst-in">
+          <path id="hi-fl" d="M -5 30 L 0 58 L 5 30 Z" fill="#ffb347"/>
+          <rect x="-6" y="-30" width="12" height="60" fill="#f4efe2"/>
+          <rect x="-6" y="-30" width="12" height="9" fill="#252a31"/>
+          <path id="hi-legs" d="M -6 26 L -18 36 M 6 26 L 18 36" stroke="#f4efe2" stroke-width="3" fill="none"/>
+        </g></g>
+      </svg>
+      <div class="k-label cream" id="hi-orb" style="left:1640px; top:176px; font-size:28px">TO ORBIT →</div>
+      <div class="k-abs" id="hi-c3" style="left:1280px; top:610px; width:520px">
+        <div class="k-label gold" style="left:0; top:0; font-weight:600">2015</div>
+        <div class="k-label cream" style="left:0; top:40px">FIRST BOOSTER LANDS AFTER</div>
+        <div class="k-label cream" style="left:0; top:78px">AN ORBITAL LAUNCH</div>
+      </div>
+      <div class="k-abs" id="hi-base" style="left:140px; top:790px; width:1640px; height:3px; background:#3a3f47"></div>
+      <div class="k-abs" id="hi-line" style="left:140px; top:789px; width:1640px; height:5px; background:#f08a3c"></div>
+      <div class="k-abs hi-tk" id="hi-t1" style="left:140px; top:776px; width:4px; height:32px; background:#d9b46a"></div>
+      <div class="k-abs hi-tk" id="hi-t2" style="left:897px; top:776px; width:4px; height:32px; background:#d9b46a"></div>
+      <div class="k-abs hi-tk" id="hi-t3" style="left:1086px; top:776px; width:4px; height:32px; background:#d9b46a"></div>
+      <div class="k-label" id="hi-tl1" style="left:140px; top:814px; font-size:28px">2000</div>
+      <div class="k-label" id="hi-tl2" style="left:872px; top:814px; font-size:28px">2012</div>
+      <div class="k-label" id="hi-tl3" style="left:1064px; top:814px; font-size:28px">2015</div>
+      <div class="k-label" id="hi-tl4" style="left:1722px; top:814px; font-size:28px">2026</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    K.enter(tl, "#hi-stage", "wipe");
+    K.fade(tl, "#hi-kicker", 0.3); K.fade(tl, ["#hi-base", "#hi-tl1", "#hi-tl4"], 0.5, 0.5, 0);
+    // 2000 → 26 years
+    K.fade(tl, "#hi-c1", c("vo2", 0.1), 0.6, 0, -30); K.pop(tl, "#hi-t1", c("vo2", 0.3), 0.3);
+    K.count(tl, "#hi-n", 0, 26, c("vo2", 2.6), c.end("vo2") - c("vo2") - 2.4);
+    tl.fromTo("#hi-line", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: c.end("vo4") - c("vo2") - 1, ease: "none" }, c("vo2", 0.3));
+    // 2012: the real photograph
+    K.photo(tl, "#hi-photo", c("vo3", 0.0)); K.kb(tl, "#hi-img", c("vo3"), c.dur - c("vo3"), { s: 1.3, y: -20 }, { s: 1.05, y: 0 });
+    K.fade(tl, "#hi-c2", c("vo3", 0.5), 0.5); K.pop(tl, "#hi-t2", c("vo3", 0.4), 0.3); K.fade(tl, "#hi-tl2", c("vo3", 0.4), 0.3, 0);
+    // 2015: launch, separation, flip, landing
+    const b0 = c("vo4", -0.5), bd = c.dur - b0 - 0.3;
+    K.fade(tl, ["#hi-pan"], b0, 0.4, 0); K.fade(tl, ["#hi-gnd", "#hi-pad", "#hi-pad2"], b0 + 0.1, 0.4, 0);
+    K.fade(tl, "#hi-c3", c("vo4", 0.2), 0.5); K.pop(tl, "#hi-t3", c("vo4", 0.2), 0.3); K.fade(tl, "#hi-tl3", c("vo4", 0.2), 0.3, 0);
+    const up = document.querySelector("#hi-up"), back = document.querySelector("#hi-back"), bst = document.querySelector("#hi-bst"), fl = document.querySelector("#hi-fl"), legs = document.querySelector("#hi-legs");
+    const LU = up.getTotalLength(), LB = back.getTotalLength();
+    const ang = (path, L, s, rev) => { const a = path.getPointAtLength(Math.max(0, s - 2)), b = path.getPointAtLength(Math.min(L, s + 2)); return (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI + 90 + (rev ? 180 : 0); };
+    const o = { p: 0 };
+    const apply = (p) => {
+      let pt, rot, flame = 1;
+      if (p < 0.38) { const s = (p / 0.38) * LU; pt = up.getPointAtLength(s); rot = ang(up, LU, s); }
+      else { const f = (p - 0.38) / 0.62, s = f * LB; pt = back.getPointAtLength(s); const tail = ang(back, LB, s, true); const k = Math.min(1, f / 0.3); const a0 = ang(up, LU, LU);
+        let dlt = ((tail - a0 + 540) % 360) - 180; rot = a0 + dlt * (k * k * (3 - 2 * k)); flame = f > 0.82 ? 1 : f < 0.12 ? 1 - f / 0.12 : 0; }
+      bst.setAttribute("transform", `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)}) rotate(${rot.toFixed(1)})`);
+      fl.setAttribute("opacity", flame.toFixed(2)); legs.setAttribute("opacity", p > 0.86 ? "1" : "0");
+    };
+    Object.defineProperty(o, "q", { get() { return this.p; }, set(v) { this.p = v; apply(v); } }); apply(0);
+    tl.fromTo("#hi-bst-in", { opacity: 0 }, { opacity: 1, duration: 0.3 }, b0 + 0.2);
+    tl.fromTo(o, { q: 0 }, { q: 1, duration: bd - 0.4, ease: "power1.inOut" }, b0 + 0.4);
+    K.draw(tl, "#hi-up", b0 + 0.4, (bd - 0.4) * 0.42, "power1.in");
+    K.pop(tl, "#hi-sep", b0 + 0.4 + (bd - 0.4) * 0.44, 0.3);
+    tl.fromTo(["#hi-s2", "#hi-orb"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, b0 + 0.4 + (bd - 0.4) * 0.46);
+    tl.fromTo("#hi-back", { opacity: 0 }, { opacity: 1, duration: 0.5 }, b0 + 0.4 + (bd - 0.4) * 0.48);
+    tl.fromTo("#hi-pad2", { boxShadow: "none" }, { fill: "#7fd17a", duration: 0.3 }, b0 + bd - 0.1);
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

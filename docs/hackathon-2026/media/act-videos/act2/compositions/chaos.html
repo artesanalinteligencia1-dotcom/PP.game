@@ -1,0 +1,93 @@
+<template>
+  <div id="root" data-composition-id="chaos" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ch-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-photo" id="ch-photo" style="left:90px; top:150px; width:700px; height:700px; border-color:#d9b46a">
+        <img id="ch-img" src="assets/act2-03.jpg" alt="" style="object-position:62% 40%">
+        <div class="k-ai">AI-GENERATED</div>
+      </div>
+      <div class="k-kicker" id="ch-k" style="left:880px; top:92px">EARTH–MOON SYSTEM · ROTATING FRAME</div>
+      <div class="k-h2" id="ch-h" style="left:880px; top:136px">Five quiet points, and chaos</div>
+      <div class="k-panel" id="ch-panel" style="left:880px; top:240px; width:960px; height:620px; background:rgba(8,10,14,.95)">
+        <svg id="ch-svg" viewBox="0 0 960 620" style="position:absolute; left:0; top:0; width:960px; height:620px; overflow:hidden">
+          <g id="ch-world">
+            <circle id="ch-earth" r="26" fill="#2a6fb4" stroke="#7fb7ff" stroke-width="2" vector-effect="non-scaling-stroke"/>
+            <circle id="ch-moon" r="10" fill="#c9c2b2"/>
+            <path id="ch-pa" fill="none" stroke="#f08a3c" stroke-width="3" vector-effect="non-scaling-stroke"/>
+            <path id="ch-pb" fill="none" stroke="#36d1ff" stroke-width="3" vector-effect="non-scaling-stroke"/>
+          </g>
+          <g id="ch-lp"></g>
+          <g id="ch-zl" opacity="0"></g>
+          <circle id="ch-da" r="8" fill="#f08a3c" opacity="0"/><circle id="ch-db" r="8" fill="#36d1ff" opacity="0"/>
+        </svg>
+        <div class="k-label" id="ch-l1" style="left:24px; top:20px; color:#f08a3c">PATH A</div>
+        <div class="k-label" id="ch-l2" style="left:150px; top:20px; color:#36d1ff">PATH B · NUDGED 10 CM/S</div>
+        <div class="k-label cream" id="ch-sep" style="left:24px; top:60px">APART: <span id="ch-km">0</span> KM</div>
+        <div class="k-label" id="ch-l3" style="left:24px; top:566px; font-size:28px">BOTH START AT L1 · CIRCULAR THREE-BODY MODEL, 35 DAYS</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("chaos");
+    // Circular restricted three-body problem, Earth–Moon (mu = 0.01215), nondimensional rotating frame, RK4.
+    const mu = 0.01215, W = 960, H = 620, S = 300, cx = 330, cy = 310;
+    const px = (x) => cx + x * S, py = (y) => cy - y * S;
+    const acc = (s) => { const [x, y, vx, vy] = s; const r1 = Math.hypot(x + mu, y), r2 = Math.hypot(x - 1 + mu, y);
+      return [vx, vy, 2 * vy + x - (1 - mu) * (x + mu) / r1 ** 3 - mu * (x - 1 + mu) / r2 ** 3, -2 * vx + y - (1 - mu) * y / r1 ** 3 - mu * y / r2 ** 3]; };
+    const rk = (s, h) => { const a = acc(s), b = acc(s.map((v, i) => v + h / 2 * a[i])), c2 = acc(s.map((v, i) => v + h / 2 * b[i])), d = acc(s.map((v, i) => v + h * c2[i]));
+      return s.map((v, i) => v + h / 6 * (a[i] + 2 * b[i] + 2 * c2[i] + d[i])); };
+    const fly = (s, T) => { const pts = []; let t = 0; const h = 0.0025;
+      while (t < T) { s = rk(s, h); t += h; const r1 = Math.hypot(s[0] + mu, s[1]), r2 = Math.hypot(s[0] - 1 + mu, s[1]);
+        if (r1 < 0.02 || r2 < 0.006 || Math.abs(s[0]) > 1.45 || Math.abs(s[1]) > 1.0) break; if (Math.round(t / h) % 4 === 0) pts.push([s[0], s[1]]); }
+      return pts; };
+    // Lagrange points (L1..L3 by bisection on the x-axis force)
+    const fx = (x) => x - (1 - mu) * (x + mu) / Math.abs(x + mu) ** 3 - mu * (x - 1 + mu) / Math.abs(x - 1 + mu) ** 3;
+    const root = (a, b) => { for (let k = 0; k < 80; k++) { const m = (a + b) / 2; if (fx(a) * fx(m) <= 0) b = m; else a = m; } return (a + b) / 2; };
+    const L = [[root(0.5, 0.98), 0], [root(1.01, 1.5), 0], [root(-1.5, -0.5), 0], [0.5 - mu, Math.sqrt(3) / 2], [0.5 - mu, -Math.sqrt(3) / 2]];
+    let lp = ""; L.forEach((p, i) => { lp += `<g class="ch-L" transform="translate(${px(p[0]).toFixed(1)} ${py(p[1]).toFixed(1)})"><path d="M -9 0 L 9 0 M 0 -9 L 0 9" stroke="#d9b46a" stroke-width="3"/><text x="12" y="-10" style="fill:#d9b46a; font-size:28px; font-weight:600">L${i + 1}</text></g>`; });
+    document.querySelector("#ch-lp").innerHTML = lp;
+    document.querySelector("#ch-earth").setAttribute("cx", px(-mu)); document.querySelector("#ch-earth").setAttribute("cy", py(0));
+    document.querySelector("#ch-moon").setAttribute("cx", px(1 - mu)); document.querySelector("#ch-moon").setAttribute("cy", py(0));
+    // two spacecraft start at L1: B gets an extra 10 cm/s (1e-4 in Earth–Moon units)
+    const L1x = 0.8369180073;
+    const A = fly([L1x, 0, 1e-4, 0], 8), B = fly([L1x, 0, 1e-4, 1e-4], 8);
+    const d = (P) => P.map((p, i) => (i ? "L " : "M ") + px(p[0]).toFixed(2) + " " + py(p[1]).toFixed(2)).join(" ");
+    document.querySelector("#ch-pa").setAttribute("d", d(A)); document.querySelector("#ch-pb").setAttribute("d", d(B));
+    // zoom from the whole system into the Moon's neighbourhood
+    const Z = 9.3, fx0 = px(0.972), fy0 = py(0);
+    const view = { z: 0 };
+    const apply = () => { const z = view.z, sc = 1 + (Z - 1) * z, tx = (480 - fx0 * sc) * z, ty = (cy - fy0 * sc) * z;
+      document.querySelector("#ch-world").setAttribute("transform", `translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${sc.toFixed(4)})`);
+      document.querySelector("#ch-moon").setAttribute("r", (10 / (1 + 2.6 * z)).toFixed(2)); };
+    const scr = (x, y) => { const sc = Z; return [480 - fx0 * sc + px(x) * sc, cy - fy0 * sc + py(y) * sc]; };
+    let zl = ""; [[L[0][0], "L1"], [L[1][0], "L2"]].forEach(([x, n]) => { const p = scr(x, 0); zl += `<g transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><path d="M -9 0 L 9 0 M 0 -9 L 0 9" stroke="#d9b46a" stroke-width="3"/><text x="12" y="-12" style="fill:#d9b46a; font-size:28px; font-weight:600">${n}</text></g>`; });
+    const mp = scr(1 - mu, 0); zl += `<text x="${(mp[0] + 16).toFixed(0)}" y="${(mp[1] + 34).toFixed(0)}" style="fill:#c9c2b2; font-size:28px">MOON</text><text x="16" y="330" style="fill:#7fb7ff; font-size:28px">← EARTH</text>`;
+    document.querySelector("#ch-zl").innerHTML = zl;
+    apply();
+    K.enter(tl, "#ch-stage", "rise");
+    K.photo(tl, "#ch-photo", 0.3);
+    K.kb(tl, "#ch-img", 0.3, c.dur, { s: 1.0 }, { s: 1.12, x: -20 });
+    K.fade(tl, "#ch-k", 0.5, 0.5); K.fade(tl, "#ch-h", 0.65, 0.6, 20);
+    K.fade(tl, "#ch-panel", 0.8, 0.5, 30);
+    tl.fromTo(["#ch-earth", "#ch-moon"], { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.2 }, 1.0);
+    tl.fromTo(".ch-L", { opacity: 0 }, { opacity: 1, duration: 0.35, stagger: 0.35 }, c("vo3", 1.6));
+    const tz = c("vo4", 0.0);
+    tl.to(".ch-L", { opacity: 0, duration: 0.4 }, tz);
+    tl.fromTo(view, { z: 0 }, { z: 1, duration: 1.4, ease: "power3.inOut", onUpdate: apply }, tz);
+    tl.fromTo("#ch-zl", { opacity: 0 }, { opacity: 1, duration: 0.5 }, tz + 1.3);
+    const t0 = tz + 1.5, dur = Math.max(4.5, c.end("rob") - t0 - 0.2);
+    K.fade(tl, ["#ch-l1", "#ch-l2", "#ch-sep"], t0 - 0.3, 0.4, 0);
+    tl.set(["#ch-da", "#ch-db"], { opacity: 1 }, t0);
+    K.draw(tl, "#ch-pa", t0, dur, "none"); K.draw(tl, "#ch-pb", t0, dur, "none");
+    const n = Math.min(A.length, B.length) - 1; const o = { k: 0 };
+    tl.fromTo(o, { k: 0 }, { k: n, duration: dur, ease: "none", onUpdate: () => {
+      const i = Math.floor(o.k), a = scr(A[i][0], A[i][1]), b = scr(B[i][0], B[i][1]);
+      const da = document.querySelector("#ch-da"), db = document.querySelector("#ch-db");
+      da.setAttribute("cx", a[0]); da.setAttribute("cy", a[1]); db.setAttribute("cx", b[0]); db.setAttribute("cy", b[1]);
+      document.querySelector("#ch-km").textContent = (Math.round(Math.hypot(A[i][0] - B[i][0], A[i][1] - B[i][1]) * 384400 / 100) * 100).toLocaleString("en-US");
+    } }, t0);
+    K.fade(tl, "#ch-l3", c("vo4", 2.5), 0.5, 0);
+    K.exit(tl, "#ch-stage", "zoom", c.dur, { x: 1360, y: 550 });
+    window.__timelines["chaos"] = tl;
+  </script>
+</template>

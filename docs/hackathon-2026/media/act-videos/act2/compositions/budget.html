@@ -1,0 +1,35 @@
+<template>
+  <div id="root" data-composition-id="budget" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="bu-stage" class="k-stage">
+      <div id="bu-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="bu-img" src="assets/act2-05.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-panel" id="bu-chart" style="left:110px; top:110px; width:620px; height:330px">
+        <div class="k-head">BUDGET VS. PLAN · MONTHS</div>
+        <svg viewBox="0 0 620 280" style="position:absolute; left:0; top:50px; width:620px; height:280px">
+          <line x1="40" y1="230" x2="590" y2="230" stroke="#3a3f47" stroke-width="2"/>
+          <path id="bu-plan" d="M 40 70 L 590 70" stroke="#8a8f98" stroke-width="3" stroke-dasharray="10 8" fill="none"/>
+          <path id="bu-real" d="M 40 70 L 140 78 L 240 74 L 330 110 L 420 150 L 500 196 L 590 222" stroke="#e0457b" stroke-width="5" fill="none"/>
+          <text x="440" y="60" style="fill:#8a8f98; font-size:28px">PLAN</text>
+          <text id="bu-t" x="380" y="260" style="fill:#e0457b; font-size:28px; font-weight:600">RESERVES RUNNING OUT</text>
+        </svg>
+      </div>
+      <div class="k-panel" id="bu-q" style="left:110px; top:470px; width:820px; height:120px; border-color:#e0457b">
+        <div class="k-abs" style="left:28px; top:24px; font-size:52px; font-weight:600; color:#f4efe2">“One small error and the route is lost.”</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("budget");
+    K.enter(tl, "#bu-stage", "zoom");
+    K.kb(tl, "#bu-img", 0, c.dur + 0.5, { s: 1.08, x: 30 }, { s: 1.18, x: -20, y: -10 });
+    K.fade(tl, "#bu-chart", 0.4, 0.5, 0, -30);
+    K.draw(tl, "#bu-plan", 0.7, 0.8);
+    K.draw(tl, "#bu-real", c("vo7", 0.6), 2.6, "power1.in");
+    tl.fromTo("#bu-t", { opacity: 0 }, { opacity: 1, duration: 0.4 }, c("vo7", 3.0));
+    tl.fromTo("#bu-q", { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, c("vo7", 2.0));
+    K.exit(tl, "#bu-stage", "fade", c.dur);
+    window.__timelines["budget"] = tl;
+  </script>
+</template>

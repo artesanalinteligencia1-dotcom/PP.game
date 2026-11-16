@@ -1,0 +1,37 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="sc-k" style="left:120px; top:92px">HOW MUCH AIR COULD WE RELEASE? · 2018 NASA-SUPPORTED STUDY</div>
+      <div class="k-abs" id="sc-chart" style="left:120px; top:170px; width:1680px; height:720px">
+        <div class="k-abs" style="left:160px; top:0; width:4px; height:640px; background:#3a3f47"></div>
+        <div class="k-abs" style="left:160px; top:640px; width:1500px; height:4px; background:#3a3f47"></div>
+        <div class="k-abs" id="sc-target" style="left:164px; top:40px; width:1490px; height:0; border-top:4px dashed #36d1ff"></div>
+        <div class="k-label cyan" id="sc-tl" style="left:1060px; top:-6px; font-weight:600">EARTH-LIKE AIR · ≈ 1,000 MBAR</div>
+        <div class="k-abs" id="sc-b1" style="left:260px; top:636px; width:220px; height:4px; background:#f08a3c; transform-origin:50% 100%"></div>
+        <div class="k-label cream" style="left:260px; top:664px; font-weight:600">MARS TODAY</div>
+        <div class="k-num" id="sc-v1" style="left:260px; top:560px; font-size:56px; color:#f08a3c">≈ 6</div>
+        <div class="k-abs" id="sc-b2" style="left:620px; top:627px; width:220px; height:13px; background:#d9b46a; transform-origin:50% 100%"></div>
+        <div class="k-label cream" style="left:620px; top:664px; font-weight:600">ALL REACHABLE CO₂</div>
+        <div class="k-num" id="sc-v2" style="left:620px; top:540px; font-size:56px; color:#d9b46a">≈ 20</div>
+        <div class="k-label" id="sc-u" style="left:0; top:20px">MBAR</div>
+        <div class="k-label" id="sc-src" style="left:960px; top:440px; line-height:1.4; white-space:normal; width:660px">POLAR ICE, CO₂ HELD IN SOIL AND IN ROCKS, ADDED TOGETHER · SOURCE: JAKOSKY &amp; EDWARDS, NATURE ASTRONOMY, 2018</div>
+        <div class="k-stamp" id="sc-no" style="left:980px; top:240px; font-size:48px">NOT ENOUGH</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.enter(tl, "#sc-stage", "wipe");
+    K.fade(tl, "#sc-k", 0.4, 0.5, 0);
+    K.fade(tl, "#sc-chart", 0.5, 0.5, 20);
+    tl.fromTo("#sc-target", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 1.2, ease: "power3.out" }, c("vo5", 0.6));
+    K.fade(tl, "#sc-tl", c("vo5", 1.4), 0.5, 0);
+    tl.fromTo("#sc-b1", { scaleY: 0 }, { scaleY: 1, duration: 0.6 }, c("vo6", 0.2)); K.fade(tl, "#sc-v1", c("vo6", 0.4), 0.4, 0);
+    tl.fromTo("#sc-b2", { scaleY: 0 }, { scaleY: 1, duration: 1.4, ease: "power2.out" }, c("vo6", 4.0)); K.fade(tl, "#sc-v2", c("vo6", 5.0), 0.4, 0);
+    K.fade(tl, "#sc-src", c("vo6", 5.6), 0.5, 0);
+    K.stamp(tl, "#sc-no", c("vo7", 0.1));
+    K.exit(tl, "#sc-stage", "fade", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

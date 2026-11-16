@@ -1,0 +1,33 @@
+<template>
+  <div id="root" data-composition-id="callao" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ca-stage" class="k-stage">
+      <div id="ca-wrap" style="position:absolute; inset:0">
+        <video id="ca-vid" class="clip" src="assets/prologue-03.mp4" data-start="0" data-duration="11.8" data-playback-rate="0.85" muted playsinline style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover"></video>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(8,6,4,.62) 0%, transparent 42%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED VIDEO (VEO)</div>
+      <div class="k-chip" id="ca-place" style="left:120px; top:110px; font-size:38px; padding:6px 22px">CALLAO · LIMA</div>
+      <div class="k-label cream" id="ca-coord" style="left:124px; top:178px">12°03′ S · 77°09′ W · SALSA NIGHT</div>
+      <div class="k-panel" id="ca-card" style="left:120px; top:560px; width:860px; height:210px; border-color:#f08a3c">
+        <div class="k-photo" style="left:18px; top:18px; width:150px; height:172px; box-shadow:none; border-color:#f08a3c"><img src="assets/kit/portraits/franchesca.jpg" alt="" style="object-position:50% 20%"></div>
+        <div class="k-label orange" style="left:192px; top:26px; font-weight:600">FRANCHESCA</div>
+        <div class="k-abs" style="left:192px; top:66px; font-size:44px; font-weight:600; line-height:1.05">ASTROBIOLOGIST</div>
+        <div class="k-label" style="left:192px; top:124px">BACK FROM THE U.S. · LIFE IN THE ANDES</div>
+        <div class="k-label" style="left:192px; top:160px; font-size:28px">AI-GENERATED PORTRAIT</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("callao");
+    K.enter(tl, "#ca-stage", "whip");
+    tl.fromTo("#ca-wrap", { scale: 1.04 }, { scale: 1.12, duration: c.dur + 0.5, ease: "none", transformOrigin: "60% 55%" }, 0);
+    tl.fromTo("#ca-place", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.8, ease: "steps(12)" }, 0.5);
+    K.fade(tl, "#ca-coord", 1.1, 0.5, 0);
+    // the lower third arrives on "they met Franchesca"
+    tl.fromTo("#ca-card", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, c.end("vo6", -0.9));
+    tl.fromTo("#ca-card .k-photo img", { scale: 1.2 }, { scale: 1, duration: 1.2 }, c.end("vo6", -0.9));
+    tl.to(["#ca-place", "#ca-coord"], { opacity: 0.5, duration: 0.6 }, c.end("vo6", -0.9));
+    K.exit(tl, "#ca-stage", "fade", c.dur);
+    window.__timelines["callao"] = tl;
+  </script>
+</template>

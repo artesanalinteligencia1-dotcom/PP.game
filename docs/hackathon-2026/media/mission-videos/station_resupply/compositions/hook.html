@@ -1,0 +1,28 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage">
+      <img id="hk-img" src="assets/iss.jpg" alt="" style="position:absolute; left:0; top:-72px; width:1920px; height:1224px">
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,13,16,.7) 0%, rgba(11,13,16,0) 30%, rgba(11,13,16,0) 62%, rgba(11,13,16,.75) 100%)"></div>
+      <div class="k-credit" id="hk-credit" style="left:140px; top:306px; bottom:auto">Image: NASA · International Space Station, 2010</div>
+      <div class="k-kicker" id="hk-kicker" style="left:140px; top:84px">STATION RESUPPLY · THE REAL STORY</div>
+      <div class="k-title" id="hk-title" style="left:140px; top:128px; font-size:150px; white-space:nowrap">Groceries to orbit</div>
+      <div class="k-abs" id="hk-chips" style="left:0; top:770px; width:1920px; text-align:center; white-space:nowrap">
+        <div class="k-chip hk-c" style="position:relative; display:inline-block; margin:0 14px; font-size:40px; padding:8px 26px">FOOD</div>
+        <div class="k-chip hk-c" style="position:relative; display:inline-block; margin:0 14px; font-size:40px; padding:8px 26px">WATER</div>
+        <div class="k-chip hk-c" style="position:relative; display:inline-block; margin:0 14px; font-size:40px; padding:8px 26px">AIR</div>
+        <div class="k-chip hk-c" style="position:relative; display:inline-block; margin:0 14px; font-size:40px; padding:8px 26px">SPARE PARTS</div>
+        <div class="k-chip hk-c" style="position:relative; display:inline-block; margin:0 14px; font-size:40px; padding:8px 26px; border-color:#f08a3c; color:#f08a3c">ALL THE TIME</div>
+      </div>
+      <div class="k-vig"></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    tl.fromTo("#hk-img", { scale: 1.34, x: -60, transformOrigin: "50% 45%" }, { scale: 1.04, x: 0, duration: c.dur + 0.6, ease: "sine.out" }, 0);
+    tl.fromTo("#hk-kicker", { opacity: 0.0 }, { opacity: 1, duration: 0.6 }, 0.3); tl.fromTo("#hk-title", { opacity: 0.35, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.0, ease: "power4.out" }, 0.1); K.fade(tl, "#hk-credit", 1.2, 0.5, 0);
+    const d = c.end("vo1") - c("vo1"); const t0 = c("vo1") + d * 0.42;
+    document.querySelectorAll(".hk-c").forEach((el, i) => tl.fromTo(el, { opacity: 0, y: 26, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(2)" }, t0 + i * (i === 4 ? 0.62 : 0.5)));
+    K.exit(tl, "#hk-stage", "dim", c.dur);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

@@ -1,0 +1,40 @@
+<template>
+  <style>
+    @font-face { font-family: "Barlow Condensed"; font-weight: 500; src: url("assets/fonts/barlow-500.woff2") format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url("assets/fonts/barlow-600.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #0b0d10; font-family: "Barlow Condensed", sans-serif; color: #e8e0cc; }
+    #en-card { position: absolute; left: 200px; top: 170px; width: 1520px; height: 460px; border: 1px solid #3a3f47; background: rgba(22,25,30,.92); }
+    #en-head { position: absolute; left: 0; right: 0; top: 0; height: 52px; background: #252a31; font-size: 28px; letter-spacing: .14em; color: #d9b46a; padding: 10px 22px; font-weight: 600; }
+    #en-photo { position: absolute; left: 40px; top: 92px; width: 300px; height: 334px; background: url("assets/goicochea.jpg") center / cover; border: 2px solid #d9b46a; }
+    #en-ai { position: absolute; left: 46px; top: 386px; padding: 2px 8px; background: rgba(0,0,0,.75); font-size: 28px; letter-spacing: .1em; color: #e8e0cc; }
+    #en-name { position: absolute; left: 390px; top: 96px; font-size: 30px; letter-spacing: .14em; color: #f08a3c; font-weight: 600; }
+    #en-quote { position: absolute; left: 390px; top: 150px; width: 1080px; font-size: 64px; line-height: 1.15; font-weight: 600; }
+    #en-src { position: absolute; left: 200px; top: 680px; width: 1520px; font-size: 30px; line-height: 1.5; color: #8a8f98; letter-spacing: .04em; }
+    #en-src b { color: #d9b46a; letter-spacing: .14em; font-weight: 600; }
+    #en-credit { position: absolute; left: 200px; top: 880px; font-size: 28px; color: #8a8f98; letter-spacing: .08em; }
+  </style>
+  <div id="root" data-composition-id="ending" data-width="1920" data-height="1080" data-layout-allow-overlap>
+    <div id="en-card">
+      <div id="en-head">TRANSMISSION · DR. PEDRO GOICOCHEA</div>
+      <div id="en-photo"></div>
+      <div id="en-ai">AI-GENERATED</div>
+      <div id="en-name">MISSION DIRECTOR</div>
+      <div id="en-quote">“Twelve metres in 1926. A hundred kilometres today. Paulet would want us to keep going.”</div>
+    </div>
+    <div id="en-src"><b>LEARN MORE</b><br>NASA Goddard Space Flight Center history: the 1926 liquid-fuel rocket · NASA Sounding Rockets Program Office, Wallops Flight Facility · Pedro Paulet’s 1890s engine tests are his own claims, not proven facts.</div>
+    <div id="en-credit">Animation: Paulet Delta-V · Narration: AI voice (Kokoro, open model, run locally) · Music: generated locally with ACE-Step 1.5 · Characters: AI-generated illustration</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#en-card", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0);
+    tl.fromTo("#en-photo", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 1.0, ease: "power2.out" }, 0.4);
+    tl.fromTo("#en-ai", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.9);
+    tl.fromTo("#en-name", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.8);
+    tl.fromTo("#en-quote", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 3.2, ease: "none" }, 1.1);
+    tl.fromTo("#en-src", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6 }, 4.4);
+    tl.fromTo("#en-credit", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 7.0);
+    tl.fromTo("#en-card", { scale: 1 }, { scale: 1.03, duration: 12, ease: "none" }, 0.7);
+    tl.to("#root", { opacity: 0, duration: 1.0, ease: "power2.in" }, 12.8);
+    window.__timelines["ending"] = tl;
+  </script>
+</template>

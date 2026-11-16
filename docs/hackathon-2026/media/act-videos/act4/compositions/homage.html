@@ -1,0 +1,53 @@
+<template>
+  <div id="root" data-composition-id="homage" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ho-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="ho-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <div class="k-kicker" id="ho-k" style="left:120px; top:110px">ACT 4 · BEYOND</div>
+      <div class="k-title" id="ho-t" style="left:120px; top:160px; font-size:110px">THE PAULET 1<br>IN ORBIT</div>
+      <div class="k-chip" id="ho-spec" style="left:120px; top:420px; border-color:#36d1ff; color:#36d1ff">SPECULATIVE FUTURE</div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <g transform="translate(1330 540)">
+          <circle id="ho-eo" r="170" fill="none" stroke="#2a6fb4" stroke-width="2" stroke-dasharray="6 8"/>
+          <circle id="ho-mo" r="259" fill="none" stroke="#b5532e" stroke-width="2" stroke-dasharray="6 8"/>
+          <circle r="22" fill="#f2b84b"/>
+          <path id="ho-car" fill="none" stroke="#e8e0cc" stroke-width="3"/>
+          <circle id="ho-dot" r="8" fill="#e8e0cc"/>
+        </g>
+        <line id="ho-ln" x1="770" y1="590" x2="1080" y2="590" stroke="#e8e0cc" stroke-width="3"/><text id="ho-l1" x="120" y="600" style="fill:#e8e0cc">THE 2018 TEST PAYLOAD'S ORBIT AROUND THE SUN</text>
+        <text id="ho-l2" x="120" y="645" style="fill:#8a8f98">FROM 0.99 TO 1.66 TIMES EARTH'S DISTANCE</text>
+        <text id="ho-l3" x="1225" y="760" style="fill:#7fb7ff">EARTH ORBIT</text><text id="ho-l4" x="1500" y="840" style="fill:#d0643a">MARS ORBIT</text>
+      </svg>
+      <div class="k-abs" id="ho-flash" style="left:0; top:0; width:1920px; height:1080px; background:#fff4dc; opacity:0"></div>
+      <div id="ho-b" style="position:absolute; inset:0; overflow:hidden; opacity:0">
+        <img id="ho-img" src="assets/act4-01.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+        <div class="k-chip" style="left:120px; top:110px; border-color:#36d1ff; color:#36d1ff">SPECULATIVE FUTURE</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("homage");
+    K.stars("#ho-stars", 170, 77);
+    // the 2018 payload's heliocentric orbit: perihelion 0.99 AU, aphelion 1.66 AU (scale: 1 AU = 170 px)
+    const q = 0.99 * 170, Q = 1.66 * 170, a = (q + Q) / 2, e = (Q - q) / (Q + q), w = 20 * Math.PI / 180;
+    const pt = (nu) => { const r = a * (1 - e * e) / (1 + e * Math.cos(nu)); return [r * Math.cos(nu + w), -r * Math.sin(nu + w)]; };
+    let d = ""; for (let k = 0; k <= 120; k++) { const p = pt(2 * Math.PI * k / 120); d += (k ? " L " : "M ") + p[0].toFixed(1) + " " + p[1].toFixed(1); }
+    document.querySelector("#ho-car").setAttribute("d", d);
+    K.fade(tl, "#ho-k", 0.1, 0.5, 0);
+    tl.fromTo("#ho-t", { opacity: 0, x: -40, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.9, ease: "power4.out" }, 0.0);
+    K.pop(tl, "#ho-spec", 0.8, 0.4);
+    K.draw(tl, ["#ho-eo", "#ho-mo"], 0.4, 1.4);
+    K.fade(tl, ["#ho-l3", "#ho-l4"], 1.2, 0.5, 0);
+    K.draw(tl, "#ho-car", c("vo1", 2.4), 2.2, "power1.inOut");
+    K.fade(tl, ["#ho-l1", "#ho-l2"], c("vo1", 3.0), 0.5, 0); K.draw(tl, "#ho-ln", c("vo1", 3.0), 0.6);
+    const o = { u: 0 }; tl.fromTo(o, { u: 0 }, { u: 1.4, duration: c.dur, ease: "none", onUpdate: () => { const p = pt(2 * Math.PI * o.u); const el = document.querySelector("#ho-dot"); el.setAttribute("cx", p[0]); el.setAttribute("cy", p[1]); } }, 0);
+    // "a different payload": a flash, and the Paulet 1 floats free of the upper stage
+    const tb = c("vo2", 0.4);
+    tl.fromTo("#ho-flash", { opacity: 0 }, { opacity: 0.85, duration: 0.12 }, tb); tl.to("#ho-flash", { opacity: 0, duration: 0.7 }, tb + 0.12);
+    tl.set("#ho-b", { opacity: 1 }, tb + 0.1);
+    K.kb(tl, "#ho-img", tb, c.dur - tb + 0.6, { s: 1.12, x: -40, y: 20 }, { s: 1.02, x: 30, y: -10 });
+    K.exit(tl, "#ho-stage", "fade", c.dur);
+    window.__timelines["homage"] = tl;
+  </script>
+</template>

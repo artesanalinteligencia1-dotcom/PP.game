@@ -1,0 +1,47 @@
+{
+  "id": "earth_watch",
+  "title": "Earth Watch — the real story: fifty years of watching Earth",
+  "music": "blueprints-a.mp3",
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "orbit.mp3", "scene": "hook", "at": 0.3, "dur": 2.4, "vol": 0.35 },
+    { "src": "deploy.mp3", "scene": "history", "cue": "vo3", "off": 0.2, "dur": 2.4, "vol": 0.35 },
+    { "src": "success.mp3", "scene": "compare", "cue": "vo9", "off": 0.1, "dur": 4, "vol": 0.3 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 3.2, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Your satellite passes over the same place at the same local time, every time.", "es": "Tu satélite pasa sobre el mismo lugar a la misma hora local, siempre." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "Why does that matter?", "es": "¿Por qué importa eso?" }
+    ] },
+    { "id": "history", "lead": 0.9, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "In 1972, the first Landsat satellite began photographing the whole planet.", "tts": "In nineteen seventy-two, the first Landsat satellite began photographing the whole planet.", "es": "En 1972, el primer satélite Landsat empezó a fotografiar todo el planeta." },
+      { "id": "vo4", "v": "nar", "gap": 0.6, "en": "The record is now more than fifty years long, the longest of its kind.", "es": "El registro ya supera los cincuenta años: el más largo de su tipo." }
+    ] },
+    { "id": "science", "lead": 1.0, "tail": 1.6, "lines": [
+      { "id": "vo5", "v": "nar", "en": "A sun-synchronous orbit turns with the seasons, about one degree a day,", "es": "Una órbita heliosíncrona gira con las estaciones, cerca de un grado por día," },
+      { "id": "vo6", "v": "nar", "gap": 0.3, "en": "so the lighting stays the same and changes on the ground are real.", "es": "así la luz es siempre la misma y los cambios en el suelo son reales." },
+      { "id": "vo7", "v": "nar", "gap": 1.2, "en": "Healthy leaves reflect near-infrared light strongly.", "es": "Las hojas sanas reflejan con fuerza la luz del infrarrojo cercano." },
+      { "id": "vo7b", "v": "nar", "gap": 0.4, "en": "That lets us measure forest health from space.", "es": "Eso nos permite medir la salud del bosque desde el espacio." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "Landsat 9, the newest of the series",
+      "photo": { "src": "landsat9.jpg", "credit": "Illustration: NASA", "pos": "40% 50%" },
+      "rows": [
+        { "label": "ALTITUDE", "value": "705 km", "note": "sun-synchronous", "frac": 0.7 },
+        { "label": "REVISIT", "value": "16 days", "note": "8 days with Landsat 8", "frac": 0.5, "color": "#d9b46a" },
+        { "label": "IMAGES A DAY", "value": "700+", "note": "free and open data", "frac": 0.86, "color": "#36d1ff" }
+      ],
+      "yours": ["ALTITUDE", "REVISIT TIME", "GIGABYTES A DAY"],
+      "lines": [
+        { "id": "vo8", "v": "nar", "en": "Landsat 9 flies at 705 kilometres and returns to each place every 16 days.", "tts": "Landsat nine flies at seven hundred and five kilometres, and returns to each place every sixteen days.", "es": "Landsat 9 vuela a 705 kilómetros y vuelve a cada lugar cada 16 días." },
+        { "id": "vo9", "v": "nar", "gap": 0.6, "en": "Now compare your design. Every pixel is part of a story about forests and farms.", "es": "Ahora compara tu diseño. Cada píxel es parte de una historia de bosques y cultivos." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "fra", "lead": 1.0, "tail": 7.5,
+      "quote": "Life leaves fingerprints in colour. From orbit, the planet is a living map.",
+      "learn": "NASA / USGS Landsat Science: landsat.gsfc.nasa.gov · NASA Earth Observatory: World of Change, Amazon Deforestation · NASA Earth Observatory: Measuring Vegetation (NDVI)",
+      "images": "Real images: NASA and NASA Earth Observatory, public domain",
+      "lines": [
+        { "id": "fra", "v": "fra", "cap": false, "en": "Life leaves fingerprints in colour. From orbit, the planet is a living map.", "es": "La vida deja huellas de color. Desde la órbita, el planeta es un mapa vivo." }
+      ] }
+  ]
+}

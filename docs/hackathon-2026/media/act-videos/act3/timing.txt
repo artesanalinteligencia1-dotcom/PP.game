@@ -1,0 +1,26 @@
+act3  total 73.55s
+
+[viking] start 0.0  dur 12.81
+   vo1      1.40 ->   9.17   July 20, 1976: Viking 1 sends the first photograph from the surface of Mars.
+   vo1b     9.57 ->  11.61   It arrived line by line.
+
+[salar] start 12.81  dur 12.31
+   vo2      0.70 ->   7.89   Franchesca's Andes look like Mars: high, dry, salty and full of sunlight. That's
+   fra      8.39 ->  11.31   If life survives here, maybe it survived there.
+
+[window] start 25.12  dur 8.21
+   vo3      0.60 ->   6.81   Mars opens a window every 26 months. Miss it, and you wait two more years.
+
+[social] start 33.33  dur 5.6
+   vo4      0.60 ->   2.76   The whole country is watching.
+
+[chute] start 38.93  dur 8.03
+   vo5      0.80 ->   4.91   A parachute tears in the test. Seven days to the window.
+   chi      5.41 ->   7.03   Then we sew a new one. Tonight.
+
+[moxie] start 46.96  dur 14.09
+   vo6      0.60 ->   6.73   And they are not alone. On Mars, a small box on a rover made oxygen from the air
+   vo6b     6.93 ->  12.69   122 grams, between 2021 and 2023.
+
+[close] start 61.05  dur 12.5
+   vo7      1.00 ->   2.83   Land. Breathe. Stay.

@@ -1,0 +1,39 @@
+<template>
+  <div id="root" data-composition-id="real" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="re-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="re-k" style="left:120px; top:90px">THE REAL STORY · 2006 – 2008</div>
+      <div class="k-h2" id="re-h" style="left:120px; top:136px">Three failures, then orbit</div>
+      <div class="k-abs" id="re-tiles" style="left:120px; top:270px; width:720px; height:520px"></div>
+      <div class="k-photo" id="re-photo" style="left:900px; top:270px; width:900px; height:516px">
+        <img id="re-img" src="assets/falcon1-f4.jpg" alt="" style="object-position:50% 30%">
+        <div class="k-credit">IMAGE: SPACEX (CC0) · FALCON 1, FLIGHT 4 · 28 SEP 2008</div>
+      </div>
+      <div class="k-label" id="re-note" style="left:900px; top:806px">FIRST PRIVATELY DEVELOPED LIQUID-FUEL ROCKET TO REACH ORBIT</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("real");
+    // four flight tiles: three red crosses, then a green tick
+    const F = [["FLIGHT 1", "MAR 2006", 0], ["FLIGHT 2", "MAR 2007", 0], ["FLIGHT 3", "AUG 2008", 0], ["FLIGHT 4", "SEP 2008", 1]];
+    let h = "";
+    F.forEach((f, i) => { const x = (i % 2) * 360, y = Math.floor(i / 2) * 260, col = f[2] ? "#7fd17a" : "#e0457b";
+      h += `<div class="k-panel re-t" id="re-t${i}" style="left:${x}px; top:${y}px; width:340px; height:240px; border-color:${col}">
+        <div class="k-label cream" style="left:24px; top:20px; font-weight:600">${f[0]}</div><div class="k-label" style="left:24px; top:60px">${f[1]}</div>
+        <div class="k-abs re-m" style="left:24px; top:96px; font-size:120px; line-height:1; font-weight:600; color:${col}">${f[2] ? "✓" : "✕"}</div>
+        <div class="k-label" style="left:150px; top:176px; color:${col}">${f[2] ? "ORBIT" : "LOST"}</div></div>`; });
+    document.querySelector("#re-tiles").innerHTML = h;
+    K.enter(tl, "#re-stage", "wipe");
+    K.fade(tl, "#re-k", 0.4, 0.5, 0); K.fade(tl, "#re-h", 0.55, 0.6, 20);
+    [0, 1, 2].forEach((i) => { tl.fromTo("#re-t" + i, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, c("vo9", 0.4 + i * 0.6));
+      tl.fromTo(`#re-t${i} .re-m`, { scale: 2.2, opacity: 0, transformOrigin: "30% 50%" }, { scale: 1, opacity: 1, duration: 0.3, ease: "power4.in" }, c("vo9", 0.6 + i * 0.6)); });
+    K.photo(tl, "#re-photo", c("vo10", 0.2));
+    K.kb(tl, "#re-img", c("vo10", 0.2), c.dur, { s: 1.0, y: 10 }, { s: 1.12, y: -20 });
+    tl.fromTo("#re-t3", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, c("vo10", 3.1));
+    tl.fromTo("#re-t3 .re-m", { scale: 2.6, opacity: 0, transformOrigin: "30% 50%" }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, c("vo10", 3.3));
+    tl.to("#re-t3", { boxShadow: "0 0 50px rgba(127,209,122,.6)", duration: 0.5, yoyo: true, repeat: 1 }, c("vo10", 3.6));
+    K.fade(tl, "#re-note", c("vo10", 1.2), 0.5, 0);
+    K.exit(tl, "#re-stage", "fade", c.dur);
+    window.__timelines["real"] = tl;
+  </script>
+</template>

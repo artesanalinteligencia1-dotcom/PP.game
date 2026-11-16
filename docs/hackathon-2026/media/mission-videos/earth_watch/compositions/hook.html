@@ -1,0 +1,60 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="hk-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <canvas id="hk-globe" width="1920" height="1080" style="position:absolute; left:0; top:0; width:1920px; height:1080px"></canvas>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <g id="hk-sun">
+          <line x1="150" y1="250" x2="430" y2="250" stroke="#d9b46a" stroke-width="3"/>
+          <path d="M 430 250 l -22 -12 v 24 z" fill="#d9b46a"/>
+          <line x1="150" y1="300" x2="390" y2="300" stroke="#d9b46a" stroke-width="3" opacity=".6"/>
+          <path d="M 390 300 l -22 -12 v 24 z" fill="#d9b46a" opacity=".6"/>
+        </g>
+        <path id="hk-lead" d="M 1330 236 L 1290 236 L 1236 330" fill="none" stroke="#f08a3c" stroke-width="3"/>
+      </svg>
+      <div class="k-label gold" id="hk-sunlab" style="left:150px; top:196px">SUNLIGHT</div>
+      <div class="k-chip" id="hk-chip" style="left:1330px; top:210px; border-color:#f08a3c; color:#f08a3c">LOCAL TIME AT EVERY PASS · 10:00</div>
+      <div class="k-abs" id="hk-pass" style="left:1334px; top:274px; width:400px; height:44px">
+        <div class="k-label cream hk-p" style="left:0; top:0">PASS 1</div>
+        <div class="k-label cream hk-p" style="left:0; top:0">PASS 2 · 99 MINUTES LATER</div>
+        <div class="k-label cream hk-p" style="left:0; top:0">PASS 3 · SAME LIGHT</div>
+        <div class="k-label cream hk-p" style="left:0; top:0">PASS 4 · SAME LIGHT</div>
+      </div>
+      <div class="k-kicker" id="hk-kicker" style="left:140px; top:470px">EARTH WATCH · THE REAL STORY</div>
+      <div class="k-title" id="hk-title" style="left:140px; top:520px; width:900px; font-size:118px">Fifty years<br>of watching<br>Earth</div>
+      <div class="k-vig"></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    K.stars("#hk-stars", 140, 11);
+    const g = K.globe("#hk-globe", { dist: 5.2, camLat: 14, camLon: 0, sunLat: 8, sunLon: -42, rot: 25 });
+    g.lookX = -6.4;
+    const orb = g.orbit({ alt: 705, inc: 98.2, raan: 22, width: 0.004, color: "#d9b46a", opacity: 0.55 });
+    const trk = g.track({ alt: 705, inc: 98.2, raan: 22, from: -70, orbits: 4, period: 99, rot0: 25, width: 0.0145, color: "#f08a3c", opacity: 0.82 });
+    const sat = g.sat(orb, { size: 0.03, u: -70 });
+    const N = 4, o = { p: 0 };
+    const apply = (p) => { g.batch = true; trk.reveal = p / N; sat.u = -70 + 360 * p; g.batch = false; g.rot = 25 + p * (99 / 1436) * 360; };
+    Object.defineProperty(o, "q", { get() { return this.p; }, set(v) { this.p = v; apply(v); } });
+    apply(0);
+    const T0 = 0.4, T1 = c.dur + 0.4;
+    tl.fromTo(o, { q: 0 }, { q: N, duration: T1 - T0, ease: "none" }, T0);
+    tl.fromTo(g, { dist: 5.6 }, { dist: 4.7, duration: c.dur + 0.5, ease: "sine.inOut" }, 0);
+    tl.fromTo("#hk-stars", { opacity: 0 }, { opacity: 1, duration: 2, ease: "sine.out" }, 0);
+    K.fade(tl, "#hk-sun", 0.6, 0.8, 0, -40); K.fade(tl, "#hk-sunlab", 0.8, 0.6, 0);
+    // the satellite crosses the sunlit face once per orbit: label each pass
+    const per = (T1 - T0) / N, first = T0 + per * (70 / 360);
+    K.draw(tl, "#hk-lead", first - 0.2, 0.5); K.pop(tl, "#hk-chip", first, 0.5);
+    const pass = Array.from(document.querySelectorAll(".hk-p"));
+    pass.forEach((el, i) => {
+      const t = first + i * per;
+      tl.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, t);
+      if (i < pass.length - 1) tl.to(el, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in" }, t + per - 0.3);
+      tl.fromTo("#hk-chip", { boxShadow: "0 0 0px rgba(240,138,60,0)" }, { boxShadow: "0 0 26px rgba(240,138,60,.9)", duration: 0.25, yoyo: true, repeat: 1, ease: "sine.inOut" }, t);
+    });
+    K.fade(tl, "#hk-kicker", c("vo2", -0.5), 0.7); K.blurIn(tl, "#hk-title", c("vo2", -0.2), 0.9);
+    K.exit(tl, "#hk-stage", "zoom", c.dur, { x: 1210, y: 540 });
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

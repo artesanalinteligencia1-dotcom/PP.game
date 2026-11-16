@@ -1,0 +1,55 @@
+<template>
+  <div id="root" data-composition-id="moxie" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="mx-stage" class="k-stage">
+      <div id="mx-a" style="position:absolute; inset:0; overflow:hidden">
+        <img id="mx-ai" src="assets/act3-06.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      </div>
+      <div id="mx-b" style="position:absolute; inset:0; background:rgba(11,13,16,.96); opacity:0; z-index:5">
+        <div class="k-grid"></div>
+        <div class="k-kicker" style="left:120px; top:92px">THE REAL ONE · MOXIE ON THE PERSEVERANCE ROVER</div>
+        <div class="k-photo" id="mx-ph" style="left:120px; top:150px; width:760px; height:428px">
+          <img src="assets/moxie.jpg" alt="" style="object-position:50% 40%">
+          <div class="k-credit">IMAGE: NASA / JPL-CALTECH · MOXIE, 2020</div>
+        </div>
+        <svg class="k-svg" viewBox="0 0 1920 1080">
+          <g transform="translate(1020 360)"><g id="mx-in">
+            <circle cx="0" cy="0" r="22" fill="#4b4b4b"/><circle cx="-38" cy="0" r="18" fill="#e0453c"/><circle cx="38" cy="0" r="18" fill="#e0453c"/>
+            <text x="-40" y="62" style="fill:#e8e0cc">CO₂</text>
+          </g></g>
+          <g id="mx-box"><rect x="1150" y="300" width="220" height="120" fill="#16191e" stroke="#d9b46a" stroke-width="3"/><text x="1180" y="352" style="fill:#d9b46a; font-weight:600">800 °C</text><text x="1180" y="392" style="fill:#8a8f98">SOLID OXIDE CELL</text></g>
+          <path id="mx-ar1" d="M 1072 360 L 1140 360" stroke="#e8e0cc" stroke-width="4"/>
+          <path id="mx-ar2" d="M 1380 330 L 1460 300" stroke="#7fd17a" stroke-width="4"/>
+          <path id="mx-ar3" d="M 1380 390 L 1460 420" stroke="#8a8f98" stroke-width="4"/>
+          <g transform="translate(1520 290)"><g id="mx-o2"><circle cx="-18" cy="0" r="18" fill="#e0453c"/><circle cx="18" cy="0" r="18" fill="#e0453c"/><text x="44" y="10" style="fill:#7fd17a; font-weight:600">O₂ · TO BREATHE AND BURN</text></g></g>
+          <g transform="translate(1520 430)"><g id="mx-co"><circle cx="-18" cy="0" r="20" fill="#4b4b4b"/><circle cx="18" cy="0" r="18" fill="#e0453c"/><text x="44" y="10" style="fill:#8a8f98">CO · BACK TO THE AIR</text></g></g>
+        </svg>
+        <div class="k-abs" id="mx-stats" style="left:960px; top:560px; width:820px; height:280px">
+          <div class="k-label gold" style="left:0; top:0">OXYGEN MADE ON MARS · 2021 – 2023</div>
+          <div class="k-num" id="mx-g" style="left:0; top:44px; font-size:130px; color:#7fd17a">0 G</div>
+          <div class="k-label cream" style="left:0; top:200px">16 RUNS · UP TO 12 G PER HOUR · 98% PURE</div>
+        </div>
+        <div class="k-label" id="mx-air" style="left:120px; top:610px">MARS AIR ≈ 95% CARBON DIOXIDE</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("moxie");
+    K.enter(tl, "#mx-stage", "fade", { dur: 0.6 });
+    K.kb(tl, "#mx-ai", 0, c("vo6", 4), { s: 1.04 }, { s: 1.16, x: -30, y: 10 });
+    const tb = c("vo6", 3.2);
+    tl.to("#mx-b", { opacity: 1, duration: 0.6 }, tb);
+    K.photo(tl, "#mx-ph", tb + 0.2);
+    K.fade(tl, "#mx-air", tb + 0.8, 0.5, 0);
+    tl.fromTo("#mx-in", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, tb + 0.6);
+    K.draw(tl, "#mx-ar1", tb + 1.1, 0.4); tl.fromTo("#mx-box", { opacity: 0 }, { opacity: 1, duration: 0.4 }, tb + 1.3);
+    tl.fromTo("#mx-box rect", { fill: "#16191e" }, { fill: "#3a1e10", duration: 0.5, yoyo: true, repeat: 3 }, tb + 1.6);
+    K.draw(tl, ["#mx-ar2", "#mx-ar3"], tb + 2.0, 0.4);
+    tl.fromTo("#mx-o2", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "back.out(2)" }, tb + 2.3);
+    tl.fromTo("#mx-co", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5 }, tb + 2.5);
+    K.fade(tl, "#mx-stats", c("vo6b", -0.2), 0.5, 0);
+    K.count(tl, "#mx-g", 0, 122, c("vo6b", 0.2), 2.2, (v) => Math.round(v) + " G");
+    K.exit(tl, "#mx-stage", "zoom", c.dur, { x: 1300, y: 500 });
+    window.__timelines["moxie"] = tl;
+  </script>
+</template>

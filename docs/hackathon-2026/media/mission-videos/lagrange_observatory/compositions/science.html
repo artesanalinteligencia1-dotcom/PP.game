@@ -1,0 +1,59 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="sc-k" style="left:120px; top:92px">BALANCED, NOT STABLE</div>
+      <div class="k-panel" id="sc-p1" style="left:120px; top:160px; width:780px; height:700px">
+        <div class="k-head">A BALL ON A SADDLE</div>
+        <svg viewBox="0 0 780 650" style="position:absolute; left:0; top:50px; width:780px; height:650px">
+          <g fill="none" stroke="#8a8f98" stroke-width="2">
+            <path d="M 60 300 Q 390 140 720 300"/><path d="M 60 340 Q 390 200 720 340"/><path d="M 60 380 Q 390 260 720 380"/>
+            <path d="M 60 420 Q 390 320 720 420"/><path d="M 60 460 Q 390 380 720 460"/>
+            <path d="M 200 120 Q 300 330 200 600" stroke="#3a3f47"/><path d="M 580 120 Q 480 330 580 600" stroke="#3a3f47"/>
+          </g>
+          <path id="sc-roll" d="M 390 300 Q 520 330 690 420" fill="none" stroke="#e0457b" stroke-width="3" stroke-dasharray="8 8" opacity="0"/>
+          <circle id="sc-ball" cx="390" cy="290" r="22" fill="#f08a3c"/>
+          <text x="40" y="620" style="fill:#e8e0cc; font-size:30px">THE SLIGHTEST PUSH AND IT ROLLS AWAY</text>
+        </svg>
+      </div>
+      <div class="k-panel" id="sc-p2" style="left:960px; top:160px; width:840px; height:700px">
+        <div class="k-head">HALO ORBIT AROUND L2 · STATION-KEEPING</div>
+        <svg viewBox="0 0 840 650" style="position:absolute; left:0; top:50px; width:840px; height:650px">
+          <circle cx="90" cy="330" r="26" fill="#c9c2b2"/><text x="56" y="390" style="fill:#c9c2b2; font-size:28px">MOON</text>
+          <line x1="90" y1="330" x2="800" y2="330" stroke="#3a3f47" stroke-width="2" stroke-dasharray="6 8"/>
+          <g transform="translate(520 330)"><path d="M -12 0 L 12 0 M 0 -12 L 0 12" stroke="#d9b46a" stroke-width="4"/><text x="16" y="-14" style="fill:#d9b46a; font-size:30px; font-weight:600">L2</text></g>
+          <path id="sc-halo" fill="none" stroke="#36d1ff" stroke-width="3"/>
+          <circle id="sc-sat" r="10" fill="#fff4dc"/>
+          <circle id="sc-burn" r="10" fill="none" stroke="#f08a3c" stroke-width="4" opacity="0"/>
+          <text id="sc-bt" x="560" y="600" style="fill:#f08a3c; font-size:30px; opacity:0">SMALL THRUSTER BURN</text>
+          <text x="30" y="600" style="fill:#8a8f98; font-size:28px">ILLUSTRATIVE, NOT TO SCALE</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    // halo orbit seen at an angle: an ellipse that leans out of the Earth–Moon plane
+    const hx = (a) => 520 + 90 * Math.cos(a), hy = (a) => 330 + 210 * Math.sin(a) + 40 * Math.cos(a);
+    let d = ""; for (let k = 0; k <= 120; k++) { const a = 2 * Math.PI * k / 120; d += (k ? " L " : "M ") + hx(a).toFixed(1) + " " + hy(a).toFixed(1); }
+    document.querySelector("#sc-halo").setAttribute("d", d);
+    K.enter(tl, "#sc-stage", "wipe");
+    K.fade(tl, "#sc-k", 0.4, 0.5, 0);
+    K.fade(tl, "#sc-p1", 0.6, 0.5, 30);
+    // the ball wobbles, then rolls off the saddle
+    tl.fromTo("#sc-ball", { x: 0, y: 0 }, { x: 6, duration: 0.25, yoyo: true, repeat: 3, ease: "sine.inOut" }, c("vo6", 1.2));
+    tl.to("#sc-roll", { opacity: 1, duration: 0.3 }, c("vo6", 2.4));
+    tl.to("#sc-ball", { x: 300, y: 130, duration: 1.6, ease: "power2.in" }, c("vo6", 2.6));
+    K.fade(tl, "#sc-p2", c("vo7", -0.4), 0.5, 30);
+    K.draw(tl, "#sc-halo", c("vo7", 0.4), 1.6);
+    const o = { a: 0 }, t0 = c("vo7", 0.6), dur = c.dur - t0;
+    tl.fromTo(o, { a: 0 }, { a: 2 * Math.PI * 2.5, duration: dur, ease: "none", onUpdate: () => { const s = document.querySelector("#sc-sat"); s.setAttribute("cx", hx(o.a)); s.setAttribute("cy", hy(o.a)); } }, t0);
+    // a burn at the same point of each lap
+    [0.85, 1.85].forEach((lap) => { const t = t0 + dur * lap / 2.5; const a = 2 * Math.PI * lap;
+      tl.set("#sc-burn", { attr: { cx: hx(a), cy: hy(a) } }, t);
+      tl.fromTo("#sc-burn", { opacity: 1, attr: { r: 8 } }, { opacity: 0, attr: { r: 46 }, duration: 0.8, ease: "power2.out" }, t);
+      tl.fromTo("#sc-bt", { opacity: 1 }, { opacity: 0, duration: 1.4, ease: "power1.in" }, t); });
+    K.exit(tl, "#sc-stage", "fade", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

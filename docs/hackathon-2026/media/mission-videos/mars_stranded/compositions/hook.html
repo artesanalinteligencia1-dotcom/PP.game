@@ -1,0 +1,45 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage" style="background:radial-gradient(ellipse at 70% 120%, #4a1d0e 0%, #1a0b06 45%, #050302 80%)">
+      <svg id="hk-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <ellipse cx="1300" cy="1500" rx="1300" ry="640" fill="#9c4526"/>
+        <ellipse cx="1300" cy="1500" rx="1300" ry="640" fill="none" stroke="#e8875a" stroke-width="30" opacity=".25"/>
+        <g id="hk-cap">
+          <path id="hk-plasma" d="M -70 30 Q 0 160 70 30 Z" fill="#ffb066" opacity=".85"/>
+          <path d="M -60 20 L 60 20 L 30 -40 L -30 -40 Z" fill="#d9cfb8"/><path d="M -64 20 Q 0 60 64 20 Z" fill="#5a3a24"/>
+        </g>
+      </svg>
+      <div class="k-kicker" id="hk-k" style="left:120px; top:110px">STRANDED · THE REAL STORY</div>
+      <div class="k-title" id="hk-t" style="left:120px; top:160px; font-size:96px; width:900px">SEVEN MINUTES<br>ON YOUR OWN</div>
+      <div class="k-panel" id="hk-clock" style="left:120px; top:450px; width:420px; height:170px; border-color:#e0457b">
+        <div class="k-head" style="color:#e0457b">ENTRY → TOUCHDOWN</div>
+        <div class="k-num" id="hk-c" style="left:24px; top:66px; font-size:92px">7:00</div>
+      </div>
+      <div class="k-panel" id="hk-sig" style="left:120px; top:660px; width:760px; height:200px">
+        <div class="k-head">ONE-WAY RADIO DELAY · EARTH ↔ MARS</div>
+        <svg viewBox="0 0 760 150" style="position:absolute; left:0; top:50px; width:760px; height:150px">
+          <circle cx="60" cy="60" r="22" fill="#2a6fb4"/><text x="34" y="120" style="fill:#7fb7ff; font-size:28px">EARTH</text>
+          <circle cx="700" cy="60" r="16" fill="#c1532c"/><text x="660" y="120" style="fill:#e8875a; font-size:28px">MARS</text>
+          <line x1="90" y1="60" x2="680" y2="60" stroke="#3a3f47" stroke-width="2" stroke-dasharray="6 8"/>
+          <circle id="hk-pulse" cx="680" cy="60" r="9" fill="#36d1ff"/>
+          <text x="280" y="40" style="fill:#e8e0cc; font-size:30px">≈ 3 TO 22 MINUTES</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    K.stars("#hk-stars", 150, 21, 1920, 700);
+    // the capsule falls through the air in a glow of plasma
+    tl.fromTo("#hk-cap", { x: 1640, y: 120, rotation: 36, scale: 0.6 }, { x: 1180, y: 760, rotation: 36, scale: 1.25, duration: c.dur + 0.5, ease: "power1.in" }, 0);
+    tl.fromTo("#hk-plasma", { opacity: 0.4, scaleY: 0.6, transformOrigin: "50% 0%" }, { opacity: 0.95, scaleY: 1.3, duration: 0.18, yoyo: true, repeat: 60, ease: "sine.inOut" }, 0.2);
+    K.fade(tl, "#hk-k", 0.2, 0.5, 0); K.blurIn(tl, "#hk-t", 0.35, 0.9);
+    K.fade(tl, "#hk-clock", c("vo1", 0.6), 0.5, 0, -30);
+    K.count(tl, "#hk-c", 420, 0, c("vo1", 0.8), c.dur - c("vo1", 0.8), (v) => { const s = Math.max(0, Math.round(v)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); });
+    K.fade(tl, "#hk-sig", c("vo2", 0.2), 0.5, 0, -30);
+    tl.fromTo("#hk-pulse", { attr: { cx: 680 } }, { attr: { cx: 90 }, duration: c.dur - c("vo2", 0.6), ease: "none" }, c("vo2", 0.6));
+    K.exit(tl, "#hk-stage", "whip", c.dur);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

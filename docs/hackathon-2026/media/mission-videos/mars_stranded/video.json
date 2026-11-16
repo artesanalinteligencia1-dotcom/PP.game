@@ -1,0 +1,47 @@
+{
+  "id": "mars_stranded",
+  "title": "Stranded — the real story: seven minutes to land, one orbiter to talk",
+  "music": "lagrange-b.mp3",
+  "musicStart": 50,
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "alert.mp3", "scene": "hook", "cue": "vo1", "off": 0.4, "dur": 1.2, "vol": 0.18 },
+    { "src": "fairing.mp3", "scene": "science", "cue": "vo6", "off": 2.0, "dur": 2, "vol": 0.25 },
+    { "src": "success.mp3", "scene": "compare", "cue": "vo9", "off": 0.2, "dur": 4, "vol": 0.28 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 2.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Landing on Mars takes about seven minutes, and nobody on Earth can help.", "es": "Aterrizar en Marte toma unos siete minutos, y nadie en la Tierra puede ayudar." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "Radio needs several minutes to cross the gap. By the time the first signal arrives, it's already over.", "es": "La radio tarda varios minutos en cruzar la distancia. Cuando llega la primera señal, ya todo terminó." }
+    ] },
+    { "id": "history", "lead": 0.8, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "In 1997, Mars Pathfinder bounced to a stop inside giant airbags.", "tts": "In nineteen ninety-seven, Mars Pathfinder bounced to a stop inside giant airbags.", "es": "En 1997, el Mars Pathfinder rebotó hasta detenerse dentro de enormes bolsas de aire." },
+      { "id": "vo4", "v": "nar", "gap": 0.5, "en": "In 2012, Curiosity was lowered on cables by a hovering rocket stage: the sky crane.", "tts": "In twenty twelve, Curiosity was lowered on cables by a hovering rocket stage: the sky crane.", "es": "En 2012, el Curiosity bajó colgado de cables desde una etapa cohete suspendida en el aire: la grúa celeste." },
+      { "id": "vo5", "v": "nar", "gap": 0.5, "en": "In 2021, Perseverance did it again, and photographed itself on the way down.", "tts": "In twenty twenty-one, Perseverance did it again, and photographed itself on the way down.", "es": "En 2021, el Perseverance lo repitió, y se fotografió a sí mismo durante el descenso." }
+    ] },
+    { "id": "science", "lead": 0.9, "tail": 1.6, "lines": [
+      { "id": "vo6", "v": "nar", "en": "Heat shield, parachute, rockets: each step slows it down, all on its own.", "es": "Escudo térmico, paracaídas, cohetes: cada paso lo frena, todo por sí solo." },
+      { "id": "vo7", "v": "nar", "gap": 0.6, "en": "Afterwards, most data from the surface reaches Earth through orbiters passing overhead, acting as relays.", "es": "Después, la mayoría de los datos de la superficie llega a la Tierra a través de orbitadores que pasan por encima y hacen de relevo." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "Perseverance, 18 February 2021",
+      "photo": { "src": "pieces.jpg", "credit": "Image: NASA/JPL-Caltech/UArizona · HiRISE", "pos": "45% 50%" },
+      "rows": [
+        { "label": "ENTRY SPEED", "value": "≈ 20,000 km/h", "note": "top of the atmosphere", "frac": 1.0, "color": "#e0457b" },
+        { "label": "PARACHUTE", "value": "21.5 m wide", "note": "opened near 1,500 km/h", "frac": 0.5, "color": "#d9b46a" },
+        { "label": "TOUCHDOWN", "value": "≈ 2.7 km/h", "note": "slower than walking", "frac": 0.04, "color": "#7fd17a" }
+      ],
+      "yours": ["LANDING ERROR", "RELAY PASSES", "SUPPLIES DELIVERED"],
+      "lines": [
+        { "id": "vo8", "v": "nar", "en": "Perseverance hit the air at about 20,000 kilometres per hour, and touched down slower than a walk.", "tts": "Perseverance hit the air at about twenty thousand kilometres per hour, and touched down slower than a walk.", "es": "El Perseverance entró en el aire a unos 20 000 kilómetros por hora y se posó más despacio que una caminata." },
+        { "id": "vo9", "v": "nar", "gap": 0.6, "en": "Now compare your design. In the game, your orbiter carries the call for help.", "es": "Ahora compara tu diseño. En el juego, tu orbitador lleva la llamada de auxilio." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "chi", "lead": 1.0, "tail": 7.5,
+      "quote": "Nobody gets left behind. Not on Mars, not anywhere.",
+      "learn": "NASA/JPL: Mars Pathfinder (1997) · NASA/JPL: Curiosity's sky crane landing (2012) · NASA/JPL: Perseverance entry, descent and landing (2021) · NASA: Mars Relay Network",
+      "images": "Real images: NASA/JPL-Caltech and University of Arizona, public domain",
+      "lines": [
+        { "id": "chi", "v": "chi", "cap": false, "en": "Nobody gets left behind. Not on Mars, not anywhere.", "es": "Nadie se queda atrás. Ni en Marte, ni en ningún lado." }
+      ] }
+  ]
+}

@@ -1,0 +1,38 @@
+<template>
+  <div id="root" data-composition-id="seat" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="se-stage" class="k-stage">
+      <div id="se-shot" style="position:absolute; inset:0; overflow:hidden">
+        <img id="se-img" src="assets/prologue-06.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <div class="k-vig"></div>
+        <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+        <div class="k-panel" id="se-term" style="left:110px; top:110px; width:760px; height:150px; border-color:#d9b46a">
+          <div class="k-head">KUNTUR · ROBOT GUIDE</div>
+          <div class="k-abs" id="se-text" style="left:24px; top:70px; font-size:48px; font-weight:600; white-space:nowrap; color:#e8e0cc">› YOUR SEAT IS READY. LET'S FLY.<span id="se-cur" style="color:#f08a3c">▌</span></div>
+        </div>
+      </div>
+      <div id="se-title" style="position:absolute; inset:0; background:#0b0d10; opacity:0; z-index:6">
+        <div class="k-grid"></div>
+        <div class="k-abs" id="se-logo" style="left:0; width:1920px; top:340px; text-align:center; font-size:180px; font-weight:600; letter-spacing:.18em; color:#e8e0cc">PAUL<span style="color:#f08a3c">Ǝ</span>T</div>
+        <div class="k-abs" id="se-sub" style="left:0; width:1920px; top:560px; text-align:center; font-size:52px; letter-spacing:.3em; color:#d9b46a; font-weight:600">ANDES TO ORBIT</div>
+        <div class="k-abs" id="se-cred" style="left:0; width:1920px; top:880px; text-align:center; font-size:28px; letter-spacing:.06em; color:#8a8f98">Illustrations and video clips: AI-generated (Google Gemini, Veo) · Real images: public domain · Voice: AI (Kokoro, run locally) · Music: ACE-Step 1.5 (local)</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("seat");
+    K.enter(tl, "#se-stage", "fade", { dur: 0.8 });
+    K.kb(tl, "#se-img", 0, c.dur, { s: 1.05, x: 40 }, { s: 1.2, x: -60, y: -20 });
+    K.fade(tl, "#se-term", 0.6, 0.5, 0, -30);
+    // Kuntur types its line, console style
+    tl.fromTo("#se-text", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.9, ease: "steps(31)" }, c("kun", 0));
+    for (let k = 0; k < 14; k++) { tl.set("#se-cur", { opacity: 0 }, 0.3 + k * 0.5); tl.set("#se-cur", { opacity: 1 }, 0.55 + k * 0.5); }
+    // title card
+    const tt = c.end("kun", 0.6);
+    tl.to("#se-title", { opacity: 1, duration: 0.9, ease: "power2.inOut" }, tt);
+    tl.fromTo("#se-logo", { opacity: 0, scale: 1.12, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.4, ease: "power3.out" }, tt + 0.4);
+    K.fade(tl, "#se-sub", tt + 1.2, 0.7);
+    K.fade(tl, "#se-cred", tt + 1.8, 0.7, 0);
+    tl.to("#se-stage", { opacity: 0, duration: 0.8, ease: "power2.in" }, c.dur - 0.85);
+    window.__timelines["seat"] = tl;
+  </script>
+</template>

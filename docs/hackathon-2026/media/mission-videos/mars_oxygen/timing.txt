@@ -1,0 +1,20 @@
+mars_oxygen  total 80.8s
+
+[hook] start 0.0  dur 12.93
+   vo1      1.20 ->   7.57   Martian air is about 95% carbon dioxide, and far too thin to breathe.
+   vo2      8.07 ->  10.53   Could we make our own oxygen there?
+
+[history] start 12.93  dur 21.1
+   vo3      0.80 ->   8.79   In 2021, a box the size of a car battery rode to Mars inside the Perseverance ro
+   vo4      9.29 ->  19.70   Between 2021 and 2023 it ran 16 times and made 122 grams of oxygen, up to 12 gra
+
+[science] start 34.03  dur 17.07
+   vo5      0.90 ->  10.29   Inside, a compressor squeezes the thin air, and a ceramic cell heated to 800 deg
+   vo6     10.79 ->  15.47   Oxygen goes one way. Carbon monoxide goes back to the air.
+
+[compare] start 51.1  dur 16.61
+   vo7      0.80 ->   8.71   A person breathes under a kilogram of oxygen a day. A rocket leaving Mars needs 
+   vo8      9.31 ->  15.41   Now compare your plant. Every kilogram made there is a kilogram you don't carry 
+
+[ending] start 67.71  dur 13.09
+   fra      1.00 ->   5.59   We used to ask if Mars could hold life. Now we ask if it can help us live.

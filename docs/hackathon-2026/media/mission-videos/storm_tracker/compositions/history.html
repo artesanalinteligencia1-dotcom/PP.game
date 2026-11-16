@@ -1,0 +1,67 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <!-- A: 1960 -->
+      <div id="hi-a" style="position:absolute; inset:0">
+        <div class="k-kicker" id="hi-kicker" style="left:140px; top:70px">1 APRIL 1960 · THE FIRST WEATHER SATELLITE</div>
+        <div class="k-photo" id="hi-p1" style="left:140px; top:140px; width:560px; height:690px">
+          <img id="hi-i1" src="assets/tiros-sat.jpg" alt="" style="object-position:50% 20%">
+          <div class="k-credit">Image: NASA · TIROS-1, 1960</div>
+        </div>
+        <div class="k-photo" id="hi-p2" style="left:780px; top:140px; width:560px; height:620px; border-color:#f08a3c">
+          <img id="hi-i2" src="assets/tiros-first.jpg" alt="">
+          <div id="hi-scan" style="position:absolute; left:0; top:0; width:100%; height:5px; background:#f08a3c; box-shadow:0 0 22px 6px rgba(240,138,60,.8); z-index:2; opacity:0"></div>
+          <div class="k-credit">Image: NASA · first photo</div>
+        </div>
+        <div class="k-year" id="hi-year" style="left:1400px; top:140px; font-size:190px">1960</div>
+        <div class="k-label cream" id="hi-s1" style="left:1406px; top:340px">122 KG · TWO TV CAMERAS</div>
+        <div class="k-label cream" id="hi-s2" style="left:1406px; top:384px">78 DAYS OF OPERATION</div>
+        <div class="k-label gold" id="hi-s3" style="left:1406px; top:428px; font-weight:600">23,000 CLOUD PICTURES</div>
+      </div>
+      <!-- B: today -->
+      <div id="hi-b" style="position:absolute; inset:0; overflow:hidden">
+        <img id="hi-irma" src="assets/irma.jpg" alt="" style="position:absolute; left:0; top:-4px; width:1920px; height:1088px">
+        <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(11,13,16,.85) 0%, rgba(11,13,16,.4) 36%, rgba(11,13,16,0) 60%)"></div>
+        <div class="k-credit" style="left:140px; top:96px; bottom:auto">Image: NOAA / NASA · GOES-16 · Hurricane Irma, 2017</div>
+        <div class="k-kicker" id="hi-bk" style="left:140px; top:230px">TODAY · GEOSTATIONARY ORBIT</div>
+        <div class="k-h2" id="hi-bt" style="left:140px; top:280px; width:760px; font-size:92px; text-transform:uppercase">Always over<br>the same spot</div>
+        <div class="k-abs" id="hi-clock" style="left:140px; top:520px; width:700px">
+          <div class="k-label gold" style="left:0; top:0">NEW IMAGE OF THE STORM</div>
+          <div class="k-num" id="hi-min" style="left:0; top:44px; font-size:120px">00:00</div>
+          <div class="k-label cream" id="hi-fr" style="left:0; top:180px">FRAME 1</div>
+        </div>
+        <svg class="k-svg" viewBox="0 0 1920 1080"><circle id="hi-ring" cx="1318" cy="560" r="60" fill="none" stroke="#f08a3c" stroke-width="4"/></svg>
+        <div class="k-chip" id="hi-eye" style="left:1392px; top:536px; border-color:#f08a3c; color:#f08a3c; background:rgba(11,13,16,.85)">THE EYE</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    K.enter(tl, "#hi-stage", "iris", { x: 1180, y: 540 });
+    K.fade(tl, "#hi-kicker", 0.25); K.photo(tl, "#hi-p1", 0.2); K.kb(tl, "#hi-i1", 0.2, c("vo3"), { s: 1.22, y: 40 }, { s: 1.02, y: 0 });
+    K.blurIn(tl, "#hi-year", c("vo2", 2.6), 0.7);
+    // "sent its first cloud pictures": the picture arrives line by line, like the TV scan it was
+    const p0 = c("vo2", 1.4), pd = 2.6;
+    K.fade(tl, "#hi-p2", p0 - 0.3, 0.4, 0);
+    tl.fromTo("#hi-i2", { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: pd, ease: "none" }, p0);
+    tl.fromTo("#hi-scan", { y: 0, opacity: 1 }, { y: 620, duration: pd, ease: "none", immediateRender: false }, p0); tl.to("#hi-scan", { opacity: 0, duration: 0.2 }, p0 + pd);
+    tl.fromTo(["#hi-s1", "#hi-s2", "#hi-s3"], { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.4, ease: "power3.out" }, c("vo2", 3.2));
+    // match cut: the grainy 1960 picture becomes today's view
+    const sw = c("vo3", -0.5);
+    tl.fromTo("#hi-b", { clipPath: "inset(0 0 0 100%)" }, { clipPath: "inset(0 0 0 0%)", duration: 0.7, ease: "power3.inOut" }, sw);
+    tl.to("#hi-a", { x: -240, duration: 0.7, ease: "power3.inOut" }, sw);
+    tl.fromTo("#hi-irma", { scale: 1.3, x: -120, transformOrigin: "68% 52%" }, { scale: 1.06, x: 0, duration: c.dur - sw + 0.5, ease: "sine.out" }, sw);
+    K.fade(tl, "#hi-bk", sw + 0.6); K.blurIn(tl, "#hi-bt", sw + 0.8, 0.8);
+    tl.fromTo("#hi-ring", { opacity: 0, scale: 2.4, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" }, c("vo3", 2.2)); K.fade(tl, "#hi-eye", c("vo3", 2.6), 0.4, 0, -20);
+    // "minute by minute"
+    K.fade(tl, "#hi-clock", c("vo3b", -0.2), 0.5);
+    const min = document.querySelector("#hi-min"), fr = document.querySelector("#hi-fr"); const o = { m: 0 };
+    Object.defineProperty(o, "q", { get() { return this.m; }, set(v) { this.m = v; const s = Math.floor(v) * 30; min.textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); fr.textContent = "FRAME " + (Math.floor(v) + 1) + " · EVERY 30 SECONDS"; } });
+    o.q = 0;
+    tl.fromTo(o, { q: 0 }, { q: 9, duration: c.dur - c("vo3b") - 0.3, ease: "none" }, c("vo3b", 0.2));
+    tl.fromTo("#hi-ring", { strokeWidth: 4 }, { strokeWidth: 10, duration: 0.17, yoyo: true, repeat: 15, ease: "sine.inOut" }, c("vo3b", 0.2));
+    K.exit(tl, "#hi-stage", "zoom", c.dur, { x: 1318, y: 560 });
+    window.__timelines["history"] = tl;
+  </script>
+</template>

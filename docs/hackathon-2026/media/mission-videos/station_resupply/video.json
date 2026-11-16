@@ -1,0 +1,46 @@
+{
+  "id": "station_resupply",
+  "title": "Station Resupply — the real story: groceries to orbit",
+  "music": "blueprints-b.mp3",
+  "musicVol": 0.2,
+  "earth": false,
+  "sfx": [
+    { "src": "liftoff.mp3", "scene": "history", "cue": "vo4", "off": 0.0, "dur": 3.4, "vol": 0.3, "fade": 1.2 },
+    { "src": "staging.mp3", "scene": "science", "cue": "vo5", "off": 3.4, "dur": 1.4, "vol": 0.35 },
+    { "src": "success.mp3", "scene": "science", "cue": "vo6", "off": 4.3, "dur": 1.9, "vol": 0.3 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.6, "tail": 2.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "A station with people on board needs food, water, air and spare parts, all the time.", "es": "Una estación con gente a bordo necesita comida, agua, aire y repuestos, todo el tiempo." }
+    ] },
+    { "id": "history", "lead": 1.0, "tail": 2.2, "lines": [
+      { "id": "vo2", "v": "nar", "en": "People have lived aboard the International Space Station without a break since November 2000.", "tts": "People have lived aboard the International Space Station without a break since November, two thousand.", "es": "Hay personas viviendo en la Estación Espacial Internacional sin interrupción desde noviembre de 2000." },
+      { "id": "vo3", "v": "nar", "gap": 0.6, "en": "Since 2012, private companies carry much of its cargo,", "tts": "Since twenty twelve, private companies carry much of its cargo,", "es": "Desde 2012, empresas privadas llevan gran parte de su carga," },
+      { "id": "vo4", "v": "nar", "gap": 0.4, "en": "and some boosters now fly back and land.", "es": "y algunos propulsores ahora regresan y aterrizan." }
+    ] },
+    { "id": "science", "lead": 1.0, "tail": 1.8, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Even up there, a trace of air drags the station down, so it must be pushed back up.", "es": "Incluso allá arriba, un rastro de aire frena la estación, así que hay que volver a empujarla." },
+      { "id": "vo6", "v": "nar", "gap": 1.3, "en": "To meet it, cargo ships start lower and faster, then catch up.", "es": "Para alcanzarla, las naves de carga parten más abajo y más rápido, y luego la alcanzan." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "The International Space Station",
+      "photo": { "src": "iss.jpg", "credit": "Image: NASA", "pos": "50% 50%" },
+      "rows": [
+        { "label": "MASS", "value": "420 tonnes", "note": "the size of a football field", "frac": 0.84 },
+        { "label": "SPEED", "value": "28,000 km/h", "note": "about 400 km up", "frac": 0.7, "color": "#d9b46a" },
+        { "label": "ORBITS A DAY", "value": "16", "note": "one every 90 minutes", "frac": 0.5, "color": "#36d1ff" }
+      ],
+      "yours": ["CARGO DELIVERED", "COST PER KILOGRAM", "BOOSTER REUSED"],
+      "lines": [
+        { "id": "vo7", "v": "nar", "en": "The station weighs about 420 tonnes and circles Earth 16 times a day.", "tts": "The station weighs about four hundred and twenty tonnes, and circles Earth sixteen times a day.", "es": "La estación pesa unas 420 toneladas y da 16 vueltas a la Tierra cada día." },
+        { "id": "vo8", "v": "nar", "gap": 0.6, "en": "Now check your delivery. Cheaper launches mean more science per dollar.", "es": "Ahora revisa tu entrega. Lanzamientos más baratos significan más ciencia por cada dólar." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "chi", "lead": 1.0, "tail": 7.5,
+      "quote": "Reusing a rocket is like reusing a truck. Nobody throws away a truck after one trip.",
+      "learn": "NASA: International Space Station Facts and Figures · NASA: Commercial Resupply Services · NASA: 20+ years of continuous human presence aboard the station",
+      "images": "Real images: NASA, public domain",
+      "lines": [
+        { "id": "chi", "v": "chi", "cap": false, "en": "Reusing a rocket is like reusing a truck. Nobody throws away a truck after one trip.", "es": "Reutilizar un cohete es como reutilizar un camión. Nadie tira un camión después de un solo viaje." }
+      ] }
+  ]
+}

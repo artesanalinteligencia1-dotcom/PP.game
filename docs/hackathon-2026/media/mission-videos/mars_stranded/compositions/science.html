@@ -1,0 +1,48 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="sc-k" style="left:120px; top:92px">ENTRY, DESCENT AND LANDING · PERSEVERANCE, 2021</div>
+      <div class="k-abs" id="sc-axis" style="left:180px; top:170px; width:4px; height:700px; background:#3a3f47"></div>
+      <div class="k-abs" id="sc-fill" style="left:180px; top:170px; width:4px; height:700px; background:#f08a3c; transform-origin:50% 0%"></div>
+      <div class="k-abs sc-s" id="sc-s1" style="left:150px; top:150px; width:900px; height:80px"><div class="k-abs" style="left:18px; top:12px; width:28px; height:28px; border-radius:50%; background:#ff9a50"></div><div class="k-label cream" style="left:80px; top:0; font-weight:600">TOP OF THE ATMOSPHERE · ≈ 125 KM</div><div class="k-label" style="left:80px; top:40px">≈ 20,000 KM/H · THE HEAT SHIELD TAKES THE FIRE</div></div>
+      <div class="k-abs sc-s" id="sc-s2" style="left:150px; top:330px; width:900px; height:80px"><div class="k-abs" style="left:18px; top:12px; width:28px; height:28px; border-radius:50%; background:#d9b46a"></div><div class="k-label cream" style="left:80px; top:0; font-weight:600">PARACHUTE · ≈ 11 KM UP</div><div class="k-label" style="left:80px; top:40px">OPENS NEAR 1,500 KM/H · 21.5 M WIDE</div></div>
+      <div class="k-abs sc-s" id="sc-s3" style="left:150px; top:510px; width:900px; height:80px"><div class="k-abs" style="left:18px; top:12px; width:28px; height:28px; border-radius:50%; background:#f08a3c"></div><div class="k-label cream" style="left:80px; top:0; font-weight:600">ROCKETS · ≈ 2 KM UP</div><div class="k-label" style="left:80px; top:40px">THE DESCENT STAGE FLIES FREE AND STEERS</div></div>
+      <div class="k-abs sc-s" id="sc-s4" style="left:150px; top:690px; width:900px; height:80px"><div class="k-abs" style="left:18px; top:12px; width:28px; height:28px; border-radius:50%; background:#7fd17a"></div><div class="k-label cream" style="left:80px; top:0; font-weight:600">SKY CRANE · ≈ 20 M UP</div><div class="k-label" style="left:80px; top:40px">THE ROVER IS LOWERED · TOUCHDOWN ≈ 2.7 KM/H</div></div>
+      <div class="k-panel" id="sc-rel" style="left:1120px; top:170px; width:680px; height:700px">
+        <div class="k-head">AFTER LANDING · ORBITERS AS RELAYS</div>
+        <svg viewBox="0 0 680 650" style="position:absolute; left:0; top:50px; width:680px; height:650px">
+          <circle cx="340" cy="430" r="190" fill="#9c4526"/>
+          <path d="M 120 430 A 220 220 0 0 1 560 430" fill="none" stroke="#36d1ff" stroke-width="2" stroke-dasharray="6 8"/>
+          <circle id="sc-orb" r="12" fill="#e8e0cc"/>
+          <circle cx="340" cy="244" r="9" fill="#7fd17a"/><text x="356" y="236" style="fill:#7fd17a; font-size:28px">ROVER</text>
+          <line id="sc-up" x1="340" y1="244" x2="340" y2="244" stroke="#7fd17a" stroke-width="4"/>
+          <line id="sc-earth" x1="340" y1="210" x2="620" y2="40" stroke="#36d1ff" stroke-width="4" stroke-dasharray="10 8" opacity="0"/>
+          <text x="470" y="40" style="fill:#7fb7ff; font-size:28px">TO EARTH</text>
+          <text x="20" y="630" style="fill:#8a8f98; font-size:28px">NOT TO SCALE</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.enter(tl, "#sc-stage", "wipe");
+    K.fade(tl, "#sc-k", 0.4, 0.5, 0);
+    tl.fromTo("#sc-fill", { scaleY: 0 }, { scaleY: 1, duration: c.end("vo6") - c("vo6", 0), ease: "none" }, c("vo6", 0));
+    ["#sc-s1", "#sc-s2", "#sc-s3", "#sc-s4"].forEach((s, i) => tl.fromTo(s, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, c("vo6", 0.1 + i * 1.25)));
+    // relay: the orbiter passes overhead, the rover uploads, the orbiter sends it home
+    K.fade(tl, "#sc-rel", c("vo7", -0.3), 0.5, 30);
+    const o = { a: Math.PI }; const t0 = c("vo7", 0.2), d = c.dur - t0;
+    tl.fromTo(o, { a: Math.PI * 1.05 }, { a: Math.PI * 1.95, duration: d, ease: "none", onUpdate: () => { const e = document.querySelector("#sc-orb"); e.setAttribute("cx", 340 + 220 * Math.cos(o.a)); e.setAttribute("cy", 430 + 220 * Math.sin(o.a)); } }, t0);
+    const at = (t) => { const a = Math.PI * 1.05 + Math.PI * 0.9 * (t - t0) / d; return [340 + 220 * Math.cos(a), 430 + 220 * Math.sin(a)]; };
+    const tu = t0 + d * 0.45, te = tu + 1.6, pu = at(tu + 0.4), pe = at(te);
+    tl.fromTo("#sc-up", { attr: { x2: 340, y2: 244 } }, { attr: { x2: pu[0], y2: pu[1] }, duration: 0.4 }, tu);
+    tl.to("#sc-up", { opacity: 0.3, duration: 0.3, yoyo: true, repeat: 3 }, tu + 0.4);
+    tl.set("#sc-up", { opacity: 0 }, te - 0.1);
+    tl.set("#sc-earth", { attr: { x1: pe[0], y1: pe[1] } }, te);
+    tl.to("#sc-earth", { opacity: 1, duration: 0.3 }, te);
+    K.draw(tl, "#sc-earth", te, 0.8);
+    K.exit(tl, "#sc-stage", "fade", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

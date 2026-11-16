@@ -1,0 +1,50 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="hk-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <canvas id="hk-globe" width="1920" height="1080" style="position:absolute; left:0; top:0; width:1920px; height:1080px"></canvas>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <circle id="hk-ring" cx="960" cy="540" r="46" fill="none" stroke="#f08a3c" stroke-width="4" opacity="0"/>
+        <circle id="hk-ring2" cx="960" cy="540" r="46" fill="none" stroke="#f08a3c" stroke-width="3" opacity="0"/>
+        <path id="hk-lead" d="M 1002 512 L 1120 400 L 1240 400" fill="none" stroke="#f08a3c" stroke-width="3"/>
+      </svg>
+      <div class="k-chip" id="hk-chip" style="left:1240px; top:374px; border-color:#f08a3c; color:#f08a3c">CORDILLERA BLANCA · PERU</div>
+      <div class="k-abs" id="hk-stat" style="left:1240px; top:440px; width:600px">
+        <div class="k-num" id="hk-pct" style="left:0; top:0; font-size:150px; color:#e8e0cc">0%</div>
+        <div class="k-label cream" style="left:0; top:156px">OF THE WORLD’S TROPICAL GLACIERS</div>
+      </div>
+      <!-- match cut: the marker ring opens onto the real place -->
+      <div id="hk-real" style="position:absolute; inset:0; overflow:hidden">
+        <img id="hk-img" src="assets/cordillera-blanca.jpg" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1272px">
+        <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(11,13,16,.82) 0%, rgba(11,13,16,.45) 38%, rgba(11,13,16,0) 62%)"></div>
+        <div class="k-credit" id="hk-credit" style="left:140px; top:96px; bottom:auto">Image: NASA · Cordillera Blanca, Peru, seen from the Space Station</div>
+        <div class="k-kicker" id="hk-kicker" style="left:140px; top:330px">ANDEAN EYE · THE REAL STORY</div>
+        <div class="k-title" id="hk-title" style="left:140px; top:382px; width:1000px; font-size:104px">The glaciers<br>of the Andes<br>are telling us<br>something</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    K.stars("#hk-stars", 140, 23);
+    const g = K.globe("#hk-globe", { dist: 6, camLat: 18, camLon: -30, sunLat: -6, sunLon: -58, rot: 0 });
+    const mk = g.marker(-9.4, -77.4, { color: "#f08a3c", size: 0.012, scale: 0 });
+    // push in on Peru; the marker ends at the centre of the frame
+    tl.fromTo(g, { dist: 6, camLat: 18, camLon: -30 }, { dist: 2.35, camLat: -9.4, camLon: -77.4, duration: c("vo1") + 3.2, ease: "power2.inOut" }, 0.1);
+    tl.fromTo("#hk-stars", { opacity: 0 }, { opacity: 1, duration: 1.5 }, 0);
+    const hit = c("vo1") + 2.6;
+    tl.fromTo(mk, { scale: 0 }, { scale: 1, duration: 0.5, ease: "back.out(2)" }, hit - 0.4);
+    tl.fromTo("#hk-ring", { scale: 3, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out", immediateRender: false }, hit);
+    tl.fromTo("#hk-ring2", { scale: 1, opacity: 0.9, transformOrigin: "50% 50%" }, { scale: 2.6, opacity: 0, duration: 1.1, ease: "power2.out", repeat: 1, immediateRender: false }, hit + 0.5);
+    K.draw(tl, "#hk-lead", hit + 0.2, 0.5); K.fade(tl, "#hk-chip", hit + 0.6, 0.4, 0, -20);
+    K.fade(tl, "#hk-stat", c("vo1", 1.2), 0.5, 0, 40); K.count(tl, "#hk-pct", 0, 70, c("vo1", 1.2), 1.6, (v) => "~" + Math.round(v) + "%");
+    // iris from the ring to the real photograph, then fly south along the range
+    const cut = c("vo2", -0.6);
+    tl.fromTo("#hk-real", { clipPath: "circle(0px at 960px 540px)" }, { clipPath: "circle(1150px at 960px 540px)", duration: 0.9, ease: "power3.inOut" }, cut);
+    tl.to(g, { dist: 1.7, duration: 0.9, ease: "power3.in" }, cut - 0.2);
+    tl.fromTo("#hk-img", { scale: 1.32, x: 150, y: -40, transformOrigin: "50% 50%" }, { scale: 1.12, x: -90, y: -120, duration: c.dur - cut + 0.6, ease: "sine.out" }, cut);
+    K.fade(tl, "#hk-credit", cut + 0.8, 0.5, 0); K.fade(tl, "#hk-kicker", cut + 0.9, 0.6); K.blurIn(tl, "#hk-title", cut + 1.1, 0.9);
+    K.exit(tl, "#hk-stage", "dim", c.dur);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

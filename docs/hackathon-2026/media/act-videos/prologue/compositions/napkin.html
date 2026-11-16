@@ -1,0 +1,32 @@
+<template>
+  <div id="root" data-composition-id="napkin" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="na-stage" class="k-stage">
+      <div id="na-cam" style="position:absolute; inset:0">
+        <img id="na-img" src="assets/prologue-04.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+        <svg class="k-svg" viewBox="0 0 1920 1080">
+          <ellipse id="na-ring" cx="1128" cy="538" rx="128" ry="62" fill="none" stroke="#f08a3c" stroke-width="7" stroke-linecap="round" transform="rotate(-6 1128 538)"/>
+          <path id="na-ul" d="M 1010 615 C 1080 628, 1170 626, 1250 606" fill="none" stroke="#f08a3c" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="k-vig"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-panel" id="na-card" style="left:110px; top:110px; width:560px; height:150px; border-color:#d9b46a">
+        <div class="k-photo" style="left:14px; top:14px; width:110px; height:122px; box-shadow:none"><img src="assets/kit/portraits/goicochea.jpg" alt="" style="object-position:50% 18%"></div>
+        <div class="k-label gold" style="left:146px; top:26px; font-weight:600">DR. PEDRO GOICOCHEA</div>
+        <div class="k-label" style="left:146px; top:66px">PHYSICIST · AREQUIPA</div>
+        <div class="k-label" style="left:146px; top:102px; font-size:28px">AI-GENERATED PORTRAIT</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("napkin");
+    K.enter(tl, "#na-stage", "fade", { dur: 0.6 });
+    tl.fromTo("#na-cam", { scale: 1.0, transformOrigin: "1128px 538px" }, { scale: 1.35, duration: c.dur + 0.5, ease: "power1.inOut" }, 0);
+    K.fade(tl, "#na-card", 0.4, 0.6, 0, -40);
+    // he circles the name again while he asks the question
+    K.draw(tl, "#na-ring", c("goi", 0.5), 1.1, "power1.inOut");
+    K.draw(tl, "#na-ul", c("goi", 1.6), 0.6, "power2.out");
+    K.exit(tl, "#na-stage", "zoom", c.dur, { x: 1128, y: 538 });
+    window.__timelines["napkin"] = tl;
+  </script>
+</template>

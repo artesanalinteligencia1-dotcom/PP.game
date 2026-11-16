@@ -1,0 +1,93 @@
+<template>
+  <style>
+    .sc-cloud { position: absolute; height: 64px; border-radius: 40px; background: linear-gradient(180deg, #c9ced6 0%, #8e949d 100%); opacity: .95; }
+  </style>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div id="sc-night" style="position:absolute; inset:0; opacity:0; background:linear-gradient(180deg, #01030a 0%, #050b1c 100%)"></div>
+      <svg id="sc-stars" class="k-svg" viewBox="0 0 1920 1080" style="opacity:0"></svg>
+      <div class="k-kicker" id="sc-k" style="left:140px; top:70px">THREE WAYS TO LOOK AT A MOUNTAIN</div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <path id="sc-ground" d="M 120 800 L 120 770 L 300 640 L 380 690 L 600 540 L 760 660 L 860 610 L 1060 770 L 1060 800 Z" fill="#1b2026" stroke="#8a8f98" stroke-width="3" stroke-linejoin="round"/>
+        <path id="sc-ice" d="M 536 584 L 600 540 L 664 588 L 632 578 L 604 596 L 570 578 Z" fill="#dff6ff" stroke="#7fe6ff" stroke-width="2"/>
+        <path id="sc-ice2" d="M 270 662 L 300 640 L 334 662 L 316 658 L 300 668 L 286 658 Z" fill="#dff6ff" stroke="#7fe6ff" stroke-width="2"/>
+        <g id="sc-sat">
+          <rect x="574" y="128" width="52" height="40" fill="#252a31" stroke="#d9b46a" stroke-width="3"/>
+          <rect x="486" y="138" width="80" height="20" fill="#2a4f8a" stroke="#8fb8f0" stroke-width="2"/>
+          <rect x="634" y="138" width="80" height="20" fill="#2a4f8a" stroke="#8fb8f0" stroke-width="2"/>
+          <path d="M 588 168 L 612 168 L 620 186 L 580 186 Z" fill="#d9b46a"/>
+        </g>
+        <!-- optical: stops at the cloud -->
+        <line id="sc-opt" x1="588" y1="190" x2="500" y2="384" stroke="#f4efe2" stroke-width="5" stroke-linecap="round"/>
+        <g id="sc-x"><line x1="482" y1="366" x2="518" y2="402" stroke="#e0457b" stroke-width="7" stroke-linecap="round"/><line x1="518" y1="366" x2="482" y2="402" stroke="#e0457b" stroke-width="7" stroke-linecap="round"/></g>
+        <!-- thermal: reads surface heat through a clear gap -->
+        <line id="sc-thr" x1="616" y1="190" x2="1000" y2="716" stroke="#f0603c" stroke-width="5" stroke-linecap="round" stroke-dasharray="14 12"/>
+        <circle id="sc-thot" cx="1000" cy="722" r="16" fill="none" stroke="#f0603c" stroke-width="5"/>
+        <!-- radar: pulses go through the cloud and come back -->
+        <line id="sc-rad" x1="600" y1="190" x2="600" y2="538" stroke="#36d1ff" stroke-width="6" stroke-linecap="round" stroke-dasharray="4 26"/>
+        <line id="sc-radb" x1="600" y1="190" x2="600" y2="538" stroke="#36d1ff" stroke-width="2" opacity=".45"/>
+        <circle id="sc-rhit" cx="600" cy="540" r="18" fill="none" stroke="#36d1ff" stroke-width="5"/>
+        <path id="sc-le1" d="M 470 300 L 546 300" stroke="#f4efe2" stroke-width="3" fill="none"/>
+      </svg>
+      <div id="sc-clouds" style="position:absolute; left:0; top:0; width:1920px; height:1080px">
+        <div class="sc-cloud" style="left:150px; top:388px; width:300px"></div>
+        <div class="sc-cloud" style="left:330px; top:360px; width:260px; height:76px"></div>
+        <div class="sc-cloud" style="left:520px; top:392px; width:330px"></div>
+        <div class="sc-cloud" style="left:700px; top:366px; width:190px; height:70px"></div>
+      </div>
+      <div class="k-abs" id="sc-l1" style="left:150px; top:262px; width:330px">
+        <div class="k-label cream" style="left:0; top:0; font-weight:600">OPTICAL</div>
+        <div class="k-label" style="left:0; top:38px; color:#e0457b">BLOCKED BY CLOUD</div>
+      </div>
+      <div class="k-abs" id="sc-l2" style="left:744px; top:250px; width:400px">
+        <div class="k-label cyan" style="left:0; top:0; font-weight:600">RADAR</div>
+        <div class="k-label cream" style="left:0; top:38px">SEES THROUGH CLOUD</div>
+      </div>
+      <div class="k-abs" id="sc-l3" style="left:420px; top:808px; width:760px">
+        <div class="k-label" style="left:0; top:0; font-weight:600; color:#f0603c">THERMAL</div>
+        <div class="k-label cream" style="left:130px; top:0">SURFACE HEAT, WHERE THE SKY IS CLEAR</div>
+      </div>
+      <div class="k-photo" id="sc-photo" style="left:1180px; top:170px; width:600px; height:380px">
+        <img id="sc-img" src="assets/nisar.jpg" alt="" style="object-position:72% 50%">
+        <div class="k-credit">Illustration: NASA/JPL-Caltech</div>
+      </div>
+      <div class="k-abs" id="sc-facts" style="left:1180px; top:580px; width:600px">
+        <div class="k-label gold" style="left:0; top:0; font-weight:600">NISAR · NASA + ISRO · LAUNCHED 2025</div>
+        <div class="k-label cream" id="sc-f1" style="left:0; top:46px">TWO RADARS: L-BAND AND S-BAND</div>
+        <div class="k-label cream" id="sc-f2" style="left:0; top:86px">ICE, LANDSLIDES, GROUND MOTION</div>
+        <div class="k-label cyan" id="sc-f3" style="left:0; top:126px; font-weight:600">WORKS DAY AND NIGHT</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.stars("#sc-stars", 90, 5, 1920, 420);
+    K.enter(tl, "#sc-stage", "whip");
+    K.fade(tl, "#sc-k", 0.4);
+    K.wipe(tl, "#sc-ground", 0.4, 0.9, "right"); K.pop(tl, ["#sc-ice", "#sc-ice2"], 1.0, 0.5);
+    tl.fromTo("#sc-sat", { y: -220, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, 0.6);
+    // "Clouds often hide the mountains"
+    tl.fromTo(".sc-cloud", { x: -700, opacity: 0 }, { x: 0, opacity: 0.95, duration: 1.6, stagger: 0.12, ease: "power2.out" }, c("vo5", 0.0));
+    tl.to("#sc-clouds", { x: 26, duration: c.dur, ease: "none" }, c("vo5", 1.6));
+    // optical → thermal → radar, each as it is named
+    const t1 = c.end("vo5", -2.9), t2 = c.end("vo5", -1.9), t3 = c.end("vo5", -1.0);
+    K.draw(tl, "#sc-opt", t1, 0.45, "power2.in"); K.pop(tl, "#sc-x", t1 + 0.45, 0.3); K.fade(tl, "#sc-l1", t1 + 0.2, 0.4, 0, -20); K.draw(tl, "#sc-le1", t1 + 0.3, 0.3);
+    tl.fromTo("#sc-thr", { opacity: 0 }, { opacity: 1, duration: 0.3 }, t2); tl.fromTo("#sc-thr", { strokeDashoffset: 0 }, { strokeDashoffset: -520, duration: c.dur - t2, ease: "none" }, t2);
+    K.pop(tl, "#sc-thot", t2 + 0.4, 0.3); K.fade(tl, "#sc-l3", t2 + 0.3, 0.4, 0, 20);
+    tl.fromTo(["#sc-rad", "#sc-radb"], { opacity: 0 }, { opacity: 1, duration: 0.3 }, t3);
+    tl.fromTo("#sc-rad", { strokeDashoffset: 0 }, { strokeDashoffset: -900, duration: c.dur - t3 + 0.5, ease: "none" }, t3);
+    K.pop(tl, "#sc-rhit", t3 + 0.4, 0.3); K.fade(tl, "#sc-l2", t3 + 0.3, 0.4, 0, 20);
+    tl.fromTo("#sc-rhit", { scale: 1, opacity: 1, transformOrigin: "50% 50%" }, { scale: 2.2, opacity: 0.15, duration: 0.9, ease: "power2.out", repeat: Math.max(0, Math.floor((c.dur - t3 - 1) / 0.9) - 1) }, t3 + 0.8);
+    // NISAR
+    K.photo(tl, "#sc-photo", c("vo6", 0.1)); K.kb(tl, "#sc-img", c("vo6", 0.1), c.dur - c("vo6"), { s: 1.16, x: 20 }, { s: 1.0, x: 0 });
+    K.fade(tl, "#sc-facts", c("vo6", 0.9), 0.5);
+    tl.fromTo(["#sc-f1", "#sc-f2"], { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4, stagger: 1.4, ease: "power3.out" }, c("vo6", 2.0));
+    // "day and night": the sky goes dark and the radar keeps working
+    tl.to(["#sc-night", "#sc-stars"], { opacity: 0.92, duration: 1.4, ease: "sine.inOut" }, c("vo6b", 0.4));
+    tl.to(["#sc-opt", "#sc-thr", "#sc-thot", "#sc-l1", "#sc-l3", "#sc-x", "#sc-le1"], { opacity: 0.18, duration: 1.2 }, c("vo6b", 0.5));
+    K.pop(tl, "#sc-f3", c("vo6b", 0.9), 0.4);
+    K.exit(tl, "#sc-stage", "rise", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

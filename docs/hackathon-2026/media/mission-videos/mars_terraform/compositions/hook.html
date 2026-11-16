@@ -1,0 +1,26 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage" style="background:#000">
+      <div id="hk-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="hk-img" src="assets/jezero.jpg" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover; object-position:50% 45%">
+        <svg class="k-svg" viewBox="0 0 1920 1080"><path id="hk-river" d="M 0 560 C 150 560, 260 590, 380 570 C 480 560, 600 525, 700 522 C 760 520, 810 515, 850 508" fill="none" stroke="#5fc8ff" stroke-width="10" stroke-linecap="round" opacity=".85"/></svg>
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.72) 0%, transparent 40%)"></div>
+      <div class="k-credit" style="left:auto; right:40px; top:40px; bottom:auto">IMAGE: NASA/JPL/JHUAPL/MSSS/BROWN UNIV. · JEZERO DELTA</div>
+      <div class="k-kicker" id="hk-k" style="left:120px; top:110px">TERRAFORMING · THE REAL STORY</div>
+      <div class="k-title" id="hk-t" style="left:120px; top:160px; font-size:96px; width:820px">GIVE MARS BACK<br>ITS SKY?</div>
+      <div class="k-chip" id="hk-c1" style="left:200px; top:600px; border-color:#5fc8ff; color:#5fc8ff">ANCIENT RIVER</div>
+      <div class="k-chip" id="hk-c2" style="left:1120px; top:430px">DELTA, ≈ 3.5 BILLION YEARS OLD</div>
+      <div class="k-chip" id="hk-c3" style="left:1250px; top:820px; border-color:#7fd17a; color:#7fd17a">GREEN: CLAYS FORMED IN WATER</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    K.kb(tl, "#hk-img", 0, c.dur + 0.5, { s: 1.0 }, { s: 1.14, x: -40, y: -10 });
+    K.fade(tl, "#hk-k", 0.2, 0.5, 0); K.blurIn(tl, "#hk-t", 0.35, 0.9);
+    K.draw(tl, "#hk-river", c("vo1", 3.0), 2.0, "power1.inOut");
+    K.pop(tl, "#hk-c1", c("vo1", 3.6), 0.4); K.pop(tl, "#hk-c2", c("vo1", 5.0), 0.4); K.pop(tl, "#hk-c3", c("vo1", 6.2), 0.4);
+    K.exit(tl, "#hk-stage", "zoom", c.dur, { x: 1300, y: 500 });
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

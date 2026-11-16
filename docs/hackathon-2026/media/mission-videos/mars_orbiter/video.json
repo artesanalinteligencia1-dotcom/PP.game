@@ -1,0 +1,47 @@
+{
+  "id": "mars_orbiter",
+  "title": "Red Horizon — the real story: getting to Mars and staying there",
+  "music": "blueprints-b.mp3",
+  "musicStart": 60,
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "failure.mp3", "scene": "history", "cue": "vo5", "off": 0.2, "dur": 2.5, "vol": 0.22 },
+    { "src": "orbit.mp3", "scene": "science", "cue": "vo6", "off": 0.4, "dur": 2.4, "vol": 0.3 },
+    { "src": "success.mp3", "scene": "compare", "cue": "vo9", "off": 0.2, "dur": 4, "vol": 0.28 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 2.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "July 1965: the first close-up pictures of Mars arrive on Earth as long lists of numbers.", "tts": "July nineteen sixty-five: the first close-up pictures of Mars arrive on Earth as long lists of numbers.", "es": "Julio de 1965: las primeras imágenes cercanas de Marte llegan a la Tierra como largas listas de números." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "The engineers couldn't wait for the computers. They coloured the numbers in by hand.", "es": "Los ingenieros no pudieron esperar a las computadoras. Colorearon los números a mano." }
+    ] },
+    { "id": "history", "lead": 0.8, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "In 1971, Mariner 9 became the first spacecraft to orbit another planet.", "tts": "In nineteen seventy-one, Mariner Nine became the first spacecraft to orbit another planet.", "es": "En 1971, el Mariner 9 se convirtió en la primera nave en orbitar otro planeta." },
+      { "id": "vo4", "v": "nar", "gap": 0.6, "en": "In 1999, Mars Climate Orbiter was lost: one team used pound-force, the other used newtons.", "tts": "In nineteen ninety-nine, Mars Climate Orbiter was lost: one team used pound-force, the other used newtons.", "es": "En 1999 se perdió el Mars Climate Orbiter: un equipo usaba libras-fuerza y el otro, newtons." },
+      { "id": "vo5", "v": "nar", "gap": 0.3, "en": "It flew far too close to Mars and was never heard from again.", "es": "Pasó demasiado cerca de Marte y nunca más se supo de él." }
+    ] },
+    { "id": "science", "lead": 0.9, "tail": 1.6, "lines": [
+      { "id": "vo6", "v": "nar", "en": "To stay at Mars, a spacecraft must brake as it arrives.", "es": "Para quedarse en Marte, una nave debe frenar al llegar." },
+      { "id": "vo7", "v": "nar", "gap": 0.5, "en": "Then, for five months, Mars Reconnaissance Orbiter dipped into the thin upper air again and again, shrinking its orbit with the air instead of fuel.", "es": "Luego, durante cinco meses, el Mars Reconnaissance Orbiter se sumergió una y otra vez en el aire tenue de arriba, achicando su órbita con el aire en vez de combustible." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "Mars Reconnaissance Orbiter",
+      "photo": { "src": "mro.jpg", "credit": "Artist's concept: NASA/JPL", "pos": "62% 30%" },
+      "rows": [
+        { "label": "SCIENCE ORBIT", "value": "≈ 255 – 320 km", "note": "since 2006", "frac": 0.5 },
+        { "label": "CAMERA", "value": "≈ 30 cm / pixel", "note": "HiRISE", "frac": 0.8, "color": "#d9b46a" },
+        { "label": "AEROBRAKING", "value": "5 months", "note": "March – August 2006", "frac": 0.42, "color": "#36d1ff" }
+      ],
+      "yours": ["MONTHS OF CRUISE", "ARRIVAL ORBIT", "FUEL LEFT"],
+      "lines": [
+        { "id": "vo8", "v": "nar", "en": "Since 2006 it has studied Mars from about 300 kilometres up, with a camera that can spot things the size of a kitchen table.", "tts": "Since two thousand six it has studied Mars from about three hundred kilometres up, with a camera that can spot things the size of a kitchen table.", "es": "Desde 2006 estudia Marte a unos 300 kilómetros de altura, con una cámara que distingue cosas del tamaño de una mesa de cocina." },
+        { "id": "vo9", "v": "nar", "gap": 0.6, "en": "Now compare your design. And always check your units.", "es": "Ahora compara tu diseño. Y revisa siempre tus unidades." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "goi", "lead": 1.0, "tail": 7.5,
+      "quote": "Paulet dreamed of rockets. We are reading the weather on another planet.",
+      "learn": "NASA/JPL: Mariner 4 (1965) and Mariner 9 (1971) · NASA: Mars Climate Orbiter Mishap Investigation Board report (1999) · NASA/JPL: Mars Reconnaissance Orbiter",
+      "images": "Real images: NASA/JPL, public domain",
+      "lines": [
+        { "id": "goi", "v": "goi", "cap": false, "en": "Paulet dreamed of rockets. We are reading the weather on another planet.", "es": "Paulet soñaba con cohetes. Nosotros leemos el clima de otro planeta." }
+      ] }
+  ]
+}

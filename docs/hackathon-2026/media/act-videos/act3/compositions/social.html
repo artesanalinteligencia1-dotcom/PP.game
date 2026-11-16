@@ -1,0 +1,24 @@
+<template>
+  <div id="root" data-composition-id="social" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="so-stage" class="k-stage">
+      <div id="so-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="so-img" src="assets/act3-04.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-panel" id="so-v" style="left:110px; top:110px; width:520px; height:150px; border-color:#e0457b">
+        <div class="k-head" style="color:#e0457b">● TRENDING IN PERU</div>
+        <div class="k-num" id="so-n" style="left:24px; top:64px; font-size:72px">0.0 M</div>
+        <div class="k-label" style="left:250px; top:88px">VIEWS</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("social");
+    K.enter(tl, "#so-stage", "zoom");
+    K.kb(tl, "#so-img", 0, c.dur + 0.5, { s: 1.04, y: 20 }, { s: 1.16, y: -30 });
+    K.fade(tl, "#so-v", 0.3, 0.5, 0, -30);
+    K.count(tl, "#so-n", 0.3, 4.8, 0.5, c.dur - 0.8, (v) => v.toFixed(1) + " M");
+    K.exit(tl, "#so-stage", "whip", c.dur);
+    window.__timelines["social"] = tl;
+  </script>
+</template>

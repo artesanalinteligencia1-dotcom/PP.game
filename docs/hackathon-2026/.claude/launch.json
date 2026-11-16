@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "spaceapps-dev", "runtimeExecutable": "C:\Program Files\nodejs\node.exe", "runtimeArgs": ["game/node_modules/vite/bin/vite.js", "game", "--port", "5174", "--strictPort"], "port": 5174 }
+  ]
+}

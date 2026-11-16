@@ -1,0 +1,46 @@
+{
+  "id": "lunar_pathfinder",
+  "title": "Lunar Pathfinder — the real story: water on the Moon",
+  "music": "quiet-orbit-a.mp3",
+  "musicStart": 40,
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "explosion.mp3", "scene": "history", "cue": "vo3", "off": 4.6, "dur": 2.4, "vol": 0.3 },
+    { "src": "success.mp3", "scene": "compare", "cue": "vo9", "off": 0.2, "dur": 4, "vol": 0.28 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 2.6, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Near the Moon's south pole, some crater floors have not seen sunlight in billions of years.", "es": "Cerca del polo sur de la Luna, el fondo de algunos cráteres no ha visto la luz del Sol en miles de millones de años." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "What could be hiding in the dark?", "es": "¿Qué podría esconderse en la oscuridad?" }
+    ] },
+    { "id": "history", "lead": 0.8, "tail": 1.6, "lines": [
+      { "id": "vo3", "v": "nar", "en": "On October 9, 2009, NASA's LCROSS mission crashed its spent rocket stage into one of those craters, Cabeus.", "tts": "On October ninth, two thousand nine, NASA's L-cross mission crashed its spent rocket stage into one of those craters, Cabeus.", "es": "El 9 de octubre de 2009, la misión LCROSS de NASA estrelló su etapa de cohete agotada en uno de esos cráteres: Cabeus." },
+      { "id": "vo4", "v": "nar", "gap": 0.5, "en": "In the plume of dust, it found water: about 155 kilograms.", "tts": "In the plume of dust, it found water: about one hundred and fifty-five kilograms.", "es": "En la nube de polvo encontró agua: unos 155 kilogramos." }
+    ] },
+    { "id": "science", "lead": 0.9, "tail": 1.6, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Orbiters study the poles without landing.", "es": "Los orbitadores estudian los polos sin aterrizar." },
+      { "id": "vo6", "v": "nar", "gap": 0.4, "en": "A laser measures the height of the ground. A neutron counter senses hydrogen, a sign of ice.", "es": "Un láser mide la altura del suelo. Un contador de neutrones detecta hidrógeno, señal de hielo." },
+      { "id": "vo7", "v": "nar", "gap": 0.5, "en": "A thermometer found some of the coldest places ever measured in the solar system.", "es": "Un termómetro encontró algunos de los lugares más fríos jamás medidos en el sistema solar." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "The Lunar Reconnaissance Orbiter",
+      "photo": { "src": "neutrons.jpg", "credit": "Image: NASA · LRO / LEND neutron map", "pos": "28% 55%" },
+      "rows": [
+        { "label": "MAPPING ORBIT", "value": "≈ 50 km", "note": "polar, 2009 – 2011", "frac": 0.35 },
+        { "label": "WORKING SINCE", "value": "2009", "note": "still mapping the Moon", "frac": 0.9, "color": "#d9b46a" },
+        { "label": "COLDEST CRATER FLOORS", "value": "−238 °C", "note": "Diviner instrument", "frac": 0.62, "color": "#36d1ff" }
+      ],
+      "yours": ["POLAR ORBIT", "INSTRUMENTS", "GIGABYTES A DAY"],
+      "lines": [
+        { "id": "vo8", "v": "nar", "en": "The Lunar Reconnaissance Orbiter has mapped the Moon since 2009.", "tts": "The Lunar Reconnaissance Orbiter has mapped the Moon since two thousand nine.", "es": "El Lunar Reconnaissance Orbiter cartografía la Luna desde 2009." },
+        { "id": "vo9", "v": "nar", "gap": 0.6, "en": "Now compare your design. Water there means drinking water, air and rocket fuel for explorers.", "es": "Ahora compara tu diseño. Agua allá significa agua para beber, aire y combustible para los exploradores." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "fra", "lead": 1.0, "tail": 7.5,
+      "quote": "Where there is water, there are questions. Maybe even answers.",
+      "learn": "NASA: LCROSS, water in Cabeus crater (2009) · NASA Goddard: Lunar Reconnaissance Orbiter (LOLA, LEND, Diviner) · NASA Science: permanently shadowed regions",
+      "images": "Real images: NASA / GSFC / Arizona State University, public domain",
+      "lines": [
+        { "id": "fra", "v": "fra", "cap": false, "en": "Where there is water, there are questions. Maybe even answers.", "es": "Donde hay agua, hay preguntas. Quizás hasta respuestas." }
+      ] }
+  ]
+}

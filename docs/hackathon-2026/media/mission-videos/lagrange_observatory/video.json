@@ -1,0 +1,46 @@
+{
+  "id": "lagrange_observatory",
+  "title": "Lagrange Observatory — the real story: parking where gravity balances",
+  "music": "misti-b.mp3",
+  "musicStart": 50,
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "deploy.mp3", "scene": "science", "cue": "vo7", "off": 1.5, "dur": 2, "vol": 0.25 },
+    { "src": "success.mp3", "scene": "compare", "cue": "vo9", "off": 0.2, "dur": 4, "vol": 0.28 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 2.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Between the Earth and the Moon there are five places where a spacecraft can almost stand still,", "es": "Entre la Tierra y la Luna hay cinco lugares donde una nave casi puede quedarse quieta," },
+      { "id": "vo2", "v": "nar", "gap": 0.2, "en": "where gravity and motion balance.", "es": "donde la gravedad y el movimiento se equilibran." }
+    ] },
+    { "id": "history", "lead": 0.8, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "Joseph-Louis Lagrange found them with pen and paper in 1772.", "tts": "Joseph-Louis Lagrange found them with pen and paper in seventeen seventy-two.", "es": "Joseph-Louis Lagrange los encontró con papel y lápiz en 1772." },
+      { "id": "vo4", "v": "nar", "gap": 0.5, "en": "In 2010, two NASA probes called ARTEMIS became the first spacecraft to orbit Earth–Moon Lagrange points.", "tts": "In twenty ten, two NASA probes called Artemis became the first spacecraft to orbit Earth-Moon Lagrange points.", "es": "En 2010, dos sondas de NASA llamadas ARTEMIS fueron las primeras naves en orbitar puntos de Lagrange Tierra–Luna." },
+      { "id": "vo5", "v": "nar", "gap": 0.5, "en": "Since 2022, the James Webb Space Telescope has worked near a Lagrange point of the Sun and the Earth.", "tts": "Since twenty twenty-two, the James Webb Space Telescope has worked near a Lagrange point of the Sun and the Earth.", "es": "Desde 2022, el telescopio espacial James Webb trabaja cerca de un punto de Lagrange del Sol y la Tierra." }
+    ] },
+    { "id": "science", "lead": 0.9, "tail": 1.6, "lines": [
+      { "id": "vo6", "v": "nar", "en": "These points are balanced, but not stable: like a ball resting on a saddle.", "es": "Estos puntos están en equilibrio, pero no son estables: como una pelota sobre una silla de montar." },
+      { "id": "vo7", "v": "nar", "gap": 0.5, "en": "So a spacecraft circles them on a halo orbit, and fires small thrusts every few weeks to stay.", "es": "Por eso una nave los rodea en una órbita de halo y enciende pequeños impulsos cada pocas semanas para quedarse." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "title": "The James Webb Space Telescope",
+      "photo": { "src": "jwst.jpg", "credit": "Illustration: NASA", "pos": "62% 45%" },
+      "rows": [
+        { "label": "DISTANCE FROM EARTH", "value": "1.5 million km", "note": "near Sun–Earth L2", "frac": 0.9 },
+        { "label": "MIRROR", "value": "6.5 m", "note": "18 gold-coated segments", "frac": 0.6, "color": "#d9b46a" },
+        { "label": "STATION-KEEPING", "value": "every ~3 weeks", "note": "small thruster burns", "frac": 0.3, "color": "#36d1ff" }
+      ],
+      "yours": ["DELTA-V USED", "MONTHS TO ARRIVE", "LIFETIME"],
+      "lines": [
+        { "id": "vo8", "v": "nar", "en": "Webb works 1.5 million kilometres from Earth, behind a 6.5-metre golden mirror.", "tts": "Webb works one and a half million kilometres from Earth, behind a six and a half metre golden mirror.", "es": "Webb trabaja a 1,5 millones de kilómetros de la Tierra, detrás de un espejo dorado de 6,5 metros." },
+        { "id": "vo9", "v": "nar", "gap": 0.6, "en": "Now compare your design: less fuel spent getting there means a longer life once you arrive.", "es": "Ahora compara tu diseño: menos combustible gastado en llegar significa una vida más larga al llegar." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "rob", "lead": 1.0, "tail": 7.5,
+      "quote": "Chaos is not the enemy. It is the rule we play by.",
+      "learn": "NASA Science: What is a Lagrange point? · NASA: THEMIS-ARTEMIS, first spacecraft at Earth–Moon Lagrange points (2010) · NASA: James Webb Space Telescope orbit",
+      "images": "Real images: NASA and the Library of Congress, public domain",
+      "lines": [
+        { "id": "rob", "v": "rob", "cap": false, "en": "Chaos is not the enemy. It is the rule we play by.", "es": "El caos no es el enemigo. Es la regla del juego." }
+      ] }
+  ]
+}

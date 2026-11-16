@@ -1,0 +1,34 @@
+<template>
+  <div id="root" data-composition-id="night" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="ni-stage" class="k-stage">
+      <div id="ni-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="ni-img" src="assets/act1-06.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(5,6,9,.8) 0%, transparent 40%)"></div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-stamp" id="ni-s2" style="left:110px; top:120px; font-size:46px">FLIGHT 2 · LOST</div>
+      <div class="k-stamp" id="ni-s3" style="left:110px; top:220px; font-size:46px">FLIGHT 3 · LOST</div>
+      <div class="k-panel" id="ni-fund" style="left:110px; top:360px; width:560px; height:200px; border-color:#3a3f47">
+        <div class="k-head">FUNDS LEFT</div>
+        <div class="k-num" id="ni-m" style="left:24px; top:70px; font-size:84px">$ 4.1 M</div>
+        <div class="k-abs" style="left:24px; top:170px; width:510px; height:12px; background:#252a31"></div>
+        <div class="k-abs" id="ni-bar" style="left:24px; top:170px; width:510px; height:12px; background:#d9b46a; transform-origin:0% 50%"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("night");
+    K.enter(tl, "#ni-stage", "fade", { dur: 0.7 });
+    K.kb(tl, "#ni-img", 0, c.dur + 0.5, { s: 1.12, x: 50 }, { s: 1.2, x: -30, y: -10 });
+    K.stamp(tl, "#ni-s2", c("vo8", 0.1)); K.stamp(tl, "#ni-s3", c("vo8", 1.1));
+    K.fade(tl, "#ni-fund", c("vo8", 1.8), 0.5, 0, -30);
+    K.count(tl, "#ni-m", 4.1, 0.3, c("vo8", 2.2), 2.2, (v) => "$ " + v.toFixed(1) + " M");
+    tl.fromTo("#ni-bar", { scaleX: 1 }, { scaleX: 0.07, duration: 2.2, ease: "power2.out" }, c("vo8", 2.2));
+    tl.to("#ni-bar", { backgroundColor: "#e0457b", duration: 0.4 }, c("vo8", 3.6));
+    // Franchesca: "we go again" — the stamps fade, warmth comes back
+    tl.to(["#ni-s2", "#ni-s3"], { opacity: 0.35, duration: 0.6 }, c("fra", 0));
+    tl.to("#ni-img", { filter: "brightness(1.12) saturate(1.1)", duration: 1.2 }, c("fra", 0));
+    K.exit(tl, "#ni-stage", "zoom", c.dur);
+    window.__timelines["night"] = tl;
+  </script>
+</template>

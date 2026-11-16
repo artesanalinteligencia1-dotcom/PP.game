@@ -1,0 +1,46 @@
+{
+  "id": "mars_terraform",
+  "title": "Terraforming — the real story: can we give Mars back its sky?",
+  "music": "misti-a.mp3",
+  "musicStart": 60,
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "orbit.mp3", "scene": "history", "cue": "vo3", "off": 0.4, "dur": 2.4, "vol": 0.28 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.2, "tail": 2.4, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Billions of years ago, water flowed on Mars. Rivers built deltas, like this one in Jezero crater.", "es": "Hace miles de millones de años, el agua corría en Marte. Los ríos formaron deltas, como este en el cráter Jezero." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "Where did all that water and air go?", "es": "¿A dónde se fue toda esa agua y ese aire?" }
+    ] },
+    { "id": "history", "lead": 0.8, "tail": 1.4, "lines": [
+      { "id": "vo3", "v": "nar", "en": "Since 2014, NASA's MAVEN orbiter has measured how the Sun strips gas from the top of the Martian atmosphere.", "tts": "Since twenty fourteen, NASA's Maven orbiter has measured how the Sun strips gas from the top of the Martian atmosphere.", "es": "Desde 2014, el orbitador MAVEN de NASA mide cómo el Sol arranca gas de la parte alta de la atmósfera de Marte." },
+      { "id": "vo4", "v": "nar", "gap": 0.5, "en": "Without a global magnetic shield, the solar wind carried much of the air away over time.", "es": "Sin un escudo magnético global, el viento solar se llevó gran parte del aire con el tiempo." }
+    ] },
+    { "id": "science", "lead": 0.9, "tail": 1.6, "lines": [
+      { "id": "vo5", "v": "nar", "en": "To warm Mars, we would need a much thicker atmosphere.", "es": "Para calentar Marte haría falta una atmósfera mucho más gruesa." },
+      { "id": "vo6", "v": "nar", "gap": 0.5, "en": "In 2018, a NASA-supported study added up all the carbon dioxide we could release. It would bring the pressure to only a few percent of Earth's.", "tts": "In twenty eighteen, a NASA-supported study added up all the carbon dioxide we could release. It would bring the pressure to only a few percent of Earth's.", "es": "En 2018, un estudio apoyado por NASA sumó todo el dióxido de carbono que podríamos liberar. Llevaría la presión a solo un pequeño porcentaje de la terrestre." },
+      { "id": "vo7", "v": "nar", "gap": 0.5, "en": "Not enough. With today's technology, Mars cannot be terraformed.", "es": "No alcanza. Con la tecnología actual, Marte no se puede terraformar." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "whip", "exit": "zoom", "tail": 1.2,
+      "kicker": "THE AIR OF MARS, IN NUMBERS",
+      "title": "Surface pressure",
+      "photo": { "src": "maven-year.jpg", "credit": "Image: NASA/GSFC · MAVEN ultraviolet view", "pos": "50% 50%" },
+      "rows": [
+        { "label": "EARTH", "value": "≈ 1,013 mbar", "note": "sea level", "frac": 1.0, "color": "#36d1ff" },
+        { "label": "ALL REACHABLE CO₂ ON MARS", "value": "≈ 20 mbar", "note": "2018 study, best case", "frac": 0.02, "color": "#d9b46a" },
+        { "label": "MARS TODAY", "value": "≈ 6 mbar", "note": "average surface", "frac": 0.006, "color": "#f08a3c" }
+      ],
+      "yours": ["GRAND CHALLENGE", "SPECULATIVE", "CENTURIES"],
+      "lines": [
+        { "id": "vo8", "v": "nar", "en": "Earth's air presses about a thousand millibars. Mars today: about six. All the reachable carbon dioxide: about twenty.", "es": "El aire de la Tierra presiona unos mil milibares. Marte hoy: unos seis. Todo el dióxido de carbono alcanzable: unos veinte." },
+        { "id": "vo9", "v": "nar", "gap": 0.6, "en": "Some dreams take more than one lifetime.", "es": "Algunos sueños toman más de una vida." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "goi", "lead": 1.0, "tail": 7.5,
+      "quote": "Paulet started with an engine. We will leave the next chapter to you.",
+      "learn": "NASA: MAVEN and the loss of the Martian atmosphere · NASA (2018): Mars terraforming not possible using present-day technology · NASA/JPL: Jezero crater delta",
+      "images": "Real images: NASA/JPL, NASA/GSFC and partners, public domain",
+      "lines": [
+        { "id": "goi", "v": "goi", "cap": false, "en": "Paulet started with an engine. We will leave the next chapter to you.", "es": "Paulet empezó con un motor. El próximo capítulo te lo dejamos a ti." }
+      ] }
+  ]
+}

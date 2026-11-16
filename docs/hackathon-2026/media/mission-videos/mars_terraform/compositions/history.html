@@ -1,0 +1,47 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-space"></div>
+      <div class="k-kicker" id="hi-k" style="left:120px; top:92px">MAVEN · MARS ATMOSPHERE AND VOLATILE EVOLUTION · SINCE 2014</div>
+      <div class="k-photo" id="hi-p" style="left:120px; top:160px; width:620px; height:479px">
+        <img src="assets/maven.jpg" alt="" style="object-position:40% 40%">
+        <div class="k-credit">ARTIST'S CONCEPT: NASA · MAVEN</div>
+      </div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <g id="hi-sw"></g>
+        <g transform="translate(1180 520)">
+          <path d="M -80 -90 C -260 -90, -260 90, -80 90 M -60 -120 C -330 -140, -330 140, -60 120" fill="none" stroke="#7fb7ff" stroke-width="2" opacity=".55" id="hi-mag"/>
+          <circle r="70" fill="#2a6fb4"/><text x="-50" y="120" style="fill:#7fb7ff">EARTH</text>
+          <text x="-170" y="-150" style="fill:#7fb7ff">MAGNETIC SHIELD</text>
+        </g>
+        <g transform="translate(1600 520)">
+          <circle r="62" fill="none" stroke="#e8875a" stroke-width="16" opacity=".25"/>
+          <circle r="50" fill="#b5532e"/><text x="-40" y="110" style="fill:#e8875a">MARS</text>
+          <g id="hi-loss"></g>
+        </g>
+        <text x="800" y="200" style="fill:#f2b84b">SOLAR WIND →</text>
+        <text x="1440" y="380" style="fill:#e8e0cc">AIR STRIPPED AWAY</text>
+      </svg>
+      <div class="k-label" id="hi-n" style="left:780px; top:880px">DIAGRAM NOT TO SCALE</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    const r = K.rng(11); let sw = "", loss = "";
+    for (let i = 0; i < 70; i++) sw += `<circle class="hi-p" r="5" fill="#f2b84b" opacity="0" cx="780" cy="${(260 + r() * 520).toFixed(0)}" data-d="${(r() * 1.6).toFixed(2)}"/>`;
+    for (let i = 0; i < 26; i++) loss += `<circle class="hi-l" r="5" fill="#e8875a" opacity="0" cx="${(-20 + r() * 40).toFixed(0)}" cy="${(-40 + r() * 80).toFixed(0)}" data-x="${(140 + r() * 160).toFixed(0)}" data-y="${((r() - 0.5) * 200).toFixed(0)}"/>`;
+    document.querySelector("#hi-sw").innerHTML = sw; document.querySelector("#hi-loss").innerHTML = loss;
+    K.enter(tl, "#hi-stage", "rise");
+    K.fade(tl, "#hi-k", 0.4, 0.5, 0); K.photo(tl, "#hi-p", 0.5); K.kb(tl, "#hi-p img", 0.5, c.dur, { s: 1.0 }, { s: 1.12 });
+    // solar wind particles stream right; around Earth they are deflected, at Mars they hit and knock gas loose
+    document.querySelectorAll(".hi-p").forEach((el, i) => { const y = +el.getAttribute("cy"); const nearEarth = Math.abs(y - 520) < 150;
+      for (let k = 0; k < 8; k++) { const s = 0.8 + (+el.dataset.d) + k * 2.0;
+        tl.fromTo(el, { attr: { cx: 780, cy: y }, opacity: 0.9 }, { attr: { cx: nearEarth ? 1060 : 1800, cy: nearEarth ? y + (y > 520 ? 150 : -150) : y }, opacity: nearEarth ? 0 : 0.9, duration: 2.0, ease: "none" }, s); } });
+    document.querySelectorAll(".hi-l").forEach((el, i) => { for (let k = 0; k < 4; k++) { const s = c("vo4", 0.4) + (i % 9) * 0.25 + k * 2.2;
+      tl.fromTo(el, { attr: { cx: -20 + (i % 5) * 8, cy: -30 + (i % 7) * 10 }, opacity: 1 }, { attr: { cx: +el.dataset.x, cy: +el.dataset.y }, opacity: 0, duration: 2.0, ease: "power1.out" }, s); } });
+    K.draw(tl, "#hi-mag", c("vo4", 0.2), 1.2);
+    K.fade(tl, "#hi-n", c("vo4", 1.0), 0.5, 0);
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

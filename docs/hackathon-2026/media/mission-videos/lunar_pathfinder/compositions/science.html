@@ -1,0 +1,60 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="sc-k" style="left:120px; top:92px">THREE WAYS TO FIND ICE FROM ORBIT</div>
+      <div class="k-panel sc-p" id="sc-p1" style="left:120px; top:160px; width:540px; height:700px; border-color:#f08a3c">
+        <div class="k-head" style="color:#f08a3c">1 · LASER ALTIMETER</div>
+        <svg viewBox="0 0 540 650" style="position:absolute; left:0; top:50px; width:540px; height:650px">
+          <rect x="245" y="40" width="50" height="30" fill="#e8e0cc"/><rect x="200" y="48" width="40" height="14" fill="#36d1ff"/><rect x="300" y="48" width="40" height="14" fill="#36d1ff"/>
+          <line id="sc-beam" x1="270" y1="72" x2="270" y2="470" stroke="#f08a3c" stroke-width="4"/>
+          <circle id="sc-pulse" cx="270" cy="72" r="9" fill="#ffd2a8"/>
+          <path id="sc-ground" d="M 20 520 L 80 500 L 140 515 L 200 470 L 270 470 L 330 520 L 390 560 L 450 540 L 520 500" fill="none" stroke="#c9c2b2" stroke-width="4"/>
+          <text x="30" y="610" style="fill:#e8e0cc; font-size:30px">LIGHT'S ROUND TRIP → HEIGHT</text>
+        </svg>
+      </div>
+      <div class="k-panel sc-p" id="sc-p2" style="left:690px; top:160px; width:540px; height:700px; border-color:#36d1ff">
+        <div class="k-head" style="color:#36d1ff">2 · NEUTRON DETECTOR</div>
+        <div class="k-photo" id="sc-map" style="left:30px; top:80px; width:480px; height:440px; border-color:#3a3f47">
+          <img src="assets/neutrons.jpg" alt="" style="object-fit:cover; object-position:22% 62%">
+          <div class="k-credit">IMAGE: NASA · LRO / LEND</div>
+        </div>
+        <div class="k-label cyan" style="left:30px; top:546px">FEWER NEUTRONS (BLUE)</div>
+        <div class="k-label cream" style="left:30px; top:586px">= MORE HYDROGEN = POSSIBLE ICE</div>
+      </div>
+      <div class="k-panel sc-p" id="sc-p3" style="left:1260px; top:160px; width:540px; height:700px; border-color:#b06cf0">
+        <div class="k-head" style="color:#c9a0ff">3 · THERMOMETER</div>
+        <div class="k-abs" style="left:60px; top:110px; width:44px; height:440px; border-radius:22px; background:#1a1d22; border:2px solid #3a3f47"></div>
+        <div class="k-abs" id="sc-merc" style="left:68px; top:118px; width:28px; height:424px; border-radius:14px; background:linear-gradient(180deg, #e0453c, #36d1ff); transform-origin:50% 100%"></div>
+        <div class="k-num" id="sc-t" style="left:150px; top:250px; font-size:110px; color:#c9a0ff">+120 °C</div>
+        <div class="k-label cream" id="sc-tday" style="left:150px; top:390px">SUNLIT GROUND, NOON</div>
+        <div class="k-label cyan" id="sc-tn" style="left:150px; top:390px; opacity:0">SHADOWED CRATER FLOOR</div>
+        <div class="k-label" style="left:30px; top:600px; font-size:28px">DIVINER INSTRUMENT · NASA LRO</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.enter(tl, "#sc-stage", "wipe");
+    K.fade(tl, "#sc-k", 0.4, 0.5, 0);
+    K.fade(tl, "#sc-p1", c("vo5", 0.6), 0.5, 30); K.fade(tl, "#sc-p2", c("vo5", 0.9), 0.5, 30); K.fade(tl, "#sc-p3", c("vo5", 1.2), 0.5, 30);
+    // laser: pulses fly down and back; the ground profile is drawn point by point
+    const tA = c("vo6", 0.2);
+    K.draw(tl, "#sc-beam", tA, 0.4);
+    for (let k = 0; k < 6; k++) { tl.fromTo("#sc-pulse", { attr: { cy: 72 } }, { attr: { cy: 470 }, duration: 0.25, ease: "none" }, tA + k * 0.55); tl.to("#sc-pulse", { attr: { cy: 72 }, duration: 0.25, ease: "none" }, tA + k * 0.55 + 0.25); }
+    K.draw(tl, "#sc-ground", tA + 0.2, 3.0, "none");
+    tl.to("#sc-p1", { boxShadow: "0 0 40px rgba(240,138,60,.5)", duration: 0.4, yoyo: true, repeat: 1 }, tA);
+    // neutrons
+    const tB = c("vo6", 3.2);
+    tl.to("#sc-p2", { boxShadow: "0 0 40px rgba(54,209,255,.5)", duration: 0.4, yoyo: true, repeat: 1 }, tB);
+    K.kb(tl, "#sc-map img", tB, 4, { s: 1.0 }, { s: 1.25, x: -20 });
+    // thermometer drops to -238 C
+    const tC = c("vo7", 0.6);
+    tl.to("#sc-p3", { boxShadow: "0 0 40px rgba(176,108,240,.5)", duration: 0.4, yoyo: true, repeat: 1 }, tC);
+    tl.fromTo("#sc-merc", { scaleY: 1 }, { scaleY: 0.06, duration: 2.6, ease: "power2.inOut" }, tC);
+    K.count(tl, "#sc-t", 120, -238, tC, 2.6, (v) => (v > 0 ? "+" : "−") + Math.abs(Math.round(v)) + " °C");
+    tl.to("#sc-tday", { opacity: 0, duration: 0.3 }, tC + 1.1); tl.to("#sc-tn", { opacity: 1, duration: 0.4 }, tC + 1.2);
+    K.exit(tl, "#sc-stage", "fade", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

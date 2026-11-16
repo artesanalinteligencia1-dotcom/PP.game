@@ -1,0 +1,41 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="hi-k" style="left:120px; top:92px">MOXIE · MARS OXYGEN IN-SITU RESOURCE UTILIZATION EXPERIMENT</div>
+      <div class="k-photo" id="hi-p1" style="left:120px; top:160px; width:820px; height:615px">
+        <img src="assets/moxie-in.jpg" alt="" style="object-position:40% 50%">
+        <div class="k-credit">IMAGE: NASA/JPL-CALTECH · MOXIE INSIDE THE ROVER</div>
+      </div>
+      <div class="k-photo" id="hi-p2" style="left:980px; top:160px; width:820px; height:461px; border-color:#e8e0cc">
+        <img src="assets/moxie-lower.jpg" alt="" style="object-position:55% 40%">
+        <div class="k-credit">IMAGE: NASA/JPL-CALTECH · 2020</div>
+      </div>
+      <div class="k-chip" id="hi-size" style="left:980px; top:650px">SIZE OF A CAR BATTERY · ≈ 17 KG</div>
+      <div class="k-panel" id="hi-runs" style="left:120px; top:800px; width:820px; height:150px">
+        <div class="k-head">RUNS ON MARS · 2021 – 2023</div>
+        <div class="k-abs" id="hi-ticks" style="left:24px; top:70px; width:780px; height:60px"></div>
+      </div>
+      <div class="k-panel" id="hi-o2" style="left:980px; top:720px; width:820px; height:230px; border-color:#7fd17a">
+        <div class="k-head" style="color:#7fd17a">OXYGEN MADE</div>
+        <div class="k-num" id="hi-g" style="left:24px; top:66px; font-size:120px; color:#7fd17a">0 G</div>
+        <div class="k-label cream" style="left:400px; top:96px">UP TO 12 G / HOUR</div>
+        <div class="k-label" style="left:400px; top:140px">≈ 98% PURE OR BETTER</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    let t = ""; for (let i = 0; i < 16; i++) t += `<div class="k-abs hi-t" style="left:${i * 48}px; top:0; width:36px; height:56px; background:#7fd17a; opacity:.2"></div>`;
+    document.querySelector("#hi-ticks").innerHTML = t;
+    K.enter(tl, "#hi-stage", "rise");
+    K.fade(tl, "#hi-k", 0.4, 0.5, 0);
+    K.photo(tl, "#hi-p1", 0.5); K.kb(tl, "#hi-p1 img", 0.5, c.dur, { s: 1.0 }, { s: 1.15, x: -20 });
+    K.photo(tl, "#hi-p2", c("vo3", 2.0)); K.pop(tl, "#hi-size", c("vo3", 3.0), 0.4);
+    K.fade(tl, ["#hi-runs", "#hi-o2"], c("vo4", -0.2), 0.5, 30);
+    tl.to(".hi-t", { opacity: 1, duration: 0.15, stagger: (c("vo4", 3.4) - c("vo4", 1.0)) / 16 }, c("vo4", 1.0));
+    K.count(tl, "#hi-g", 0, 122, c("vo4", 3.6), 2.6, (v) => Math.round(v) + " G");
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

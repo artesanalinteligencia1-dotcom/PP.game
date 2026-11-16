@@ -1,0 +1,25 @@
+prologue  total 68.77s
+
+[paris] start 0.0  dur 12.19
+   vo1      1.20 ->   3.33   Paris, the 1890s.
+   vo2      3.83 ->  11.19   A young Peruvian engineer, Pedro Paulet, later claimed he fired a liquid-fuel ro
+
+[drawing] start 12.19  dur 10.18
+   vo3      0.80 ->   5.34   He also drew a rocket craft of his own: the Avion-Torpedo.
+   vo4      5.94 ->   8.98   For more than a century, it stayed on paper.
+
+[arequipa] start 22.37  dur 8.79
+   vo5      1.60 ->   7.79   Arequipa, Peru. Three classmates wanted to go up there: Pedro, Chicho and Robert
+
+[callao] start 31.16  dur 11.69
+   vo6      0.70 ->   5.18   Years later, on a salsa night in Callao, they met Franchesca,
+   vo7      5.38 ->  11.09   an astrobiologist back from the United States, looking for life in the Andes.
+
+[napkin] start 42.85  dur 5.19
+   goi      0.90 ->   3.79   If Paulet started it, why don't we finish it?
+
+[rooftop] start 48.04  dur 7.73
+   vo8      0.80 ->   6.13   A small institute. An old notebook. A 130-year promise.
+
+[seat] start 55.77  dur 13
+   kun      1.20 ->   4.60   Kuntur: Your seat is ready. Let's fly.

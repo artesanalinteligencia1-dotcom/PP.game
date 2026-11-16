@@ -1,0 +1,72 @@
+<template>
+  <div id="root" data-composition-id="science" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sc-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="sc-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <canvas id="sc-globe" width="1920" height="1080" style="position:absolute; left:0; top:0; width:1920px; height:1080px"></canvas>
+      <div class="k-kicker" id="sc-k" style="left:140px; top:70px">TWO ORBITS, TRUE SCALE</div>
+      <div class="k-panel" id="sc-p1" style="left:140px; top:150px; width:560px; height:190px; border-color:#36d1ff">
+        <div class="k-head" style="color:#36d1ff">LOW ORBIT · 700 KM</div>
+        <div class="k-num" id="sc-laps" style="left:24px; top:72px; font-size:84px; color:#36d1ff">0</div>
+        <div class="k-label" style="left:150px; top:84px">LAPS · ONE EVERY 99 MIN</div>
+        <div class="k-label" style="left:150px; top:124px">NEVER STAYS OVER ONE PLACE</div>
+      </div>
+      <div class="k-panel" id="sc-p2" style="left:140px; top:370px; width:560px; height:190px; border-color:#f08a3c">
+        <div class="k-head" style="color:#f08a3c">GEOSTATIONARY · 35,786 KM</div>
+        <div class="k-num" id="sc-glap" style="left:24px; top:72px; font-size:84px; color:#f08a3c">0.0</div>
+        <div class="k-label" style="left:190px; top:84px">LAPS · ONE A DAY</div>
+        <div class="k-label" style="left:190px; top:124px">TURNS WITH THE EARTH</div>
+      </div>
+      <div class="k-abs" id="sc-clock" style="left:140px; top:596px; width:560px">
+        <div class="k-label gold" style="left:0; top:6px">HOURS</div>
+        <div class="k-num" id="sc-h" style="left:110px; top:-14px; font-size:84px">0</div>
+        <div class="k-label" style="left:220px; top:6px">OF 24</div>
+      </div>
+      <div class="k-panel" id="sc-p3" style="left:1240px; top:150px; width:540px; height:330px; border-color:#b06cf0">
+        <div class="k-head" style="color:#c9a0ff">THE PRICE OF THE HIGH SEAT</div>
+        <div class="k-label cream" style="left:24px; top:74px">CLIMB</div>
+        <div class="k-num" id="sc-x" style="left:24px; top:106px; font-size:76px; color:#e8e0cc">90×</div>
+        <div class="k-label" style="left:180px; top:132px">HIGHER THAN THE STATION</div>
+        <div class="k-label cream" style="left:24px; top:204px">RADIATION · RELATIVE</div>
+        <div class="k-abs" style="left:24px; top:248px; width:80px; height:18px; background:#36d1ff" id="sc-r1"></div>
+        <div class="k-label" style="left:116px; top:240px; font-size:28px">LOW ORBIT</div>
+        <div class="k-abs" style="left:24px; top:286px; width:480px; height:18px; background:#b06cf0" id="sc-r2"></div>
+      </div>
+      <div class="k-label" id="sc-bl" style="left:1240px; top:496px; color:#c9a0ff">VAN ALLEN BELTS · TRAPPED PARTICLES</div>
+      <div class="k-label" id="sc-il" style="left:1240px; top:536px; font-size:28px">BELTS AND DOSE BARS ARE ILLUSTRATIVE</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("science");
+    K.stars("#sc-stars", 160, 41);
+    const g = K.globe("#sc-globe", { dist: 34, camLat: 28, camLon: -60, sunLat: 8, sunLon: -100, rot: 0, fov: 30 });
+    g.lookX = 1.2; g.lookY = -1.5;
+    const leo = g.orbit({ alt: 700, inc: 98, raan: 30, width: 0.03, color: "#36d1ff" });
+    const geo = g.orbit({ alt: 35786, inc: 0, raan: 0, width: 0.035, color: "#f08a3c" });
+    const sl = g.sat(leo, { size: 0.11, color: "#bff0ff" }), sg = g.sat(geo, { size: 0.2, color: "#ffd0a0" });
+    const spot = g.marker(0, -75, { size: 0.09, color: "#f08a3c" });
+    const outer = g.belt({ R: 4.7, r: 1.9, color: "#7a3cf0", flat: 0.5 }), inner = g.belt({ R: 1.9, r: 0.55, color: "#b06cf0", flat: 0.6 });
+    const laps = document.querySelector("#sc-laps"), glap = document.querySelector("#sc-glap"), hh = document.querySelector("#sc-h");
+    const o = { t: 0 };
+    const apply = (h) => { g.batch = true; sl.u = (h * 60 / 99) * 360; sg.u = 75 + (h / 24) * 360; g.batch = false; g.rot = (h / 24) * 360;
+      laps.textContent = Math.floor(h * 60 / 99); glap.textContent = (h / 24).toFixed(1); hh.textContent = Math.round(h); };
+    Object.defineProperty(o, "q", { get() { return this.t; }, set(v) { this.t = v; apply(v); } }); apply(0);
+    leo.reveal = 0; geo.reveal = 0;
+    K.enter(tl, "#sc-stage", "iris", { x: 960, y: 540 });
+    tl.fromTo(g, { dist: 9 }, { dist: 34, duration: 2.6, ease: "power3.inOut" }, 0);
+    K.fade(tl, "#sc-k", 0.5);
+    tl.fromTo(leo, { reveal: 0 }, { reveal: 1, duration: 0.8, ease: "power2.inOut" }, 0.6); K.fade(tl, "#sc-p1", 0.8, 0.5, 0, -40);
+    tl.fromTo(geo, { reveal: 0 }, { reveal: 1, duration: 1.4, ease: "power2.inOut" }, c("vo4", 0.1)); K.fade(tl, "#sc-p2", c("vo4", 0.4), 0.5, 0, -40);
+    K.fade(tl, "#sc-clock", c("vo4", 2.2), 0.5, 0, -40);
+    tl.fromTo(o, { q: 0 }, { q: 24, duration: c.dur - c("vo4") - 2.4, ease: "sine.inOut" }, c("vo4", 2.2));
+    tl.to(g, { camLat: 20, camLon: -48, duration: c.dur - c("vo4"), ease: "sine.inOut" }, c("vo4"));
+    // the price
+    K.fade(tl, "#sc-p3", c("vo5", 0.2), 0.5, 0, 40);
+    K.pop(tl, "#sc-x", c("vo5", 1.0), 0.5);
+    tl.fromTo([outer, inner], { opacity: 0 }, { opacity: 0.2, duration: 1.4, ease: "sine.out" }, c("vo5", 2.6));
+    K.fade(tl, ["#sc-bl", "#sc-il"], c("vo5", 2.9), 0.5, 0);
+    K.grow(tl, "#sc-r1", c("vo5", 3.0), 0.6); K.grow(tl, "#sc-r2", c("vo5", 3.3), 1.2);
+    K.exit(tl, "#sc-stage", "whip", c.dur);
+    window.__timelines["science"] = tl;
+  </script>
+</template>

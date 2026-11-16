@@ -1,0 +1,351 @@
+# PROGRESS
+
+**Current phase:** Phase 3.5 Act 2 (Moon, Lagrange, three-body) — DONE (branch `cloud/fase-1`, 2026-11-02).
+**Next:** Phase 3.6 / Act 3 planning (Mars: launch windows + entry-descent-landing), or polish after local tasks (launch-pad art).
+
+## Done
+- Phase 0 (local): scaffold, CI.
+- Phase 1: pure design engine (`evaluateDesign`), live dashboard, Design Review, Earth Watch + Lunar Pathfinder, `docs/model.md`.
+- Phase 2:
+  - Engine: `simulate.ts` (weekly, seeded, events with role-owned decisions, bots), `score.ts` (0–1 000 + rank), `report.ts` (top-3 causes).
+  - UI: launch pad (seed, CSS/SVG launch animation with staging/explosion, skip, reduced-motion), mission control (play/speed,
+    live gauges, chart, log, decision dialog, per-role You/Bot delegation + bot personality), mission report (score breakdown,
+    causes + "what would you change", actual requirements, chart, redesign / fly again / new seed, local leaderboard).
+  - Roles renamed to Mission Director / Spacecraft Engineer / Astrophysicist / Astrobiologist; protagonist Dr. Pedro Goicochea in the briefing.
+  - Tests: 41 passing (determinism, replay with same decisions, 2 winning designs per scenario, launch failure, radiation death, bots, analysis).
+  - Verified in Chromium: full flow design → launch → 9 human decisions → report (983/1 000), no console errors; mobile 390 px no horizontal scroll.
+- Media tests (not in repo): 30 s intro test video (16:9, EN narration, word-by-word subtitles + .srt), 2 music tests. Script: `scripts/video/build_intro_test.py`.
+
+- Phase 3 (part 1):
+  - Procedural spacecraft drawing from the design, visible in the design sidebar, inside the fairing on the launch pad, at deployment and in flight (journey view: orbit, eclipse, transfer to the Moon with ion plume).
+  - New launch pad: rocket per launcher (Heavy with boosters), countdown, liftoff smoke, Max-Q, staging, fairing separation, orbit insertion, array deployment, HUD telemetry (T+, altitude, velocity, Δv), educational captions, seed-dependent failure moment.
+  - Audio: music per stage (A home, B launch), crossfade loops, mute toggle, unlock on first click; SFX hooks ready (files pending, LOCAL_TODO §5).
+  - Typography: Space Grotesk + Inter in game and video script; `docs/video-style.md`; `CREDITS.md`; HANDOFF §19.
+  - Tests: 46 passing (+ spacecraft visual mapping and launch timeline).
+
+- Phase 3 (part 2 — Act 1 vertical slice):
+  - Home hub (career, free mission, watch intro, learn, Paulet legacy, sandbox), profile (name, Dr./Eng., 3 levels), local save.
+  - Prologue "First Light": Paulet-1 sounding rocket, suborbital flight animation, honest history card.
+  - Career screen: contracts by act (Mars previews), investors with trust, funds/prestige, technology tree with real-world cards.
+  - New launchers (Paulet-1, rideshare, R-2 reusable) with locks in the designer; booster-landing inset; rideshare neighbours.
+  - New contracts: Andean Eye, Station Resupply (cargo), Storm Tracker (GEO); Sandbox.
+  - Lessons: Newton's cannon (orbit), budgets, rocket equation (sliders), Pedro Paulet facts. Intro video (test) with captions.
+  - Share link (design + seed). Tests: 66 passing. Browser: full career loop with no console errors; progress survives reload.
+
+- Local session (2026-11-02): generated audio downloaded from ElevenLabs and added (LOCAL_TODO §5 done):
+  voiced countdown (take B: `count_10…1`, `ignition`, `liftoff`), farewells (take B: `farewell_1…5`), music loops
+  `design-focus` / `flight-ambient`, and the 10 SFX (loudness-normalised). Take B chosen because take A's countdown merges
+  "one / ignition / liftoff" into one segment. `prepare_launch_audio.py`: farewell split uses 0.3 s pauses (0.6 s found none).
+  Tests 66 passing; build passes once `intro.mp4` is present (see Open risks). Not listened to by a human yet.
+
+- Cloud session (2026-11-02): `src/assets/video/intro.mp4` (720p, 30 s, 2.9 MB — the original encode) committed now that
+  `.gitignore` allows `src/assets/video/*.mp4`; clean-checkout `npm ci && npm run build` verified.
+
+- Audio pass (cloud): voiced countdown verified in Chromium (count_10…1 at 1 s steps, ignition at 10 s, liftoff + music B at 11.5 s,
+  farewell, staging/fairing/deploy/orbit SFX, design/flight loops, alert SFX; no 404s). Fixed overlaps: "T-minus ten" fitted to 1 s,
+  farewell after the liftoff call, clock T−0 = ignition.
+- Phase 3.5 (Act 2):
+  - Engine `threebody.ts`: CR3BP Earth–Moon, RK4 (deterministic arithmetic), Jacobi, L1/L2/L3, L2 Lyapunov orbit, butterfly experiment.
+  - Routes (direct / flyby / low-energy) for lunar orbit and L2, correction reserve slider, chaos-dependent corrections in flight,
+    halo drift events; new orbit "Earth–Moon L2 halo"; instruments IR telescope + low-frequency radio antennas.
+  - Scenario + contract **Lagrange Observatory** (Act 2, after Lunar Pathfinder); **R-3 Reusable Heavy** tech.
+  - UI: route cards + reserve slider + real L2 orbit view (Orbit tab), L2 journey view, **lesson 4 "Three bodies & chaos"**.
+  - Tests: 77 passing (Lagrange points, Jacobi, periodicity, determinism snapshot 1e-12, butterfly, Lagrange designs/outcomes).
+  - Browser: lesson 4 + full Lagrange mission (low-energy route, drift decisions) → 901/1 000, no console errors.
+
+- Local session (2026-11-02, after the user's playtest): audio engine on the Web Audio clock (scheduled, cancellable
+  cues; one music track; ducking) fixing the "countdown at random moments" and overlapping songs; the three launch lights
+  (dawn/day/night) chosen by the launch window. Tests 78 passing; browser: cue times checked (one count per second,
+  ignition/liftoff/farewell on time), full launch with no new console errors. Not listened to by a human yet.
+  Next steps for the cloud: `CLOUD_NEXT.md`.
+
+- Local session (2026-11-02, cloud out of credits — the local chat does everything for now): **soundtrack in the game.**
+  The user's favourite ACE-Step 1.5 songs (version A), loudness-normalised to −16 LUFS: "Beneath the Misti" → menu/home,
+  "Paulet's Fire" → launch, "Lagrange" → results (it had no music). Design and flight keep their loops. Old ElevenLabs
+  home/launch tests removed. `MUSIC` map only (engine logic untouched); CREDITS.md entry (ACE-Step 1.5 MIT, AI disclosed).
+  Tests 83 passing, build passes; browser: all five stage tracks load (200). Not listened to by a human yet.
+
+- Local session (2026-11-02): **final intro in the game.** `src/assets/video/intro.mp4` = `C:\PPgame\intro_paulet.mp4`
+  (style A "Painted cinema", HyperFrames source `C:\PPgame\intro-a`) re-encoded to 720p H.264 CRF 27 (4.4 MB, SSIM 0.965
+  vs the 1080p master). Its captions are burned in, so the `<track>` and `intro.en.vtt` were removed (no double captions).
+  Tests 83 passing, build passes; browser: Extras → Watch intro plays 1280×720, 31 s, no text tracks.
+
+- Local session (2026-11-02): **final trailer + manuals.** Trailer (54 s, style A) built in HyperFrames at
+  `C:\PPgame\trailer-final` (`build.mjs`: one scene per shot, camera moves, titles, satellite crossing): the user's 8 Gemini
+  stills in STORYBOARD order (upscaled ×4 with Real-ESRGAN), music "Beneath the Misti" cut to the song (first cut on the drum
+  entry at 10.85 s, bar-aligned jump to the song's real ending), launch SFX, logo "Paulet — Andes to Orbit". Output
+  `C:\PPgame\trailer_paulet.mp4` (1080p, −14 LUFS) + 720p. The rooftop ending (shot2 + animated satellite) was approved by the user and stays;
+  Gemini first/last-frame clips (v1–v7) will replace the stills later.
+  `docs/PLAYBOOK.md` written for the definitive game (stack, hard-won rules, media pipeline, NASA sources, order of work).
+  Also outside the repo: a Spanish learning manual for the owner (artifact) and `MEJORAS_DESDE_PAULET.md` for Goicochea Studio.
+
+- Local session (2026-11-03): **Three.js launch, delivery 1** (CLOUD_NEXT §3). `src/ui/launch/three/LaunchScene3D.tsx`
+  (lazy chunk, precached offline) driven by the game timeline through `ascent.ts` (pure, 8 tests): pad, lattice tower with
+  service arms, Andes + Misti on the horizon, cloud deck at ~650 m, stars, the three lights (dawn/day/night, same Settings
+  choice as the SVG), a two-stage rocket sized per launcher with flame, smoke, Max-Q vapour, stage separation, fairing halves,
+  failure explosion; the camera follows the rocket's framing and closes in on the upper stage after MECO. HUD, captions,
+  countdown digits, deployed spacecraft (2D), booster-landing inset and every sound stay in LaunchSequence. SVG scene kept
+  for reduced motion, no WebGL and the side-booster rockets (heavy, reusable_heavy). Checked in headless Chrome (real UI flow,
+  Earth Watch on L-1): 61–121 fps, no console errors. Tests 91 passing.
+  Trailer fixed after the owner's review: Gemini's end-of-clip jumps (v2, v4, v5) cut and cross-faded; music jump moved into
+  the song's quiet breath (40 s → 127.2 s, same passage) and ends on the song's own ending; 56 s.
+
+- Local session (2026-11-03): **Three.js launch, delivery 2 done.** All six launchers in 3D: side boosters on heavy and
+  reusable_heavy (drop just before MECO), legs + grid fins on reusables, and the player's **procedural spacecraft in 3D**
+  (`src/ui/launch/three/spacecraft3d.ts`, built from the same `spacecraftVisual(design)` as the 2D drawing: bus, body/deployable/
+  tracking arrays, antenna, radiator, thruster, every instrument shape). It rides in the fairing, pushes off at deployment and
+  unfolds its arrays while the camera closes in; above the atmosphere the Sun lights it from the camera side. The 2D spacecraft
+  overlay now only appears on the SVG fallback. Debug view: `?scene3d=<launcher>&pad=&t=&mission=&inst=&array=&area=`.
+  Checked in headless Chrome (debug views + the real Earth Watch flow): 121 fps, no console errors. Tests 91 passing.
+
+- Local session (2026-11-05): **Three.js launch, delivery 3 done — the 3D launch is complete.**
+  - Booster recovery in 3D: a second small scene (ocean, drone ship, returning booster with legs, grid fins and landing burn)
+    drawn in an inset with scissor; landed or lost at sea from the mission roll (`boosterLandingAt`, tested); HTML labels
+    over the same box. The SVG inset stays for the fallback.
+  - The curved Earth above the atmosphere (`makeEarth` in `three/common.ts`: textured sphere + thin atmosphere, rotated so the
+    equator faces up); the flat ground and the Andes hide when it appears; the camera looks slightly down in space.
+  - Failure: the scene freezes where the rocket broke up (the camera no longer keeps climbing); smaller blast in close-ups.
+  - Paulet-1 prologue in 3D (`three/SoundingScene3D.tsx`, lazy): brass-and-copper rocket on an 1890s rail with a blockhouse,
+    smoke, gold 100 km ring, Earth's curve above 60 km, nose-down fall and parachute. Flight profile moved to
+    `src/ui/hub/soundingProfile.ts` (pure, tested) and shared with the SVG fallback.
+  - Shared 3D helpers in `three/common.ts`; WebGL check in `three/support.ts` (no three.js import, keeps the main bundle small).
+  - Checked in headless Chrome: debug views (`?scene3d=reusable_medium|reusable_heavy&landed=0|medium&fail=…|paulet[&fail=1]`)
+    and the real game (Earth Watch on L-1 and on R-2 with the landing inset, and with reduced motion → SVG): 119–121 fps,
+    no console errors. Tests 98 passing.
+
+## Project log for the final storytelling (HANDOFF §19.7)
+1. Handoff written by the user; local session did Phase 0 (scaffold, CI).
+2. Cloud session: analysis of the handoff → decisions (branch, defaults) → Phase 1 engine + design UI (evaluateDesign, Design Review).
+3. Player-experience storytelling → user's vision (scientist vs society/economy, investors, roles, NASA data, music) → Pedro Goicochea, 4 roles, 3 difficulty levels.
+4. Media tests with ElevenLabs (music A/B, 30 s intro) → Phase 2 (seeded simulation, events, bots, score, report).
+5. User feedback (launch pad basic, typography, videos per format) → HANDOFF §19 → visual identity, spacecraft everywhere, new launch pad, per-stage audio.
+6. Movie-style voiced countdown with ignition phase and varying farewell line; design/flight music loops generated; evaluation of rockets (reusables), Mars projects and the rest of Phase 3.
+7. Paulet-1 as the starting rocket (the user's idea), rockets progression up to reusables, Act 1 career with investors, hub, lessons, share links; Mars planned for Acts 3–4.
+8. Audio landed from the local session; voiced-countdown pass; Act 2: real three-body physics, routes, chaos lesson, Lagrange Observatory.
+9. The local session delivered the illustrated launch scenery (dawn sky, Andes with the Misti, lattice tower, drone ship); the cloud
+   session merged it with Act 2 and checked it against the voiced countdown in the browser (no overlaps, no errors).
+10. Offline build (user's goal: "a game you download and play offline"): installable PWA that stores the whole game (code,
+    fonts, audio, intro video — 10 MB) on the first visit and was tested with the network cut; Tauri 2 desktop wrapper and a
+    GitHub Actions workflow (`Desktop build`) that produces the Windows installer (.exe/.msi, unsigned) as a downloadable
+    artifact; versioned save files with export/import (Settings → Career save).
+11. Game shell: fixed 16:9 stage (1440×810, zoomed to the window, letterboxed, no page scroll), "Press any key" boot screen
+    (also the audio unlock gesture), main menu over the launch site with arrow-key navigation, Settings (Esc) with volumes
+    per bus (music / effects / mission control), interface sounds, fullscreen (F11), launch light Auto/Dawn/Day/Night,
+    motion, save export/import and offline install; screen transitions. Three art-direction mock-ups (`?mock=1|2|3`) wait
+    for the user's choice.
+12. The user chose mock-up 3, "modern space-agency HUD". Applied to the whole game: the launch site blurred behind every
+    screen, glass panels with corner brackets, light titles, sky-blue labels, one orange call to action; main menu, design,
+    free-mission and settings rebuilt as in the mock-up, the rest restyled through a theme layer (`.hud` in `src/index.css`).
+
+## How to run
+```
+npm install
+npm run dev
+npm test
+npm run build
+```
+
+## Deploy
+Public link (2026-11-06): https://paulet-andes-to-orbit.vercel.app/ — Vercel, owner's Hobby account, project
+`paulet-andes-to-orbit`, production branch `main` (PR #1 merged `cloud/fase-1`). Checked in headless Chrome: HTTP 200, no console
+errors, service worker active, 87 files precached, reload with the network cut still works. Pushes to `cloud/fase-1` only make
+preview deployments; the public link updates when `cloud/fase-1` is merged into `main` (PR).
+
+## Open risks
+- Balance is first-pass: reference designs score ~850–950; human players will likely score lower. Retune after playtests.
+- Recharts bundle ~570 kB (warning only).
+- ElevenLabs licence for public/commercial use not verified (LOCAL_TODO) — now only design/flight loops, voice and SFX; the songs are ACE-Step (MIT).
+
+## Definitive game
+13. Public link on Vercel (2026-11-06), animation libraries installed (postprocessing, GSAP, Motion, Theatre.js, Rive).
+14. Languages, delivery 1 (2026-11-08): English is the default; the first boot asks English / Español (both written in
+    themselves; keyboard and mouse), Settings switches it live, `<html lang>` follows. Boot, main menu and Settings are
+    translated; the rest of the game moves to the tables in delivery 2 (586 candidate strings left, see
+    `node scripts/i18n/find-hardcoded.mjs`). Checked in headless Chrome: picker → Spanish menu → Settings in Spanish →
+    back to English, no picker on the next boot, no console errors. 102 tests pass.
+
+15. Languages finished (2026-11-08): every screen, lesson, review message, catalog item, flight event and report line in Spanish
+    (Gemini extracted the UI; Claude moved the engine sentences to key + params, translated all 1 187 strings and fixed two
+    Gemini bugs: route ids and the id `none` collided between categories). Intro re-rendered without burned-in captions; the
+    game draws them word by word per language. Checked in headless Chrome, both languages: menu, free mission, 5 lessons, intro
+    captions, career, prologue, all design tabs of two scenarios, launch pad, launch captions, flight decisions and report: no
+    console errors, no raw keys, no horizontal scroll. 106 tests pass.
+16. Rocket Engineer pad, delivery 1 (2026-11-11): pure rocket engine and parts catalog. Presets match the catalog launchers'
+    LEO capacity (light 320 vs 300 kg, medium 2 500 vs 3 000, reusable 2 040 vs 2 100, heavy 15 660 vs 15 000). 121 tests pass.
+17. Rocket Engineer pad, delivery 2 (2026-11-12): the workbench screen. Editing helpers keep each tank on its engine's fuel;
+    review codes are typed (`ROCKET_ISSUE_CODES`) and a test checks every code has EN/ES text. Checked in headless Chrome in
+    English and Spanish: opens from the menu, presets, a broken design (vacuum engine on stage 1), legs without fins; no
+    console errors, no raw keys, no overflow. 125 tests pass.
+18. Rocket Engineer pad, delivery 3 (2026-11-12): the rocket in 3D. `src/engine/rocketLayout.ts` is the pure blueprint in
+    metres (same height as `analyzeRocket().heightM`); `src/ui/launch/three/rocket3d.ts` builds the Three.js model from it
+    (one group per stage with its interstage, nozzles in a ring up to 9, boosters in pairs, ogive fairing in two halves, legs,
+    grid fins). Workbench: 3D viewer (`RocketViewer3D`, drag or arrow keys, a 1.8 m figure for scale) with the side view as a
+    tab and as the fallback without WebGL. Launch: `LaunchScene3D` takes `rocket` (a `RocketDesign`) and flies it on the same
+    timeline: boosters drop at MECO - 0.4 s, stage 1 at MECO, a middle stage halfway to SECO (`stagingTimes`), fairing opens,
+    reusable first stages land in the inset. The rocket is scaled to the pad (34 to 62 m, `launchDisplayScale`). Debug:
+    `?scene3d=custom` (workbench rocket) and `&preset=heavy`. `LaunchSequence` already passes the workbench rocket when the
+    launcher id is `custom` (nothing selects it yet: delivery 4). Realism pass on every 3D launch: bloom + vignette + filmic
+    tone mapping through `postprocessing`, an environment map made from the pad's own sky (`makeEnvironment`), softer flame
+    core. Checked in headless Chrome: workbench with the four presets, drag, a third stage, side-view tab; launches of
+    reusable_heavy (before/after), custom heavy (day), reusable medium (dawn) and a 3-stage rocket with 4 boosters (night);
+    no console errors. 145 tests pass (`tests/rocket3d.test.ts` is new).
+19. Rocket Engineer pad, delivery 4 (2026-11-13): the pad joins the missions and the career.
+    - **Your rocket as a launcher:** `Design.customRocket` (a copy of the workbench rocket, taken when it is chosen) and
+      `resolveLauncher(design)` in `src/engine/launch.ts`; the review, the simulation, the launch pad and the launch
+      sequence use it instead of `getLauncher(design.launcherId)`. Orbit tab: a "Your rocket" card after the catalog
+      launchers, a button to open the workbench (its back button returns to the mission) and one to take the latest
+      workbench version. A rocket with a design error has zero capacity (`LAUNCHER_NO_TARGET`). A `custom` design without a
+      readable rocket falls back to the medium launcher.
+    - **Career:** open once `commercial_launchers` is unlocked (`customRocketAllowed`). Parts need technology
+      (`rocketPartTech`, `missingRocketTech` in `campaign.ts`): legs and grid fins = `reusable_medium`; hydrogen engines and
+      tanks, the large booster and the 5.2 m fairing = new tech `hydrogen_stages` (20 M, 80 prestige); methane engines and
+      tanks = new tech `methane_engines` (30 M, 150 prestige). Kerosene parts are free. The workbench marks locked parts
+      with a padlock and says what is missing; the lock is enforced in the Orbit tab. Free play has no locks.
+    - **Calibration:** K-8 engine 3.5 -> 8 M, M tanks 1.2 -> 3 M (x fuel share), reused first stage 30 % -> 50 % of a new
+      one, and a new design is 3 % less reliable than its parts (`NEW_DESIGN_RELIABILITY`). The four presets now cost
+      within 15 % of their catalog launchers and are within 0.04 of their reliability (tested).
+    - **Lesson 4, "Why rockets have stages":** `stagedDvMs()` splits the same propellant into 1 to 4 stages against the
+      9.4 km/s of low Earth orbit; lessons on chaos and Paulet are now 5 and 6.
+    Checked in the browser: card chosen in a free mission, launch pad and 3D launch with "Your rocket"; lesson; in headless
+    Chrome (Spanish) the two new technologies on the career screen and the workbench notice for medium / heavy / reusable;
+    no console errors. 160 tests pass (`tests/customLauncher.test.ts` is new).
+20. Astrobiologist pad (2026-11-13): the astrobiology lab, Home → Extras, also opened from a mission's Payload tab (it can
+    send its instruments back to the mission). Pure engine `src/engine/astrobio.ts` (docs/model.md §21): six worlds with
+    what is expected there, nine lines of evidence, an instrument × evidence sensitivity table over the existing instrument
+    catalog, observing time with diminishing returns, a downlink budget (data that does not fit is lost), three questions
+    in order (water → habitability → biosignatures) and typed review codes `ASTRO_*`. Screen
+    `src/ui/astro/AstroScreen.tsx`, store `src/store/astro.ts` (`ppgame.astro.v1`). Texts live only in en.json / es.json
+    (`astro.*`, 100 keys; a test checks every world, line, instrument and code has its text). No 3D view in this pad.
+    Checked in headless Chrome in Spanish and English: opens from the menu, world change, instruments on and off, a
+    data-hungry imager on Europa's thin link; no console errors, no raw keys, no overflow. 169 tests pass.
+21. Astrobiology lab in 3D (2026-11-13): `src/ui/astro/WorldViewer3D.tsx` (lazy, WebGL only): a procedural globe per world
+    (canvas texture from a seeded RNG, no image files), atmosphere for Earth / Mars / Titan, the spacecraft on a polar orbit,
+    Enceladus' plume, and "Look inside" for worlds with a hidden ocean (thin crust, blue ocean, rocky core). Checked in
+    headless Chrome: Europa inside, Enceladus; the button only shows where an ocean is expected.
+22. Asynchronous multiplayer, first step (2026-11-13): challenge links, no server. `src/store/share.ts`:
+    `encodeChallenge` / `decodeChallenge` / `challengeUrl` (`#c=`: scenario, seed, score to beat, name) and
+    `challengeVerdict` (a flight only counts with the same scenario and seed). Results screen: "Challenge a friend" copies
+    the link. Opening it starts that scenario with a fresh design and the challenger's seed; banners on the briefing and
+    the launch pad, win / tie / lose on the results. Changing the seed or flying a random one drops out of the challenge.
+    Checked in the browser: the link opens the scenario with its banner. The results banner was not flown end to end
+    (its verdict is unit-tested). 173 tests pass (`tests/challenge.test.ts` is new).
+23. Mars, delivery a (2026-11-13): the engine. `src/engine/mars.ts` (pure, docs/model.md §22): Mars' orbit, the synodic
+    period (779.9 days = 25.6 months between windows), the minimum-energy trip (259 days), the phase angle on launch day
+    (44°), the Earth-Mars distance and the one-way radio delay over time (4.4 to 21 minutes), solar conjunctions, the
+    capture burn from the arrival speed (`marsCaptureDv`), the areostationary altitude and `transferView()` (positions of
+    Earth, Mars and the spacecraft on any day). New launch target `tmi` (13 000 m/s from the ground; catalog launchers:
+    M-2 320 kg, R-2 220, R-3 1 950, H-3 2 800; the player's rocket gets it from its parts), central body `mars`, two
+    orbits (`mars_low` 250-500 km, `mars_areo` 17 030 km) and their routes in `catalog/routes.ts`: minimum energy
+    (8.5 months, 2 100 m/s), capture + aerobraking (13.5 months, 1 000 m/s), fast (7 months, 2 550 m/s).
+    - **Launch window:** `Scenario.launchWindow { firstMonth, everyMonths }`. `evaluateDesign` puts the launch in the first
+      window the spacecraft is ready for (`schedule.launchMonth`, `windowWaitMonths`); waiting costs half the operations
+      team; review codes `MARS_WINDOW_MISSED` and `MARS_WINDOW_TIGHT` (less than 3 months of margin) replace `LATE`.
+    - **Flight:** a pre-launch slip longer than the margin moves the launch to the next window (score: 0 of 50 schedule
+      points, arrival bonus lost); the capture burn is logged with the radio delay; aerobraking can meet a dust storm
+      (decision: raise the orbit for 3 weeks and 8 m/s, or hold and risk the arrays); every conjunction is a two-week
+      blackout with a decision (keep observing and store, or instruments off). `MissionState.blackoutUntil` is new and
+      optional, so older saved flights still load.
+24. Mars, delivery b (2026-11-13): the first playable Act 3 contract, "Red Horizon" (`mars_orbiter`, scenario and
+    contract; needs Lunar Pathfinder and 300 prestige, pays 220 M). An orbiter for one Martian year: water-ice mapping,
+    0.5 GB/day, 420 M, window in month 30. The Stranded and Breathing Mars cards stay as previews (deliveries c and d).
+    UI: Orbit tab → "Route to Mars" with the window on the project calendar, the radio delay and the trip to scale
+    (`src/ui/mars/MarsPlan.tsx`, `MarsTransferView.tsx`); flight screen → the cruise around the Sun with Earth, Mars and
+    the spacecraft on the real day, the signal-delay readout, Mars in the orbit view; rocket workbench → capacity
+    "Towards Mars (TMI)". 84 new strings in en.json / es.json. Balance over 60 seeds: one instrument on the M-2 with
+    aerobraking is Outstanding 56/60; the base orbiter with Ka-band is Success or better 58/60 (the 2 failures are the
+    launcher). Checked in the browser in Spanish: Orbit tab for Red Horizon (routes, window, delay, transfer view), then
+    a flight to week 69 (cruise view, capture log, conjunction decision); no console errors. 192 tests pass
+    (`tests/mars.test.ts` is new, 19 tests).
+25. Mars, delivery c (2026-11-14): entry, descent and landing, and the "Stranded" mission.
+    - **Engine** `src/engine/edl.ts` (pure, docs/model.md §23). The budget is worked from the ground up: landed mass →
+      landing hardware and braking propellant (rocket equation on the parachute's terminal speed) → parachute → guidance
+      → aeroshell → cruise stage → mass on the pad (`analyzeEdl`). Three aeroshells (2.65 / 3.5 / 4.5 m), three
+      parachutes (11 / 16 / 21.5 m), three landing systems (airbags ≤ 550 kg, legs and retro-rockets ≤ 900 kg, sky crane
+      ≤ 1 300 kg) and guided entry (ellipse 100 km → 25 / 20 / 8 km). The physical limit is the ballistic coefficient
+      m / (Cd·A) against what the air at the site can stop (`betaMax`, thinner air at higher sites). Issue codes
+      `EDL_SHELL_TOO_SMALL`, `EDL_SHELL_MARGIN`, `EDL_CHUTE_TOO_SMALL`, `EDL_DESCENT_LIMIT`, plus `EDL_ELLIPSE_WIDE`
+      from the scenario. Checked against Curiosity and Phoenix in the tests.
+    - **Destination** `mars_surface` (`Orbit.surface`): no braking burn, twelve-hour nights (eclipse 0.5 of a sol), dust
+      on the panels (15 %/yr), data through relay passes. Routes: minimum energy (entry at 5.7 km/s) and fast (6.1 km/s,
+      heavier shield). `Design.landing`, `DesignReport.edl`, `Scenario.landingSiteKm`, requirement `ellipseKmAtMost`.
+      In `evaluateDesign` the launch mass of a lander is the landing budget; the landing system adds cost, months of
+      development and its own reliability.
+    - **Flight:** two weeks before entry a dust storm may ask for a decision (new entry settings for 2 M, or −10 % on
+      the landing); on arrival the landing is rolled (`landing_failure` ends the mission and delivers nothing: score,
+      report cause `CAUSE_LANDING_FAILURE`); the log says how the radio delay compares with the seven minutes.
+    - **"Stranded"** (`mars_stranded`, now `kind: 'orbital'`, after Red Horizon with 400 prestige, pays 300 M): land
+      300 kg of supplies within 25 km before month 34; the only window in time opens in month 25. The base design lands
+      100 km away until the entry is guided; the sky crane is the most precise and leaves half a month of margin;
+      500 kg of cargo needs the 3.5 m shell. Balance over 60 seeds with legs and guidance: Outstanding 42, window missed
+      10, lost at launch or landing 8.
+    - **UI:** Orbit tab → "Entry, descent and landing" (`src/ui/mars/LandingPanel.tsx`): landing system, aeroshell,
+      parachute, guided entry, the mass budget as a stacked bar, the load on the heat shield against its limit, and the
+      seven minutes drawn with the speed at each handover. 106 new strings in en.json / es.json.
+    Checked in the browser: the panel in Spanish and English; in English a flight lost at landing (seed 5, with the
+    storm decision) and one that lands and scores Outstanding (seed 6), both through the results screen; no console
+    errors. 209 tests pass (`tests/edl.test.ts` is new, 17 tests).
+26. Mars, delivery d (2026-11-14): "Breathing Mars", oxygen from the Martian air. Act 3 is fully playable.
+    - **Engine** `src/engine/isru.ts` (pure, docs/model.md §24). A plant of 0 to 8 units (50 kg, 500 W, 40 g of oxygen
+      per hour each, TRL 6) that runs a chosen number of hours per sol. `analyzeOxygen`: kg per sol and per year, energy
+      per kilogram (12.5 kWh), CO2 and Martian air drawn in (2 CO2 → 2 CO + O2, half of the CO2 split), the sols to make
+      its own mass in oxygen. It runs in daylight first: only the hours after dark come out of the battery
+      (`nightEnergyWh`), so `evaluateDesign` sizes the arrays with `power.requiredAvgW` and the battery with the night
+      share (the average-load formulas are untouched for every other design). `Design.oxygen`, `DesignReport.oxygen`
+      (with `plannedKg`), requirement `oxygenKgAtLeast`, `Scenario.scoring: 'oxygen'`, review codes
+      `OXYGEN_NIGHT_RUN` and `OXYGEN_NEEDS_SURFACE`.
+    - **Flight:** `MissionState.oxygenKg` grows every week of operations with the plant's rate × the power actually
+      available (dust on the arrays: 15 %/yr) × safe mode × storms. New surface events: a dust storm (decision:
+      throttle the plant to 40 % for three weeks, or keep full power and risk the battery) and a dust devil that cleans
+      the arrays (+8 % power, for any lander). Score line "Oxygen made" (250 points against the required kilograms),
+      report cause `CAUSE_LOW_OXYGEN`.
+    - **"Breathing Mars"** (`mars_oxygen`, now `kind: 'orbital'`, after Stranded with 500 prestige, pays 250 M):
+      300 kg of oxygen in one year on the surface, 420 M, window in month 36. The base design plans 284 kg, just
+      short; a plant sized exactly for 300 kg comes up short in flight, so the lesson is margin. Balance over 60 seeds
+      with 3 units, 12 h per sol and 20 m² of array: Outstanding 52, lost at launch or landing 8.
+    - **UI:** Payload tab → "Oxygen plant" (`src/ui/mars/OxygenPanel.tsx`): units, hours per sol, and what they give
+      (oxygen per sol and over the mission, power, energy per kilogram, air drawn in, mass payback, what the same oxygen
+      would weigh on the launch pad if brought from Earth); flight screen → "Oxygen made" gauge. 51 new strings.
+    Checked in the browser in English, through the interface: the panel, the sliders (3 units at 12 h on 12 m² of array
+    is blocked for power; at 8 h it plans 341 kg), then launch, a full flight on the bot (two dust storms, a
+    conjunction, a slip absorbed by the window margin; 317 of 300 kg) and the results (Outstanding, 883); no console
+    errors. 221 tests pass (`tests/isru.test.ts` is new, 12 tests).
+
+27. Robot guide, delivery 1 (2026-11-14): three candidate looks for the owner to choose from, behind `?guide=1`
+    (`src/ui/guide/GuidePreview.tsx`, lazy-loaded from `main.tsx`). `src/ui/guide/robots.tsx` draws them in SVG, no
+    image files, with the same five faces (calm, happy, thinking, worried, explaining) and a mouth that moves while a
+    line is typed out: **Kuntur** (a condor-shaped flying drone with solar-panel wings and the condor's white collar),
+    **Inti** (a floating sphere with an orbit for a halo and its own little moon), **Chaska** (a CubeSat with a screen
+    face, whisker antennas and panels for arms). Names are Quechua words; the designs are our own (no film robot).
+    Each card says three sample lines (first mission, a hint, why it failed) and lets the owner try every face;
+    EN / ES switch on the page. Animations are CSS (`guide-*` in `index.css`) and stop with reduced motion. 28 new
+    strings. Screenshot: `docs/screenshots/guide-variants.jpg`. Checked in the browser in English and Spanish: lines,
+    faces, typing, no console errors. 224 tests pass (`tests/guide.test.ts` is new: every look draws every face, still
+    robots never animate, the faces differ).
+
+28. Robot guide, delivery 2 (2026-11-14): the owner chose **Kuntur**; Inti, Chaska and the `?guide=1` page are deleted.
+    Kuntur lives in the bottom-left corner of the design and results screens (`src/ui/guide/GuideDock.tsx`, mounted in
+    `App`); the screens tell it what to say through `useGuideContent` (`src/store/guide.ts`), and the lines are pure
+    functions in `src/ui/guide/lines.ts`.
+    - **Design screen, closed:** a small Kuntur whose face tells how the design is doing (worried = something blocks
+      the launch, thinking = warnings, happy = all green) and a badge with the number of issues. **Open:** one hint per
+      issue, blocking first and the open tab first among equals (`orderedIssues`), with the review's "why" and its
+      first lever, and a "Show me (tab)" button that opens the tab where the fix is (`tabFor`).
+    - **First-mission tutorial:** eight steps across the six tabs (each step opens its tab), shown the first time any
+      design screen opens, with "Skip the tutorial"; remembered in settings (`tutorialDone`).
+    - **Results screen:** opens by itself once per flight and explains the result, the causes that cost most first,
+      each with "What I would change", then what went well; face by rank.
+    - **Settings:** a "Robot guide" section: Kuntur on / off (`guide`) and "Repeat the tutorial".
+    - Text is typed out on screen (no voice); the mouth moves while it types; reduced motion shows it whole and stills
+      the robot. Hidden on the launch pad and in flight. 36 new strings, the preview's 27 removed.
+    Checked in the browser in Spanish: the tutorial's eight steps (each on its tab), the hints on an empty design
+    ("No instruments on board" → "Show me" opens Payload; then "Too heavy for the launcher", then "Over budget", each
+    followed to a launch), a full flight and the results opening by themselves (Outstanding, happy face), the Settings
+    section; a fresh tab has no console errors. Fixed on the way: React strict mode remounted the results screen and
+    the bubble forgot it was open (`lastId` in the store). 229 tests pass (`tests/guide.test.ts` rewritten).
+
+## Next exact step
+One animated video per role, hosted by Kuntur (PLAYBOOK §6c; HyperFrames, local). The general handoff (done /
+pending) is `HANDOFF.md` at the repo root. Older note, kept for history:
+The user compares the launch-renderer prototypes (`?proto=pixi` vs `?proto=three`, built by the local chat); the winner
+replaces the SVG launch scene with the motion list in CLOUD_NEXT item 3 (restyled in the HUD direction). The local chat
+tests the Windows installer from GitHub Actions (Desktop build → Artifacts).

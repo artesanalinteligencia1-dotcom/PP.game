@@ -1,0 +1,59 @@
+<template>
+  <div id="root" data-composition-id="history" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hi-stage" class="k-stage">
+      <div class="k-grid"></div>
+      <div class="k-kicker" id="hi-kicker" style="left:140px; top:70px">QUELCCAYA ICE CAP, PERU · THE SAME PLACE, 22 YEARS APART</div>
+      <div class="k-photo" id="hi-frame" style="left:140px; top:130px; width:1050px; height:700px">
+        <div id="hi-zoom" style="position:absolute; inset:0">
+          <img id="hi-a" src="assets/quelccaya-1988.jpg" alt="">
+          <img id="hi-b" src="assets/quelccaya-2010.jpg" alt="">
+        </div>
+        <div id="hi-div" style="position:absolute; top:0; left:0; width:5px; height:100%; background:#f08a3c; box-shadow:0 0 24px 6px rgba(240,138,60,.8); z-index:2; opacity:0"></div>
+        <div class="k-credit">Image: NASA Earth Observatory · Landsat 5</div>
+        <div class="k-ai" id="hi-ice" style="color:#7fe6ff">ICE SHOWS AS LIGHT BLUE</div>
+      </div>
+      <div class="k-year" id="hi-year" style="left:1250px; top:120px">1988</div>
+      <div class="k-label cream" id="hi-sub" style="left:1254px; top:276px">LANDSAT 5 · FALSE COLOUR</div>
+      <svg class="k-svg" viewBox="0 0 1920 1080">
+        <!-- the diagram grows: glacier → river → people -->
+        <path id="hi-mtn" d="M 1250 470 L 1340 372 L 1392 420 L 1470 340 L 1560 446 L 1610 410 L 1670 470" fill="none" stroke="#8a8f98" stroke-width="4" stroke-linejoin="round"/>
+        <path id="hi-cap" d="M 1418 392 L 1470 340 L 1522 400 L 1494 388 L 1470 404 L 1446 386 Z" fill="#bfefff" stroke="#7fe6ff" stroke-width="2"/>
+        <path id="hi-river" d="M 1470 404 C 1450 470, 1530 500, 1500 560 S 1420 640, 1470 700 S 1560 760, 1520 820" fill="none" stroke="#36d1ff" stroke-width="7" stroke-linecap="round"/>
+        <path id="hi-flow" d="M 1470 404 C 1450 470, 1530 500, 1500 560 S 1420 640, 1470 700 S 1560 760, 1520 820" fill="none" stroke="#e8f8ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 40"/>
+        <g id="hi-n1"><circle cx="1500" cy="560" r="13" fill="#0b0d10" stroke="#d9b46a" stroke-width="4"/><line x1="1513" y1="560" x2="1570" y2="560" stroke="#d9b46a" stroke-width="3"/></g>
+        <g id="hi-n2"><circle cx="1448" cy="660" r="13" fill="#0b0d10" stroke="#d9b46a" stroke-width="4"/><line x1="1461" y1="660" x2="1570" y2="660" stroke="#d9b46a" stroke-width="3"/></g>
+        <g id="hi-n3"><circle cx="1530" cy="780" r="13" fill="#0b0d10" stroke="#d9b46a" stroke-width="4"/><line x1="1543" y1="780" x2="1570" y2="780" stroke="#d9b46a" stroke-width="3"/></g>
+      </svg>
+      <div class="k-label gold" id="hi-l0" style="left:1574px; top:366px">GLACIER MELTWATER</div>
+      <div class="k-label cream" id="hi-l1" style="left:1580px; top:540px">DRINKING WATER</div>
+      <div class="k-label cream" id="hi-l2" style="left:1580px; top:640px">FARMS</div>
+      <div class="k-label cream" id="hi-l3" style="left:1580px; top:760px">HYDROPOWER</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("history");
+    K.enter(tl, "#hi-stage", "wipe");
+    K.fade(tl, "#hi-kicker", 0.3);
+    K.photo(tl, "#hi-frame", 0.25); K.blurIn(tl, "#hi-year", 0.5, 0.7); K.fade(tl, "#hi-sub", 0.8, 0.4, 0);
+    K.fade(tl, "#hi-ice", c("vo3", 0.6), 0.4, 0);
+    tl.set("#hi-b", { clipPath: "inset(0 100% 0 0)" }, 0);
+    // before → after: the divider sweeps across as the years run
+    const s0 = c("vo3", 2.2), sd = 3.4;
+    tl.set("#hi-div", { opacity: 1 }, s0);
+    tl.fromTo("#hi-b", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: sd, ease: "power2.inOut" }, s0);
+    tl.fromTo("#hi-div", { x: 0 }, { x: 1050, duration: sd, ease: "power2.inOut" }, s0); tl.to("#hi-div", { opacity: 0, duration: 0.2 }, s0 + sd);
+    K.count(tl, "#hi-year", 1988, 2010, s0, sd, (v) => String(Math.round(v)));
+    tl.fromTo("#hi-year", { color: "#d9b46a" }, { color: "#f08a3c", duration: 0.5 }, s0 + sd - 0.4);
+    tl.fromTo("#hi-zoom", { scale: 1, x: 0, y: 0, transformOrigin: "42% 38%" }, { scale: 1.5, duration: c.dur - s0, ease: "sine.inOut" }, s0 + sd * 0.6);
+    // meltwater → rivers → people
+    const d0 = c("vo4", 0.1);
+    K.draw(tl, "#hi-mtn", d0, 0.8); tl.fromTo("#hi-cap", { opacity: 0, scale: 0.4, transformOrigin: "50% 100%" }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }, d0 + 0.6);
+    K.fade(tl, "#hi-l0", d0 + 0.9, 0.4, 0);
+    K.draw(tl, "#hi-river", d0 + 1.0, 2.6, "power1.inOut");
+    tl.fromTo("#hi-flow", { opacity: 0 }, { opacity: 1, duration: 0.5 }, d0 + 2.4);
+    tl.fromTo("#hi-flow", { strokeDashoffset: 0 }, { strokeDashoffset: -230, duration: c.dur - d0 - 2.0, ease: "none" }, d0 + 2.4);
+    [1, 2, 3].forEach((n, i) => { K.pop(tl, "#hi-n" + n, d0 + 1.7 + i * 0.75, 0.35); K.fade(tl, "#hi-l" + n, d0 + 1.85 + i * 0.75, 0.35, 0, -16); });
+    K.exit(tl, "#hi-stage", "whip", c.dur);
+    window.__timelines["history"] = tl;
+  </script>
+</template>

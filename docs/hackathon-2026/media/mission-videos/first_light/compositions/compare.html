@@ -1,0 +1,52 @@
+<template>
+  <style>
+    @font-face { font-family: "Barlow Condensed"; font-weight: 500; src: url("assets/fonts/barlow-500.woff2") format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 600; src: url("assets/fonts/barlow-600.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #0b0d10; font-family: "Barlow Condensed", sans-serif; color: #e8e0cc; }
+    #cp-title { position: absolute; left: 140px; top: 110px; font-size: 34px; letter-spacing: .2em; color: #d9b46a; font-weight: 600; }
+    #cp-sub { position: absolute; left: 140px; top: 160px; font-size: 68px; font-weight: 600; }
+    .cp-row { position: absolute; left: 140px; width: 1640px; height: 120px; }
+    .cp-name { position: absolute; left: 0; top: 0; width: 420px; font-size: 34px; letter-spacing: .08em; line-height: 1.15; }
+    .cp-name small { display: block; font-size: 28px; color: #8a8f98; letter-spacing: .1em; }
+    .cp-bar { position: absolute; left: 440px; top: 26px; height: 48px; background: #f08a3c; transform-origin: 0% 50%; }
+    .cp-val { position: absolute; top: 18px; font-size: 52px; font-weight: 600; }
+    #cp-axis { position: absolute; left: 580px; top: 735px; width: 1200px; font-size: 28px; color: #8a8f98; letter-spacing: .1em; }
+    #cp-times { position: absolute; left: 0; right: 0; top: 800px; text-align: center; font-size: 60px; font-weight: 600; color: #d9b46a; }
+  </style>
+  <div id="root" data-composition-id="compare" data-width="1920" data-height="1080" data-layout-allow-overlap>
+    <div id="cp-title">YOUR FLIGHT VS. HISTORY</div>
+    <div id="cp-sub">How high, on a logarithmic scale</div>
+    <div class="cp-row" id="cp-r1" style="top:300px">
+      <div class="cp-name">1926 · FIRST LIQUID-FUEL FLIGHT<small>DOCUMENTED</small></div>
+      <div class="cp-bar" id="cp-b1" style="width:0px"></div>
+      <div class="cp-val" id="cp-v1" style="left:470px">12.5 m</div>
+    </div>
+    <div class="cp-row" id="cp-r2" style="top:450px">
+      <div class="cp-name">KÁRMÁN LINE<small>WHERE SPACE BEGINS</small></div>
+      <div class="cp-bar" id="cp-b2" style="width:1000px; background:#d9b46a"></div>
+      <div class="cp-val" id="cp-v2" style="left:1470px">100 km</div>
+    </div>
+    <div class="cp-row" id="cp-r3" style="top:600px">
+      <div class="cp-name">PAULET-1 · YOUR FLIGHT<small>FROM THIS RUN</small></div>
+      <div class="cp-bar" id="cp-b3" style="width:1040px; background:#36d1ff"></div>
+      <div class="cp-val" id="cp-v3" style="left:1510px"><span data-var-text="apogeeKm">100+</span> km</div>
+    </div>
+    <div id="cp-axis">1 m · 10 m · 100 m · 1 km · 10 km · 100 km</div>
+    <div id="cp-times">100 km is 8,000 times higher than the 1926 flight</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // log scale: 1 m → 0 px, 100 km → 1000 px (200 px per decade); 12.5 m ≈ 219 px
+    gsap.set("#cp-b1", { width: 219 });
+    tl.fromTo(["#cp-title", "#cp-sub"], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.15, ease: "power3.out" }, 0);
+    ["1", "2", "3"].forEach((n, i) => {
+      tl.fromTo("#cp-r" + n + " .cp-name", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5 }, 1 + i * 2.2);
+      tl.fromTo("#cp-b" + n, { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: "power3.out" }, 1.2 + i * 2.2);
+      tl.fromTo("#cp-v" + n, { opacity: 0 }, { opacity: 1, duration: 0.4 }, 2.3 + i * 2.2);
+    });
+    tl.fromTo("#cp-axis", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 1.2);
+    tl.fromTo("#cp-times", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.6)" }, 9.0);
+    tl.fromTo("#root", { scale: 1 }, { scale: 1.04, duration: 17, ease: "none" }, 0);
+    window.__timelines["compare"] = tl;
+  </script>
+</template>

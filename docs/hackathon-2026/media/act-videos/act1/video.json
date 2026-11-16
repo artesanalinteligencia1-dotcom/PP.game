@@ -1,0 +1,48 @@
+{
+  "id": "act1",
+  "title": "Act 1 — Three Failures",
+  "music": "fire-a.mp3",
+  "musicVol": 0.2,
+  "sfx": [
+    { "src": "beep.wav", "scene": "sputnik", "cue": "vo1", "off": -0.4, "dur": 4.8, "vol": 0.16, "fade": 0.6 },
+    { "src": "explosion.mp3", "scene": "flight1", "at": 1.9, "dur": 3, "vol": 0.42 },
+    { "src": "failure.mp3", "scene": "flight1", "cue": "vo6", "off": 0.0, "dur": 2.5, "vol": 0.25 },
+    { "src": "alert.mp3", "scene": "night", "cue": "vo8", "off": 0.2, "dur": 1.2, "vol": 0.18 },
+    { "src": "success.mp3", "scene": "success", "cue": "vo11", "off": 0.3, "dur": 4, "vol": 0.4 }
+  ],
+  "scenes": [
+    { "id": "sputnik", "lead": 1.4, "tail": 1.2, "lines": [
+      { "id": "vo1", "v": "nar", "en": "October 4, 1957: the first artificial satellite.", "tts": "October fourth, nineteen fifty-seven: the first artificial satellite.", "es": "4 de octubre de 1957: el primer satélite artificial." },
+      { "id": "vo2", "v": "nar", "gap": 0.5, "en": "A beep that changed the world.", "es": "Un pitido que cambió el mundo." }
+    ] },
+    { "id": "pitch", "lead": 0.7, "tail": 1.0, "lines": [
+      { "id": "vo3", "v": "nar", "en": "Today, in Arequipa, the investors want results. The farmers want data on their crops.", "tts": "Today, in Arequipa, the investors want results. The farmers want data on their crops.", "es": "Hoy, en Arequipa, los inversores quieren resultados. Los agricultores, datos de sus cultivos." },
+      { "id": "vo4", "v": "nar", "gap": 0.35, "en": "Goicochea wants both.", "tts": "Goy-ko-chay-ah wants both.", "es": "Goicochea quiere ambos." }
+    ] },
+    { "id": "workshop", "lead": 0.6, "tail": 0.9, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Chicho counts every gram. Roberto counts every byte.", "es": "Chicho cuenta cada gramo. Roberto, cada byte." },
+      { "id": "chi", "v": "chi", "gap": 0.4, "en": "Every gram we save is fuel we keep.", "es": "Cada gramo que ahorramos es combustible que nos queda." }
+    ] },
+    { "id": "flight1", "lead": 3.4, "tail": 1.4, "lines": [
+      { "id": "vo6", "v": "nar", "en": "Flight one. Lost.", "es": "Vuelo uno. Perdido." }
+    ] },
+    { "id": "news", "lead": 0.6, "tail": 2.4, "lines": [
+      { "id": "vo7", "v": "nar", "en": "The news asks if this is serious. Social media has jokes.", "es": "El noticiero pregunta si esto va en serio. Las redes, memes." }
+    ] },
+    { "id": "night", "lead": 0.6, "tail": 1.0, "lines": [
+      { "id": "vo8", "v": "nar", "en": "Flight two. Flight three. Lost. The money is almost gone.", "es": "Vuelo dos. Vuelo tres. Perdidos. El dinero casi se acaba." },
+      { "id": "fra", "v": "fra", "gap": 0.5, "en": "We go again. One more time.", "es": "Vamos otra vez. Una más." }
+    ] },
+    { "id": "real", "lead": 0.6, "tail": 1.2, "lines": [
+      { "id": "vo9", "v": "nar", "en": "They were not the first to fail three times.", "es": "No fueron los primeros en fallar tres veces." },
+      { "id": "vo10", "v": "nar", "gap": 0.4, "en": "In 2008, a small private rocket reached orbit on its fourth try.", "tts": "In two thousand eight, a small private rocket reached orbit on its fourth try.", "es": "En 2008, un pequeño cohete privado llegó a la órbita en su cuarto intento." }
+    ] },
+    { "id": "success", "lead": 0.8, "tail": 1.0, "lines": [
+      { "id": "vo11", "v": "nar", "en": "Flight four. Orbit.", "es": "Vuelo cuatro. Órbita." },
+      { "id": "goi", "v": "goi", "gap": 0.6, "en": "Paulet... we are in orbit.", "es": "Paulet... estamos en órbita." }
+    ] },
+    { "id": "close", "lead": 0.8, "tail": 0, "min": 12, "lines": [
+      { "id": "vo12", "v": "nar", "en": "Now it's your turn: design the satellite that will not fail.", "es": "Ahora te toca a ti: diseña el satélite que no fallará." }
+    ] }
+  ]
+}

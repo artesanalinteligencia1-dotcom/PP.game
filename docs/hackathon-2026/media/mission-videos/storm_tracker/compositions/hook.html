@@ -1,0 +1,46 @@
+<template>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="hk-stage" class="k-stage">
+      <div class="k-space"></div>
+      <svg id="hk-stars" class="k-svg" viewBox="0 0 1920 1080"></svg>
+      <div id="hk-cam" style="position:absolute; inset:0">
+        <canvas id="hk-globe" width="1920" height="1080" style="position:absolute; left:0; top:0; width:1920px; height:1080px"></canvas>
+        <svg class="k-svg" viewBox="0 0 1920 1080" data-layout-ignore>
+          <g id="hk-storm-pos"><g id="hk-storm" style="filter:blur(5px)"></g><circle id="hk-eye" r="9" fill="#06101f"/></g>
+        </svg>
+      </div>
+      <div class="k-chip" id="hk-warn" style="left:140px; top:250px; border-color:#e0457b; color:#e0457b; font-size:36px; padding:8px 22px">NO WARNING</div>
+      <div class="k-label cream" id="hk-year" style="left:140px; top:330px">ATLANTIC OCEAN · BEFORE 1960</div>
+      <div class="k-kicker" id="hk-kicker" style="left:140px; top:470px">STORM TRACKER · THE REAL STORY</div>
+      <div class="k-title" id="hk-title" style="left:140px; top:520px; width:900px; font-size:104px">The satellites<br>that see<br>hurricanes coming</div>
+      <div class="k-vig"></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("hook");
+    K.stars("#hk-stars", 150, 31);
+    const g = K.globe("#hk-globe", { dist: 4.6, camLat: 22, camLon: -60, sunLat: 5, sunLon: 118, rot: 0 });
+    g.lookX = -7;
+    // hurricane: two spiral arms of soft blobs around an eye, placed over the western Atlantic
+    const pos = g.screen(21, -57); document.querySelector("#hk-storm-pos").setAttribute("transform", `translate(${pos[0].toFixed(0)} ${pos[1].toFixed(0)})`);
+    const r = K.rng(8); let h = "";
+    for (let arm = 0; arm < 3; arm++) for (let k = 0; k < 64; k++) {
+      const a = k * 0.13 + (arm * 2 * Math.PI) / 3, rad = 10 + 150 * Math.pow(k / 64, 0.85) + r() * 10;
+      h += `<circle cx="${(rad * Math.cos(a)).toFixed(1)}" cy="${(rad * Math.sin(a) * 0.86).toFixed(1)}" r="${(22 - 15 * (k / 64) + r() * 4).toFixed(1)}" fill="#f4f8ff" opacity="${(0.5 - 0.3 * (k / 64)).toFixed(2)}"/>`;
+    }
+    h += `<circle r="34" fill="#f4f8ff" opacity=".6"/>`;
+    document.querySelector("#hk-storm").innerHTML = h;
+    tl.fromTo("#hk-stars", { opacity: 0.3 }, { opacity: 1, duration: 2 }, 0);
+    tl.fromTo("#hk-cam", { scale: 1, transformOrigin: `${pos[0]}px ${pos[1]}px` }, { scale: 1.22, duration: c.dur + 0.5, ease: "sine.inOut" }, 0);
+    tl.fromTo("#hk-storm", { scale: 0.12, opacity: 0, rotation: 80, transformOrigin: "0px 0px" }, { scale: 1, opacity: 1, rotation: -150, duration: c.end("vo1") + 0.6, ease: "power1.out" }, 0.3);
+    tl.to("#hk-storm", { rotation: -230, duration: c.dur - c.end("vo1"), ease: "none" }, c.end("vo1") + 0.9);
+    tl.fromTo("#hk-eye", { opacity: 0, scale: 0.2, transformOrigin: "50% 50%" }, { opacity: 0.9, scale: 1, duration: 1.2 }, c("vo1", 2.2));
+    K.fade(tl, "#hk-year", 0.7, 0.6, 0);
+    K.stamp(tl, "#hk-warn", c("vo1", 2.9));
+    // dawn: the Sun comes round and we can finally see it
+    tl.fromTo(g, { sunLon: 118 }, { sunLon: 12, duration: c.dur - c.end("vo1") + 1.2, ease: "sine.inOut" }, c.end("vo1") - 0.6);
+    K.fade(tl, "#hk-kicker", c.end("vo1", 0.3), 0.7); K.blurIn(tl, "#hk-title", c.end("vo1", 0.5), 0.9);
+    K.exit(tl, "#hk-stage", "zoom", c.dur, { x: pos[0], y: pos[1] });
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

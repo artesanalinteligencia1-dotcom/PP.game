@@ -1,0 +1,27 @@
+<template>
+  <div id="root" data-composition-id="tv" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="tv-stage" class="k-stage">
+      <div id="tv-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="tv-img" src="assets/act2-02.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div class="k-ai" style="right:40px; top:40px; bottom:auto">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-abs" id="tv-live" style="left:110px; top:100px; padding:6px 18px; background:#c43a2e; color:#fff; font-size:34px; font-weight:600; letter-spacing:.14em"><span id="tv-dot">●</span> LIVE</div>
+      <div class="k-abs" id="tv-view" style="left:260px; top:100px; padding:6px 18px; background:rgba(11,13,16,.85); font-size:34px; font-weight:600; letter-spacing:.06em"><span id="tv-n">0.0</span> M WATCHING</div>
+      <div class="k-abs" id="tv-l3" style="left:110px; top:760px; width:900px; height:120px; background:rgba(11,13,16,.9); border-left:8px solid #f08a3c">
+        <div class="k-label orange" style="left:28px; top:16px; font-weight:600">MORNING SHOW · GUESTS</div>
+        <div class="k-abs" style="left:28px; top:54px; font-size:46px; font-weight:600">The team that went to orbit from Arequipa</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("tv");
+    K.enter(tl, "#tv-stage", "whip");
+    K.kb(tl, "#tv-img", 0, c.dur + 0.5, { s: 1.06, x: -20 }, { s: 1.16, x: 30, y: -10 });
+    K.fade(tl, "#tv-live", 0.4, 0.4, 0); K.fade(tl, "#tv-view", 0.6, 0.4, 0);
+    for (let k = 0; k < 12; k++) tl.fromTo("#tv-dot", { opacity: 1 }, { opacity: 0.2, duration: 0.25, yoyo: true, repeat: 1 }, 0.4 + k * 0.6);
+    K.count(tl, "#tv-n", 0.2, 1.9, 0.6, c.dur - 1, (v) => v.toFixed(1));
+    tl.fromTo("#tv-l3", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power3.inOut" }, c("vo2", 0.6));
+    K.exit(tl, "#tv-stage", "fade", c.dur);
+    window.__timelines["tv"] = tl;
+  </script>
+</template>

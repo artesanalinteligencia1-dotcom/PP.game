@@ -1,0 +1,34 @@
+{
+  "id": "act4",
+  "title": "Act 4 — The Paulet 1 in Orbit",
+  "music": "misti-a.mp3",
+  "musicVol": 0.22,
+  "sfx": [
+    { "src": "countdown.mp3", "scene": "launch", "at": 0.2, "dur": 3, "vol": 0.25 },
+    { "src": "liftoff.mp3", "scene": "launch", "at": 2.4, "dur": 6, "vol": 0.45, "fade": 1.5 },
+    { "src": "fairing.mp3", "scene": "homage", "cue": "vo2", "off": 0.6, "dur": 2, "vol": 0.3 },
+    { "src": "orbit.mp3", "scene": "orbit", "at": 0.6, "dur": 2.5, "vol": 0.3 }
+  ],
+  "scenes": [
+    { "id": "homage", "lead": 1.2, "tail": 1.6, "lines": [
+      { "id": "vo1", "v": "nar", "en": "In 2018, a heavy rocket carried an unusual test payload: a car. It still orbits the Sun.", "tts": "In twenty eighteen, a heavy rocket carried an unusual test payload: a car. It still orbits the Sun.", "es": "En 2018, un cohete pesado llevó una carga de prueba poco común: un auto. Todavía orbita el Sol." },
+      { "id": "vo2", "v": "nar", "gap": 0.6, "en": "The team from Arequipa chose a different payload.", "es": "El equipo de Arequipa eligió otra carga." }
+    ] },
+    { "id": "hangar", "lead": 0.7, "tail": 1.2, "lines": [
+      { "id": "vo3", "v": "nar", "en": "The Paulet 1: Pedro Paulet's Avion-Torpedo, built piece by piece from his drawing.", "tts": "The Paulet One: Pedro Paulet's Avion Torpedo, built piece by piece from his drawing.", "es": "El Paulet 1: el Avión-Torpedo de Pedro Paulet, construido pieza a pieza a partir de su dibujo." },
+      { "id": "chi", "v": "chi", "gap": 0.5, "en": "Every rivet where he drew it.", "es": "Cada remache donde él lo dibujó." }
+    ] },
+    { "id": "launch", "lead": 3.6, "tail": 1.2, "lines": [
+      { "id": "vo4", "v": "nar", "en": "Launch day. The whole of Arequipa holds its breath.", "es": "Día del lanzamiento. Todo Arequipa contiene el aliento." }
+    ] },
+    { "id": "orbit", "lead": 0.9, "tail": 1.4, "min": 8.6, "lines": [
+      { "id": "vo5", "v": "nar", "en": "More than a century later, Paulet's Avion-Torpedo is in space.", "tts": "More than a century later, Paulet's Avion Torpedo is in space.", "es": "Más de un siglo después, el Avión-Torpedo de Paulet está en el espacio." }
+    ] },
+    { "id": "letter", "lead": 1.0, "tail": 1.4, "min": 8.5, "lines": [
+      { "id": "goi", "v": "goi", "en": "Dear Pedro: we kept your promise. Now it belongs to them.", "es": "Querido Pedro: cumplimos tu promesa. Ahora es de ellos." }
+    ] },
+    { "id": "close", "lead": 1.0, "tail": 0, "min": 13.5, "lines": [
+      { "id": "vo6", "v": "nar", "en": "Your turn.", "es": "Te toca." }
+    ] }
+  ]
+}

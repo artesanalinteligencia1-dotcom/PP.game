@@ -1,0 +1,46 @@
+{
+  "id": "andean_eye",
+  "title": "Andean Eye — the real story: the glaciers of the Andes",
+  "music": "quiet-orbit-b.mp3",
+  "musicVol": 0.2,
+  "musicStart": 20,
+  "sfx": [
+    { "src": "orbit.mp3", "scene": "hook", "at": 0.3, "dur": 2.4, "vol": 0.3 },
+    { "src": "deploy.mp3", "scene": "science", "cue": "vo6", "off": 0.2, "dur": 2.4, "vol": 0.3 }
+  ],
+  "scenes": [
+    { "id": "hook", "lead": 1.4, "tail": 2.8, "lines": [
+      { "id": "vo1", "v": "nar", "en": "Peru holds about seventy percent of the world's tropical glaciers.", "es": "El Perú tiene cerca del setenta por ciento de los glaciares tropicales del mundo." },
+      { "id": "vo2", "v": "nar", "gap": 0.9, "en": "Your satellite was built to watch them.", "es": "Tu satélite fue construido para vigilarlos." }
+    ] },
+    { "id": "history", "lead": 1.0, "tail": 1.5, "lines": [
+      { "id": "vo3", "v": "nar", "en": "Satellite records show that Andean glaciers have lost a large share of their ice since the 1970s.", "tts": "Satellite records show that Andean glaciers have lost a large share of their ice since the nineteen seventies.", "es": "Los registros satelitales muestran que los glaciares andinos han perdido gran parte de su hielo desde los años setenta." },
+      { "id": "vo4", "v": "nar", "gap": 0.7, "en": "Their meltwater feeds rivers that millions of people depend on in the dry season.", "es": "Su agua de deshielo alimenta ríos de los que dependen millones de personas en la estación seca." }
+    ] },
+    { "id": "science", "lead": 1.0, "tail": 1.4, "lines": [
+      { "id": "vo5", "v": "nar", "en": "Clouds often hide the mountains, so scientists combine optical, thermal and radar data.", "es": "Las nubes suelen tapar las montañas, por eso se combinan datos ópticos, térmicos y de radar." },
+      { "id": "vo6", "v": "nar", "gap": 0.6, "en": "NISAR, a radar satellite from NASA and India's space agency, maps ice and ground motion", "tts": "Nye-sar, a radar satellite from NASA and India's space agency, maps ice and ground motion", "es": "NISAR, un satélite radar de la NASA y la agencia espacial de la India, mide el hielo y el movimiento del suelo" },
+      { "id": "vo6b", "v": "nar", "gap": 0.15, "en": "through clouds, day and night.", "es": "a través de las nubes, de día y de noche." }
+    ] },
+    { "id": "compare", "gen": "compare", "enter": "rise", "exit": "zoom", "tail": 1.2,
+      "title": "NISAR, the NASA–ISRO radar mission",
+      "photo": { "src": "nisar.jpg", "credit": "Illustration: NASA/JPL-Caltech", "pos": "70% 50%" },
+      "rows": [
+        { "label": "ALTITUDE", "value": "747 km", "note": "near-polar orbit", "frac": 0.75 },
+        { "label": "SAME GROUND AGAIN", "value": "12 days", "note": "all of Earth's land and ice", "frac": 0.4, "color": "#d9b46a" },
+        { "label": "RADAR ANTENNA", "value": "12 m", "note": "unfolds in orbit", "frac": 0.6, "color": "#36d1ff" }
+      ],
+      "yours": ["COST", "LIFETIME", "DATA PER DAY"],
+      "lines": [
+        { "id": "vo7", "v": "nar", "en": "NISAR flies at 747 kilometres and sees the same ground every 12 days with a 12-metre antenna.", "tts": "Nye-sar flies at seven hundred and forty-seven kilometres, and sees the same ground every twelve days, with a twelve metre antenna.", "es": "NISAR vuela a 747 kilómetros y observa el mismo terreno cada 12 días con una antena de 12 metros." },
+        { "id": "vo8", "v": "nar", "gap": 0.6, "en": "You did it on a foundation budget. Small missions can still watch big changes.", "es": "Tú lo hiciste con el presupuesto de una fundación. Las misiones pequeñas también pueden vigilar grandes cambios." }
+      ] },
+    { "id": "ending", "gen": "ending", "who": "chi", "lead": 1.0, "tail": 7.5,
+      "quote": "My father herded alpacas under that ice. Now we measure it from space.",
+      "learn": "NASA Earth Observatory: Qori Kalis Glacier and the Quelccaya Ice Cap, Peru · NASA JPL: NISAR, the NASA–ISRO radar mission (nisar.jpl.nasa.gov) · NASA Gateway to Astronaut Photography of Earth",
+      "images": "Real images: NASA, NASA Earth Observatory (Landsat 5) and NASA/JPL-Caltech, public domain",
+      "lines": [
+        { "id": "chi", "v": "chi", "cap": false, "en": "My father herded alpacas under that ice. Now we measure it from space.", "es": "Mi padre pastaba alpacas bajo ese hielo. Ahora lo medimos desde el espacio." }
+      ] }
+  ]
+}

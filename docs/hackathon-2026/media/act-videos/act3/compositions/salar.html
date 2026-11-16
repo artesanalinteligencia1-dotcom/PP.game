@@ -1,0 +1,36 @@
+<template>
+  <div id="root" data-composition-id="salar" data-width="1920" data-height="1080" data-layout-allow-overlap style="position:absolute; inset:0; overflow:hidden">
+    <div id="sa-stage" class="k-stage">
+      <div id="sa-bg" style="position:absolute; inset:0; overflow:hidden">
+        <img id="sa-img" src="assets/act3-02.png" alt="" style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover">
+      </div>
+      <div style="position:absolute; left:0; right:0; top:0; height:360px; background:linear-gradient(180deg, rgba(5,7,12,.82), transparent)"></div>
+      <div class="k-ai" style="right:40px; bottom:40px">AI-GENERATED ILLUSTRATION</div>
+      <div class="k-kicker" id="sa-k" style="left:120px; top:80px">WHY THE ANDES · A MARS ANALOGUE ON EARTH</div>
+      <div class="k-abs" id="sa-cols" style="left:120px; top:136px; width:1500px; height:200px">
+        <div class="k-label cream" style="left:0; top:0; font-weight:600">HIGH ANDEAN SALT FLAT</div>
+        <div class="k-label orange" style="left:760px; top:0; font-weight:600">MARS</div>
+      </div>
+      <div class="k-chip sa-r" id="sa-r1" style="left:120px; top:186px">THIN AIR, HIGH ALTITUDE</div>
+      <div class="k-chip sa-r" id="sa-r2" style="left:120px; top:240px">VERY DRY</div>
+      <div class="k-chip sa-r" id="sa-r3" style="left:120px; top:294px">SALTS AND BRINES</div>
+      <div class="k-chip sa-r" id="sa-r4" style="left:500px; top:240px">STRONG UV LIGHT</div>
+      <div class="k-chip sa-m" id="sa-m1" style="left:880px; top:186px; border-color:#f08a3c; color:#f08a3c">AIR 1% OF EARTH'S</div>
+      <div class="k-chip sa-m" id="sa-m2" style="left:880px; top:240px; border-color:#f08a3c; color:#f08a3c">DRY SURFACE</div>
+      <div class="k-chip sa-m" id="sa-m3" style="left:880px; top:294px; border-color:#f08a3c; color:#f08a3c">SALTS FOUND BY ROVERS</div>
+      <div class="k-chip sa-m" id="sa-m4" style="left:1250px; top:240px; border-color:#f08a3c; color:#f08a3c">NO OZONE SHIELD</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true }); const c = K.cues("salar");
+    K.enter(tl, "#sa-stage", "whip");
+    K.kb(tl, "#sa-img", 0, c.dur + 0.5, { s: 1.04, x: -40 }, { s: 1.16, x: 40, y: 10 });
+    K.fade(tl, "#sa-k", 0.4, 0.5, 0); K.fade(tl, "#sa-cols", 0.6, 0.5, 0);
+    ["#sa-r1", "#sa-r2", "#sa-r3", "#sa-r4"].forEach((s, i) => {
+      tl.fromTo(s, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, c("vo2", 1.6 + i * 0.7));
+      tl.fromTo(s.replace("-r", "-m"), { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, c("vo2", 1.9 + i * 0.7));
+    });
+    K.exit(tl, "#sa-stage", "fade", c.dur);
+    window.__timelines["salar"] = tl;
+  </script>
+</template>
