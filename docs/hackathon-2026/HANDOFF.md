@@ -5,7 +5,7 @@
 > fecha, actualiza "Pendiente" y "Siguiente paso exacto", y haz commit.
 > Explicaciones al dueño en español; código, textos del juego y entrega en inglés.
 
-Última actualización: 2026-11-16 (limpieza final hecha: este archivo ya no está en el repo del concurso; vive aquí, en `PP.game/docs/hackathon-2026/`).
+Última actualización: 2026-11-16 (historial de git del repo del concurso reescrito; falta el video viejo de la intro y el pedido a GitHub Support, ver punto 32).
 
 ---
 
@@ -505,7 +505,18 @@ La tarjeta, si se usa, la ingresa el dueño en la página del proveedor; nunca C
    de NASA, créditos y uso de IA), `game/README.md` y `game/CREDITS.md` actualizados. Las copias locales de `media/` y
    `docs/` siguen en el disco del dueño, ignoradas por git. Comprobado: tsc, 262 pruebas, build, y en Vercel el menú,
    una misión, la demo `/deck/` y un video con subtítulos, sin errores de consola.
-   **Pendiente (paso 5): el dueño decide si se borran también del historial de git** (reescribir historial y force push).
+   **Paso 5 hecho (2026-11-16, con aprobación del dueño):** historial reescrito con `git filter-branch` en `main`,
+   `fable-3d-wip` y `scene3d-realism` (local) y force push de `main` y `fable-3d-wip`. Quedan 42 commits en `main` (antes 67;
+   se descartaron los que solo tocaban archivos internos); el contenido actual quedó idéntico (mismo árbol). Todos los
+   identificadores de commit cambiaron (el de la limpieza ahora es `541723f`). tsc, 262 pruebas y build OK; Vercel y
+   `/deck/` responden 200. Respaldo del historial viejo completo: `C:\PPgameespaldo-paulet-spaceapps-historial-2026-11-16.bundle`
+   (480 MB, en la PC del dueño; no subirlo a ningún lado).
+   **Pendiente:**
+   - `game/src/assets/video/intro.mp4` (intro vieja con Goicochea niño, regla de menores) **sigue en el historial**. Quitarlo
+     exige otro force push: el dueño debe aprobarlo de nuevo.
+   - GitHub guarda en caché los commits viejos: siguen abriendo por enlace directo con su identificador (p. ej.
+     `blob/3ee3281/HANDOFF.md`) y por el PR #1 (`fable-3d-wip`, ya fusionado). Para borrarlos del todo, el dueño tiene que
+     pedirlo a GitHub Support (formulario "Remove sensitive data" / purgar caché y referencias del PR). No hay forks.
    Hoy los archivos borrados aún se ven en commits anteriores del repo público.
    Texto original del punto: **LIMPIEZA FINAL DEL REPO (hacer al final, después de las últimas modificaciones y de comprobar que el juego corre bien)** (pedido del dueño, 2026-11-15).
    **PREGUNTAR AL DUEÑO ANTES DE EMPEZAR** (dicho por él el 2026-11-15 noche: es lo último de la hackathon y no se hace
