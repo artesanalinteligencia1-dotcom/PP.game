@@ -21,7 +21,7 @@
 
 ## Video
 - "Watch intro" (style A "Painted cinema", 31 s, `src/assets/video/intro.mp4`): illustrations, narration (take B) and music
-  generated with ElevenLabs for this project; animated with HyperFrames (source `C:\PPgame\intro-a`, `build.mjs`),
+  generated with ElevenLabs for this project; animated with HyperFrames (source `C:\Paulet\intro-a`, `build.mjs`),
   English captions burned in; 720p H.264 encode of `intro_paulet.mp4`.
 
 ## Data

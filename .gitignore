@@ -148,7 +148,7 @@ vite.config.ts.timestamp-*
 # Turbo Repo
 .turbo
 
-# --- PP.game additions ---
+# --- Paulet additions ---
 .env
 .env.*
 !.env.example

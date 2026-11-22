@@ -42,7 +42,7 @@ por tecnología, calibrar precios (el cohete armado cuesta solo piezas: el media
 sobre etapas.
 
 ## Herramientas
-- Servidor: `preview_start "paulet-dev"` (config en `C:\PPgame\.claude\launch.json`). Si tras editar, `import('/src/store/…')`
+- Servidor: `preview_start "paulet-dev"` (config en `C:\Paulet\.claude\launch.json`). Si tras editar, `import('/src/store/…')`
   en puppeteer da una instancia distinta del store, reiniciar el servidor (HMR con `?t=`).
 - Puppeteer: `require('C:/Users/roone/AppData/Local/npm-cache/_npx/6f2bfc0a09035133/node_modules/puppeteer-core')`,
   Chrome en `C:/Program Files/Google/Chrome/Application/chrome.exe`. Script de ejemplo del banco:

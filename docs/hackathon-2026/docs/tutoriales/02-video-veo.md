@@ -12,7 +12,7 @@ tomas 1 y 4, que son las más importantes.
 3. Pega el prompt de cada toma. Cada video dura unos 8 s. Si una toma sale mal, cambia solo una cosa del prompt.
 4. **Sin voz ni diálogo** (los videos del juego van solo con subtítulos). Si Veo agrega audio, no importa: Claude lo quita
    y pone la música del juego.
-5. Descarga cada toma y guárdala como `intro-shot1.mp4` … `intro-shot4.mp4` en `C:\PPgame\media_raw\spaceapps\`.
+5. Descarga cada toma y guárdala como `intro-shot1.mp4` … `intro-shot4.mp4` en `C:\Paulet\media_raw\spaceapps\`.
 
 ## Prompts (8 s cada uno, 16:9)
 

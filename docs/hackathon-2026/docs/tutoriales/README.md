@@ -14,6 +14,6 @@ Guías para el dueño. Explicaciones en español; **los prompts van en inglés**
 2. **Nada de logos, banderas, insignias ni identificadores de misión de NASA** (ni de otras agencias o empresas).
 3. **Marca visible "AI-generated"** en toda imagen y video generados. La añade Claude al montar (tutorial 4); no publiques un archivo sin ella.
 4. **Nada de proveedores chinos.**
-5. Guarda todo lo que generes en `C:\PPgame\media_raw\spaceapps\` con el nombre que dice cada tutorial. Claude lo toma de ahí.
-6. Anota en `C:\PPgame\media_raw\spaceapps\prompts.txt` el prompt exacto de cada archivo (la entrega pide declarar el uso de IA).
+5. Guarda todo lo que generes en `C:\Paulet\media_raw\spaceapps\` con el nombre que dice cada tutorial. Claude lo toma de ahí.
+6. Anota en `C:\Paulet\media_raw\spaceapps\prompts.txt` el prompt exacto de cada archivo (la entrega pide declarar el uso de IA).
 7. Antes de gastar créditos pagados (ElevenLabs u otros), Claude dice el costo y espera tu "sí".

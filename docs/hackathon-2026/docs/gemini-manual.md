@@ -15,10 +15,10 @@
    https://github.com/artesanalinteligencia1-dotcom/paulet-spaceapps-2026/blob/main/docs/act-videos.md
 3. Las carpetas **ya están creadas** en la PC:
    ```
-   C:\PPgame\paulet-spaceapps-2026\media\act-videos\main\           ← imágenes aprobadas (van al juego)
-   C:\PPgame\paulet-spaceapps-2026\media\act-videos\main\veo\       ← clips de Veo aprobados
-   C:\PPgame\paulet-spaceapps-2026\media\act-videos\rejected\       ← descartes (por si acaso)
-   C:\PPgame\paulet-spaceapps-2026\media\act-videos\optional-cn\    ← solo modelos chinos; NO se publica
+   C:\Paulet\paulet-spaceapps-2026\media\act-videos\main\           ← imágenes aprobadas (van al juego)
+   C:\Paulet\paulet-spaceapps-2026\media\act-videos\main\veo\       ← clips de Veo aprobados
+   C:\Paulet\paulet-spaceapps-2026\media\act-videos\rejected\       ← descartes (por si acaso)
+   C:\Paulet\paulet-spaceapps-2026\media\act-videos\optional-cn\    ← solo modelos chinos; NO se publica
    ```
 4. **Nombres de archivo:** `ref-characters.jpg` para la hoja de personajes; luego `prologue-01.png`, `act1-04.png`,
    `act3-05.mp4`… (acto y número de plano de las tablas, con dos cifras).

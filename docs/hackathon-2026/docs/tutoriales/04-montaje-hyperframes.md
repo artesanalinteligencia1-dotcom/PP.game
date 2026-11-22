@@ -4,11 +4,11 @@
 con subtítulos, música y la marca "AI-generated". **Costo:** gratis, corre en tu PC.
 
 ## Qué necesito de ti
-- Las tomas en `C:\PPgame\media_raw\spaceapps\` (tutoriales 1 y 2) y que me digas "monta la intro" o "monta el video".
+- Las tomas en `C:\Paulet\media_raw\spaceapps\` (tutoriales 1 y 2) y que me digas "monta la intro" o "monta el video".
 - Nada más: HyperFrames (HTML + GSAP → MP4) lo manejo yo desde Claude Code; si falta instalar algo, te aviso antes.
 
 ## Qué hago
-1. Una composición por video en `C:\PPgame\spaceapps-video\` con escenas, transiciones y subtítulos en inglés
+1. Una composición por video en `C:\Paulet\spaceapps-video\` con escenas, transiciones y subtítulos en inglés
    (y una versión con subtítulos en español).
 2. Música del juego (ya generada en local con ACE-Step, sin créditos). **Sin voz**, salvo que apruebes una voz de
    ElevenLabs después de que te diga el costo.

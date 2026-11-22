@@ -14,7 +14,7 @@ los reduzco a 4096×2048 y los meto al juego. (Necesito tu permiso porque es una
 2. Elige la imagen de un mes (sugiero **julio** o **diciembre**), versión **"with topography and bathymetry"**,
    formato JPG, tamaño **5400 × 2700** (no hace falta la gigante).
 3. Busca **"Black Marble"** (luces nocturnas de la Tierra) y baja la versión global en tamaño parecido.
-4. Guárdalas como `C:\PPgame\media_raw\spaceapps\nasa-blue-marble.jpg` y `nasa-black-marble.jpg`.
+4. Guárdalas como `C:\Paulet\media_raw\spaceapps\nasa-blue-marble.jpg` y `nasa-black-marble.jpg`.
 5. Anota la página exacta de cada una (la URL) en `prompts.txt`: va en las referencias de la entrega.
 
 ## Qué hago yo después

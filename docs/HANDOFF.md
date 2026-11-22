@@ -516,10 +516,10 @@ Al terminar el proyecto: un **texto detallado tipo storytelling** de todos los p
 - El proyecto se continúa desde **otra cuenta de Claude** en la PC del dueño. El historial de chat anterior no existe para
   la sesión nueva: todo el contexto está en `docs/PLAYBOOK.md` (leer primero), `CLOUD_NEXT.md` (cola y siguiente paso),
   `PROGRESS.md` (qué se hizo, numerado), `DECISIONS.md`, `docs/model.md` (cada fórmula) y la memoria de Claude Code en
-  `C:\Users\roone\.claude\projects\C--PPgame\memory\`.
-- Repositorio `artesanalinteligencia1-dotcom/PP.game`, rama `cloud/fase-1`, clon en `C:\PPgame\PP.game`. Producción:
+  `C:\Users\roone\.claude\projects\C--Paulet\memory\`.
+- Repositorio `artesanalinteligencia1-dotcom/PP.game`, rama `cloud/fase-1`, clon en `C:\Paulet\PP.game`. Producción:
   https://paulet-andes-to-orbit.vercel.app/ (rama `main`; se actualiza con un PR desde `cloud/fase-1`).
-- Servidor de desarrollo: configuración `paulet-dev` en `C:\PPgame\.claude\launch.json` (puerto 5173). Pruebas:
+- Servidor de desarrollo: configuración `paulet-dev` en `C:\Paulet\.claude\launch.json` (puerto 5173). Pruebas:
   `npm test` dentro de `PP.game` (229 en verde). El `push` se hace desde la terminal del dueño (PLAYBOOK §3.7).
 
 ### 21.2 Hecho desde el addendum v6

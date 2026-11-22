@@ -57,11 +57,11 @@ Explanations to the owner are in Spanish; code, docs and in-game text in English
 | Asset | Tool | Where |
 |---|---|---|
 | Voiced countdown, farewells, SFX, early music tests, intro illustrations | ElevenLabs (credits, approved) | `src/assets/audio/`, `scripts/audio/prepare_launch_audio.py` |
-| Soundtrack (5 songs, female vocals; 1, 2, 5 in game) | ACE-Step 1.5 local, RTX 5060 Ti | `C:\PPgame\soundtrack`, `SONGS.md` (captions + lyrics) |
-| Intro (style A "Painted cinema", 31 s) | HyperFrames, `C:\PPgame\intro-a\build.mjs` (captions from narration timings) | `src/assets/video/intro.mp4` |
-| Trailer stills | owner, Gemini, from `C:\PPgame\trailer\PROMPTS_GEMINI.md` | `C:\PPgame\trailer\gemini` |
-| Trailer (54 s) | HyperFrames, `C:\PPgame\trailer-final\build.mjs` (one scene per shot, camera moves, titles, satellite) | `C:\PPgame\trailer_paulet.mp4` |
-| Teaser (23 s, second trailer) | HyperFrames `C:\PPgame\trailer-test` (3 Kling clips, style A titles, logo) | `C:\PPgame\teaser_paulet.mp4` (+ 720p) |
+| Soundtrack (5 songs, female vocals; 1, 2, 5 in game) | ACE-Step 1.5 local, RTX 5060 Ti | `C:\Paulet\soundtrack`, `SONGS.md` (captions + lyrics) |
+| Intro (style A "Painted cinema", 31 s) | HyperFrames, `C:\Paulet\intro-a\build.mjs` (captions from narration timings) | `src/assets/video/intro.mp4` |
+| Trailer stills | owner, Gemini, from `C:\Paulet\trailer\PROMPTS_GEMINI.md` | `C:\Paulet\trailer\gemini` |
+| Trailer (54 s) | HyperFrames, `C:\Paulet\trailer-final\build.mjs` (one scene per shot, camera moves, titles, satellite) | `C:\Paulet\trailer_paulet.mp4` |
+| Teaser (23 s, second trailer) | HyperFrames `C:\Paulet\trailer-test` (3 Kling clips, style A titles, logo) | `C:\Paulet\teaser_paulet.mp4` (+ 720p) |
 | Upscaling stills ×4 | Real-ESRGAN (`pienza_studio\tools\realesrgan`) | before camera moves, so zooms stay sharp |
 
 ## 6. Start the definitive game here (recommended order)
@@ -100,6 +100,6 @@ Explanations to the owner are in Spanish; code, docs and in-game text in English
   (free tier, web editor) for the robot's expressions, Figma (connected) for screen design before code.
 
 ## 7. Where things are
-- Repo `artesanalinteligencia1-dotcom/PP.game`, branch `cloud/fase-1`, local clone `C:\PPgame\PP.game`.
-- Media workspaces: `C:\PPgame\{intro-a,intro-styles,trailer,trailer-final,trailer-test,soundtrack,media_raw,tools}`.
+- Repo `artesanalinteligencia1-dotcom/PP.game`, branch `cloud/fase-1`, local clone `C:\Paulet\PP.game`.
+- Media workspaces: `C:\Paulet\{intro-a,intro-styles,trailer,trailer-final,trailer-test,soundtrack,media_raw,tools}`.
 - Owner's video compositor "Goicochea Studio": `G:\Mi unidad\MI\Trabajo\pienza mas\pienza_studio` (has Real-ESRGAN, RIFE, RVM, SAM2…).

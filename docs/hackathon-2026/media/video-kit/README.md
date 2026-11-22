@@ -4,7 +4,7 @@ Shared tools for every HyperFrames video in `media/mission-videos/<id>/` and `me
 
 ```
 python media/video-kit/tools/fetch.py <project> <name.jpg> commons|nasa|url <ref> "<note>"   # real image + assets/SOURCES.md
-C:/PPgame/tools/tts/.venv/Scripts/python.exe media/video-kit/tools/vo.py <project>           # Kokoro voices (one clip per caption)
+C:/Paulet/tools/tts/.venv/Scripts/python.exe media/video-kit/tools/vo.py <project>           # Kokoro voices (one clip per caption)
 python media/video-kit/tools/build.py <project>      # index.html, captions, compare/ending scenes, .en.vtt/.es.vtt, timing.txt
 python media/video-kit/tools/check.py <project>      # npx hyperframes check, short summary
 python media/video-kit/tools/shots.py <project> <out prefix> 3,9.5,17    # contact sheets of snapshots

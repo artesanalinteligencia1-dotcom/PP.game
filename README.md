@@ -1,4 +1,4 @@
-# PP.game — Space Mission Design
+# Paulet — Space Mission Design
 
 Design, launch and fly a space mission under real engineering trade-offs: **mass, power, data, budget, schedule and
 lifetime**. Every choice moves at least two of them, and there is never a single right answer.

@@ -1,4 +1,4 @@
-"""Kokoro voice-over: one clip per caption line. Run with C:/PPgame/tools/tts/.venv/Scripts/python.exe tools/vo.py <project dir>
+"""Kokoro voice-over: one clip per caption line. Run with C:/Paulet/tools/tts/.venv/Scripts/python.exe tools/vo.py <project dir>
 Reads <project>/video.json, writes assets/vo/<id>.wav and assets/vo/durations.json (cached by text+voice)."""
 import sys, json, os, hashlib
 import numpy as np, soundfile as sf

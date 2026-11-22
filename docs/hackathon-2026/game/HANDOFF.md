@@ -14,7 +14,7 @@ estimar el consumo y proponerlo al dueño en entregas.
 ## Dónde está cada cosa
 | Qué | Dónde |
 |---|---|
-| Repo | `artesanalinteligencia1-dotcom/PP.game`, rama de trabajo `cloud/fase-1`, clon local `C:\PPgame\PP.game` |
+| Repo | `artesanalinteligencia1-dotcom/PP.game`, rama de trabajo `cloud/fase-1`, clon local `C:\Paulet\PP.game` |
 | Producción | https://paulet-andes-to-orbit.vercel.app/ (rama `main`; se actualiza con un PR desde `cloud/fase-1`) |
 | Cómo se construyó y reglas aprendidas | `docs/PLAYBOOK.md` (leer primero) |
 | Cola de trabajo y detalle del siguiente paso | `CLOUD_NEXT.md` |
@@ -23,8 +23,8 @@ estimar el consumo y proponerlo al dueño en entregas.
 | Cada fórmula y cada número del juego | `docs/model.md` |
 | Especificación original y sus addenda (en español) | `docs/HANDOFF.md` |
 | Tareas que necesitan al dueño o su PC | `LOCAL_TODO.md` |
-| Medios (intro, tráiler, música) | `C:\PPgame\{intro-a,trailer-final,trailer-test,soundtrack,media_raw,tools}` |
-| Servidor de desarrollo | configuración `paulet-dev` en `C:\PPgame\.claude\launch.json` (puerto 5173) |
+| Medios (intro, tráiler, música) | `C:\Paulet\{intro-a,trailer-final,trailer-test,soundtrack,media_raw,tools}` |
+| Servidor de desarrollo | configuración `paulet-dev` en `C:\Paulet\.claude\launch.json` (puerto 5173) |
 | Pruebas | `npm test` dentro de `PP.game` (229 en verde al 2026-11-14) |
 
 ## Reglas vigentes

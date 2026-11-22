@@ -140,7 +140,7 @@ Sources: NASA MAVEN; NASA (2018) "Mars terraforming not possible using present-d
      costs one preview line). Total under 15,000 characters.
    **CHOSEN (owner, 2026-11-15): Kokoro local voices for everything** — narrator `am_michael`, Goicochea `am_onyx`,
    Chicho `am_puck`, Franchesca `af_heart`, Roberto `am_eric` (k05). Parler sounded like noise: discarded. ElevenLabs not used.
-   Script per video: `C:/PPgame/tools/tts/first_light_vo.py` (one clip per caption, placed at the caption start).
+   Script per video: `C:/Paulet/tools/tts/first_light_vo.py` (one clip per caption, placed at the caption start).
 
    ~~Proposed cast (pending owner approval, listen to the previews in ElevenLabs before choosing):**
    | Role | ElevenLabs library voice | Why |
@@ -151,7 +151,7 @@ Sources: NASA MAVEN; NASA (2018) "Mars terraforming not possible using present-d
    | Franchesca | Lilith – Cinematic Storyteller (Latina accent) | Bright, emotional scientist |
    | Roberto | **Designed voice** (made here from a description: Peruvian man in his late 40s, calm, precise, soft-spoken) | No library voice fits; needs the owner's test line |~~
    **Local voices (free, on the PC, non-Chinese models):** Kokoro-82M (Apache 2.0) and Parler-TTS large v1 (Hugging Face,
-   Apache 2.0), installed in `C:/PPgame/tools/tts\.venv` (reuses ACE-Step's CUDA torch; scripts `kokoro_test.py`,
+   Apache 2.0), installed in `C:/Paulet/tools/tts\.venv` (reuses ACE-Step's CUDA torch; scripts `kokoro_test.py`,
    `parler_test.py`, lines in `lines.py`). Test takes: `media/voices/test/local/` (k = Kokoro, p = Parler). ElevenLabs
    takes: `media/voices/test/`. The owner picks per role.
 3. **Animation**: one HyperFrames project per video in `media/mission-videos/<mission>/`, rendered at 1920×1080, 30 fps,

@@ -23,10 +23,10 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
 - ✅ Soundtrack: `MUSIC` = home "Beneath the Misti", launch "Paulet's Fire", results "Lagrange" (ACE-Step 1.5, −16 LUFS);
   design/flight loops unchanged. Any new screen picks music through `useMusic(stage)` only.
 - ✅ Intro: final 31 s video (720p, 5 MB) without burned-in captions; the game draws them in the player's language. Rebuild from
-  `C:\PPgame\intro-a` (`node build.mjs --no-captions`, then HyperFrames render) and re-encode to 720p if the narration changes.
-- ✅ Trailer: `C:\PPgame\trailer_paulet.mp4` (54 s) from `C:\PPgame\trailer-final` (see its README). The rooftop ending with the animated
+  `C:\Paulet\intro-a` (`node build.mjs --no-captions`, then HyperFrames render) and re-encode to 720p if the narration changes.
+- ✅ Trailer: `C:\Paulet\trailer_paulet.mp4` (54 s) from `C:\Paulet\trailer-final` (see its README). The rooftop ending with the animated
   satellite is approved and stays. Next for the trailer: the user's 7 Gemini first/last-frame clips (v1–v7, 8 s each) replace
-  the stills; prompts in `C:\PPgame\trailer\PROMPTS_GEMINI.md`.
+  the stills; prompts in `C:\Paulet\trailer\PROMPTS_GEMINI.md`.
 - ✅ `docs/PLAYBOOK.md`: read it first when the definitive game starts.
 - ✅ Three.js delivery 2 (2026-11-03, this session): side boosters on heavy/reusable_heavy (drop at MECO−0.4 s), legs + grid fins on
   reusables (legs still stowed), solar panels on the stand-in spacecraft, all six launchers in `LAUNCHERS_3D`. Debug view without
@@ -37,7 +37,7 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
   reusable_heavy → add them to `LAUNCHERS_3D`), legs + grid fins on reusables, the procedural spacecraft in 3D; delivery 3 =
   booster landing on the drone ship, Earth limb, Paulet-1 prologue (`SoundingSequence`) in the same scene, polish.
 
-- Teaser (2nd trailer, 23 s): `C:\PPgame\teaser_paulet.mp4` from `C:\PPgame\trailer-test`. Owner's wishes for the definitive
+- Teaser (2nd trailer, 23 s): `C:\Paulet\teaser_paulet.mp4` from `C:\Paulet\trailer-test`. Owner's wishes for the definitive
   game (language choice, Rocket Engineer pad, Astrobiologist pad): `docs/PLAYBOOK.md` §6b.
 
 - ✅ Three.js delivery 3 (2026-11-05): 3D booster landing inset, Earth's curve, failure freeze, Paulet-1 prologue in 3D
@@ -94,7 +94,7 @@ User's order: 1 soundtrack ✅ · 2 intro_paulet.mp4 in the game ✅ · 3 final 
    current after every task (the owner works from several Claude accounts).
    **Session note (2026-11-13):** the project moved to another Claude account on the owner's PC. Nothing lives in the
    chat history: these files, `docs/PLAYBOOK.md` and the Claude Code memory in
-   `C:\Users\roone\.claude\projects\C--PPgame\memory\` are the whole context.
+   `C:\Users\roone\.claude\projects\C--Paulet\memory\` are the whole context.
 Also wanted (PLAYBOOK §6c): robot guide, one animated video per role, richer animation/design (postprocessing, GSAP, Motion,
 Theatre.js, Rive). Before each big task: quote the expected usage and propose it in deliveries.
 

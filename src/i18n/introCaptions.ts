@@ -1,5 +1,5 @@
 // Captions of the intro video. The video has none burned in: the game draws them, so each language gets its own.
-// Timings are the speech segments of the narration (same table as C:\PPgame\intro-a\build.mjs). The voice stays English.
+// Timings are the speech segments of the narration (same table as C:\Paulet\intro-a\build.mjs). The voice stays English.
 
 /** The narration starts this far into the video. */
 export const INTRO_DELAY_S = 0.5

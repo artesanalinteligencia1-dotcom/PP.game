@@ -65,16 +65,16 @@
   home/launch tests removed. `MUSIC` map only (engine logic untouched); CREDITS.md entry (ACE-Step 1.5 MIT, AI disclosed).
   Tests 83 passing, build passes; browser: all five stage tracks load (200). Not listened to by a human yet.
 
-- Local session (2026-11-02): **final intro in the game.** `src/assets/video/intro.mp4` = `C:\PPgame\intro_paulet.mp4`
-  (style A "Painted cinema", HyperFrames source `C:\PPgame\intro-a`) re-encoded to 720p H.264 CRF 27 (4.4 MB, SSIM 0.965
+- Local session (2026-11-02): **final intro in the game.** `src/assets/video/intro.mp4` = `C:\Paulet\intro_paulet.mp4`
+  (style A "Painted cinema", HyperFrames source `C:\Paulet\intro-a`) re-encoded to 720p H.264 CRF 27 (4.4 MB, SSIM 0.965
   vs the 1080p master). Its captions are burned in, so the `<track>` and `intro.en.vtt` were removed (no double captions).
   Tests 83 passing, build passes; browser: Extras → Watch intro plays 1280×720, 31 s, no text tracks.
 
 - Local session (2026-11-02): **final trailer + manuals.** Trailer (54 s, style A) built in HyperFrames at
-  `C:\PPgame\trailer-final` (`build.mjs`: one scene per shot, camera moves, titles, satellite crossing): the user's 8 Gemini
+  `C:\Paulet\trailer-final` (`build.mjs`: one scene per shot, camera moves, titles, satellite crossing): the user's 8 Gemini
   stills in STORYBOARD order (upscaled ×4 with Real-ESRGAN), music "Beneath the Misti" cut to the song (first cut on the drum
   entry at 10.85 s, bar-aligned jump to the song's real ending), launch SFX, logo "Paulet — Andes to Orbit". Output
-  `C:\PPgame\trailer_paulet.mp4` (1080p, −14 LUFS) + 720p. The rooftop ending (shot2 + animated satellite) was approved by the user and stays;
+  `C:\Paulet\trailer_paulet.mp4` (1080p, −14 LUFS) + 720p. The rooftop ending (shot2 + animated satellite) was approved by the user and stays;
   Gemini first/last-frame clips (v1–v7) will replace the stills later.
   `docs/PLAYBOOK.md` written for the definitive game (stack, hard-won rules, media pipeline, NASA sources, order of work).
   Also outside the repo: a Spanish learning manual for the owner (artifact) and `MEJORAS_DESDE_PAULET.md` for Goicochea Studio.
